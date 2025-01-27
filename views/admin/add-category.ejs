@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Category | VGURIE Admin</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+        }
+        .category-form-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .form-control {
+            background-color: #2a2a2a;
+            border-color: #444;
+            color: #fff;
+        }
+        .form-control:focus {
+            background-color: #333;
+            border-color: #2575fc;
+            box-shadow: 0 0 0 0.25rem rgba(37, 117, 252, 0.25);
+        }
+        .btn-submit {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            border: none;
+            transition: transform 0.3s ease;
+        }
+        .btn-submit:hover {
+            transform: scale(1.05);
+        }
+        .file-label {
+            background-color: #2a2a2a;
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+        .file-label:hover {
+            background-color: #444;
+        }
+        .file-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="category-form-container">
+            <div class="text-center mb-4">
+                <i class="fas fa-tags fa-3x text-primary mb-3"></i>
+                <h2 class="text-white">Add New Category</h2>
+            </div>
+            <form action="/admin/add-category" method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="categoryName" class="form-label">Category Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark text-white"><i class="fas fa-folder"></i></span>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="categoryName" 
+                            name="name" 
+                            placeholder="Enter category name" 
+                            required 
+                        >
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="categoryDescription" class="form-label">Category Description</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark text-white"><i class="fas fa-info-circle"></i></span>
+                        <textarea 
+                            class="form-control" 
+                            id="categoryDescription" 
+                            name="description" 
+                            placeholder="Describe the category" 
+                            rows="4" 
+                            required
+                        ></textarea>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="categoryImages" class="form-label">Category Images</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark text-white"><i class="fas fa-images"></i></span>
+                        <input 
+                            type="file" 
+                            class="form-control file-input" 
+                            id="categoryImages" 
+                            name="categoryImage" 
+                            accept="image/*" 
+                            multiple 
+                            required
+                        >
+                        <label for="categoryImages" class="file-label">Choose Images</label>
+                    </div>
+                </div>
+                
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-submit btn-lg text-white">
+                        <i class="fas fa-plus me-2"></i>Create Category
+                    </button>
+                </div>
+            </form>
+            
+            
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

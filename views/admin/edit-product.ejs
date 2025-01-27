@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.css">
+</head>
+
+<body>
+    <div class="container my-5">
+        <div class="text-center mb-4">
+            <i class="fas fa-cogs fa-3x text-primary mb-3"></i>
+            <h2>Edit Product</h2>
+        </div>
+
+        <!-- Form for editing product -->
+        <form id="productForm" action="/admin/edit-product/<%= product._id %>" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+            
+            <!-- Product Name -->
+            <div class="mb-3">
+                <label for="productName" class="form-label">Product Name</label>
+                <input type="text" class="form-control" id="productName" name="name" value="<%= product.name %>" placeholder="Enter product name" required>
+            </div>
+        
+            <!-- Product Description -->
+            <div class="mb-3">
+                <label for="productDescription" class="form-label">Product Description</label>
+                <textarea class="form-control" id="productDescription" name="description" placeholder="Describe the product" rows="4" required><%= product.description %></textarea>
+            </div>
+        
+            <!-- Product Price -->
+            <div class="mb-3">
+                <label for="productPrice" class="form-label">Product Price</label>
+                <input type="number" class="form-control" id="productPrice" name="price" value="<%= product.price %>" placeholder="Enter price" required>
+            </div>
+        
+            <!-- Category Selection -->
+            <div class="mb-3">
+                <label for="productCategory" class="form-label">Category</label>
+                <select class="form-control" id="productCategory" name="category" required>
+                    <option value="">Select Category</option>
+                    <% categories.forEach(category => { %>
+                        <option value="<%= category._id %>" <%= product.category._id === category._id ? 'selected' : '' %>><%= category.name %></option>
+                    <% }); %>
+                </select>
+            </div>
+
+            <!-- Image Upload Section (Existing Images) -->
+            <div id="imageUploadSection">
+                <label for="productImage" class="form-label">Product Images</label>
+                
+                <% product.images.forEach((image, index) => { %>
+                    <div class="image-preview" id="imagePreview_<%= index %>">
+                        <img src="<%= image %>" alt="Product Image <%= index + 1 %>" class="img-thumbnail" width="100">
+                        <input type="file" class="form-control" name="image[]" accept="image/*" onchange="previewAndCropImage(this, <%= index %>)">
+                        <button type="button" class="btn btn-danger mt-2" onclick="removeImage(<%= index %>)">Remove</button>
+                    </div>
+                <% }); %>
+            </div>
+            <button type="button" id="addImageBtn" class="btn btn-secondary" onclick="addImageInput()">Add Another Image</button>
+        
+            <!-- Image Cropper Section -->
+            <div id="cropperSection" style="display: none;">
+                <h5>Crop the Image</h5>
+                <div>
+                    <img id="imagePreview" src="" alt="Image Preview" style="max-width: 100%;" />
+                </div>
+                <button type="button" class="btn btn-primary mt-2" onclick="cropImage()">Crop Image</button>
+            </div>
+
+            <!-- Size Variations -->
+            <h5 class="mt-4">Size Variations</h5>
+        
+            <div class="mb-3">
+                <label for="sizeS" class="form-label">Size S</label>
+                <input type="number" class="form-control" id="sizeS" name="sizeS" value="<%= product.sizeS %>" placeholder="Enter stock for Size S" oninput="updateTotalStock()" required>
+            </div>
+        
+            <div class="mb-3">
+                <label for="sizeM" class="form-label">Size M</label>
+                <input type="number" class="form-control" id="sizeM" name="sizeM" value="<%= product.sizeM %>" placeholder="Enter stock for Size M" oninput="updateTotalStock()" required>
+            </div>
+        
+            <div class="mb-3">
+                <label for="sizeL" class="form-label">Size L</label>
+                <input type="number" class="form-control" id="sizeL" name="sizeL" value="<%= product.sizeL %>" placeholder="Enter stock for Size L" oninput="updateTotalStock()" required>
+            </div>
+        
+            <div class="mb-3">
+                <label for="sizeXL" class="form-label">Size XL</label>
+                <input type="number" class="form-control" id="sizeXL" name="sizeXL" value="<%= product.sizeXL %>" placeholder="Enter stock for Size XL" oninput="updateTotalStock()" required>
+            </div>
+        
+            <div class="mb-3">
+                <label for="sizeXXL" class="form-label">Size XXL</label>
+                <input type="number" class="form-control" id="sizeXXL" name="sizeXXL" value="<%= product.sizeXXL %>" placeholder="Enter stock for Size XXL" oninput="updateTotalStock()" required>
+            </div>
+        
+            <!-- Total Stock -->
+            <div class="mb-3">
+                <label for="totalStock" class="form-label">Total Stock</label>
+                <input type="number" class="form-control" id="totalStock" name="totalStock" value="<%= product.totalStock %>" placeholder="Total Stock" readonly>
+            </div>
+        
+            <!-- Submit Button -->
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        
+        </form>
+        
+        <input type="hidden" id="base64Image" name="imageBase64">
+        
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" style="display: none;">Cropping image...</div>
+        
+        <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
+        
+        <script>
+            let cropper;
+
+            function addImageInput() {
+                const container = document.getElementById('imageUploadSection');
+                const newInputDiv = document.createElement('div');
+                newInputDiv.classList.add('image-preview');
+                
+                const newInput = document.createElement('input');
+                newInput.type = 'file';
+                newInput.className = 'form-control';
+                newInput.name = 'image[]';
+                newInput.accept = 'image/*';
+                newInput.addEventListener('change', function() {
+                    previewAndCropImage(this);
+                });
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.classList.add('btn', 'btn-danger', 'mt-2');
+                removeBtn.innerText = 'Remove';
+                removeBtn.onclick = function() {
+                    removeImage(removeBtn);
+                };
+
+                newInputDiv.appendChild(newInput);
+                newInputDiv.appendChild(removeBtn);
+                container.appendChild(newInputDiv);
+            }
+
+            function removeImage(index) {
+                const container = document.getElementById('imageUploadSection');
+                const imageDiv = document.getElementById('imagePreview_' + index);
+                container.removeChild(imageDiv);
+            }
+
+            function previewAndCropImage(inputElement) {
+                if (inputElement.files.length === 0) {
+                    alert('Please select an image.');
+                    return;
+                }
+
+                const file = inputElement.files[0];
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const image = document.getElementById('imagePreview');
+                    image.src = e.target.result;
+                    document.getElementById('cropperSection').style.display = 'block';
+
+                    if (cropper) {
+                        cropper.destroy(); // Reset the cropper instance
+                    }
+
+                    cropper = new Cropper(image, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        minCropBoxWidth: 100,
+                        minCropBoxHeight: 100
+                    });
+                };
+                reader.onerror = function () {
+                    alert('Error loading the image. Please try again.');
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function cropImage() {
+                if (!cropper) {
+                    alert('Please select and crop an image first.');
+                    return;
+                }
+
+                document.getElementById('loadingIndicator').style.display = 'block';
+                setTimeout(() => {
+                    try {
+                        const croppedCanvas = cropper.getCroppedCanvas();
+                        if (!croppedCanvas) {
+                            throw new Error('Failed to crop image. Please try again.');
+                        }
+                        const croppedImage = croppedCanvas.toDataURL('image/jpeg');
+                        document.getElementById('base64Image').value = croppedImage;
+                        document.getElementById('cropperSection').style.display = 'none';
+                        document.getElementById('loadingIndicator').style.display = 'none';
+                    } catch (error) {
+                        alert(error.message);
+                        document.getElementById('loadingIndicator').style.display = 'none';
+                    }
+                }, 500); // Simulate loading time
+            }
+
+            function validateForm() {
+                const base64Image = document.getElementById('base64Image').value;
+                if (base64Image === '') {
+                    alert('Please crop and upload an image.');
+                    return false;
+                }
+                return true;
+            }
+            
+            function updateTotalStock() {
+                const sizeS = parseInt(document.getElementById('sizeS').value) || 0;
+                const sizeM = parseInt(document.getElementById('sizeM').value) || 0;
+                const sizeL = parseInt(document.getElementById('sizeL').value) || 0;
+                const sizeXL = parseInt(document.getElementById('sizeXL').value) || 0;
+                const sizeXXL = parseInt(document.getElementById('sizeXXL').value) || 0;
+
+                const totalStock = sizeS + sizeM + sizeL + sizeXL + sizeXXL;
+                document.getElementById('totalStock').value = totalStock;
+            }
+        </script>
+
+        <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    </div>
+</body>
+
+</html>

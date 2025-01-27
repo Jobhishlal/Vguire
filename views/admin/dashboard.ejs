@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VGURIE Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2 style="color: white;">VGURIE</h2>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active">
+                        <a href="#"><i class="fas fa-th-large"></i> Dashboard</a>
+                    </li>
+                    <li>
+                        <a href="/admin/product"><i class="fas fa-box"></i> Product</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-shopping-cart"></i> Orders</a>
+                    </li>
+                    <li>
+                        <a href="/admin/usersmanagement"><i class="fas fa-users"></i> Users</a>
+                    </li>
+                    <li>
+                        <a href="/admin/categories"><i class="fas fa-tags"></i> Categories</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-gift"></i> Offers</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-ticket-alt"></i> Coupon</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-image"></i> Banner</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                    </li>
+                    <li>
+                        <a href="#" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h1>Dashboard</h1>
+                <div class="user-profile">
+                    <img src="/image/Screenshot 2025-01-02 185508.png" alt="Profile" class="profile-img">
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-container">
+                <div class="stats-card purple">
+                    <div class="icon"><i class="fas fa-users"></i></div>
+                    <div class="stats-info">
+                        <span class="label">Total users</span>
+                        <h3>29</h3>
+                    </div>
+                </div>
+
+                <div class="stats-card dark-purple">
+                    <div class="icon"><i class="fas fa-shopping-bag"></i></div>
+                    <div class="stats-info">
+                        <span class="label">Items sold</span>
+                        <h3>34</h3>
+                    </div>
+                </div>
+
+                <div class="stats-card blue">
+                    <div class="icon"><i class="fas fa-rupee-sign"></i></div>
+                    <div class="stats-info">
+                        <span class="label">Total Sales</span>
+                        <h3>₹15889</h3>
+                    </div>
+                </div>
+
+                <div class="stats-card pink">
+                    <div class="icon"><i class="fas fa-clock"></i></div>
+                    <div class="stats-info">
+                        <span class="label">Pending Orders</span>
+                        <h3>12</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date Filter -->
+            <div class="date-filter">
+                <span>Sorted To Date</span>
+                <div class="date-inputs">
+                    <label>From</label>
+                    <input type="date" class="date-input">
+                    <label>To</label>
+                    <input type="date" class="date-input">
+                </div>
+                <button class="download-btn">
+                    Download report
+                    <span class="pdf-tag">PDF <i class="fas fa-download"></i></span>
+                </button>
+            </div>
+
+            <!-- Products Table
+            <div class="products-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>PRODUCT IMAGE</th>
+                            <th>PRODUCT NAME</th>
+                            <th>CATEGORY</th>
+                            <th>AMOUNT</th>
+                            <th>REVENUE</th>
+                            <th>QTY SOLD</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#11225</td>
+                            <td><img src="/api/placeholder/40/40" alt="Jersey"></td>
+                            <td>Jersey</td>
+                            <td>Women</td>
+                            <td>$120</td>
+                            <td>$178.45</td>
+                            <td>5</td>
+                        </tr>
+                        <tr>
+                            <td>#11226</td>
+                            <td><img src="/api/placeholder/40/40" alt="Jersey"></td>
+                            <td>Jersey</td>
+                            <td>Men</td>
+                            <td>$85.35</td>
+                            <td>$309.95</td>
+                            <td>5</td>
+                        </tr>
+                        <tr>
+                            <td>#11227</td>
+                            <td><img src="/api/placeholder/40/40" alt="Hand Gripper"></td>
+                            <td>Hand Gripper</td>
+                            <td>Accessories</td>
+                            <td>$25.25</td>
+                            <td>$863.45</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>#11228</td>
+                            <td><img src="/api/placeholder/40/40" alt="Boots"></td>
+                            <td>Boots</td>
+                            <td>Accessories</td>
+                            <td>$100</td>
+                            <td>$127.45</td>
+                            <td>2</td>
+                        </tr>
+                        <tr>
+                            <td>#11229</td>
+                            <td><img src="/api/placeholder/40/40" alt="Badminton"></td>
+                            <td>Badminton</td>
+                            <td>Accessories</td>
+                            <td>$80</td>
+                            <td>$86.00</td>
+                            <td>2</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="table-footer">
+                    <span>SHOWING 1 OF 10</span>
+                    <div class="pagination">
+                        <button><i class="fas fa-chevron-left"></i></button>
+                        <button class="active">1</button>
+                        <button>2</button>
+                        <button>3</button>
+                        <button>...</button>
+                        <button>8</button>
+                        <button>9</button>
+                        <button><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div> -->
+        </main>
+    </div>
+</body>
+</html>

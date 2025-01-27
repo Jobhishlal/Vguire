@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Product</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.css">
+    
+</head>
+
+<body>
+    <div class="container my-5">
+        <div class="text-center mb-4">
+            <i class="fas fa-cogs fa-3x text-primary mb-3"></i>
+            <h2>Add New Product</h2>
+        </div>
+
+        <!-- Form for adding a new product -->
+        <form id="productForm" action="/admin/add-product" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+
+            <!-- Product Name -->
+            <div class="mb-3">
+                <label for="productName" class="form-label">Product Name</label>
+                <input type="text" class="form-control" id="productName" name="name" placeholder="Enter product name" required>
+            </div>
+        
+            <!-- Product Description -->
+            <div class="mb-3">
+                <label for="productDescription" class="form-label">Product Description</label>
+                <textarea class="form-control" id="productDescription" name="description" placeholder="Describe the product" rows="4" required></textarea>
+            </div>
+        
+            <!-- Product Price -->
+            <div class="mb-3">
+                <label for="productPrice" class="form-label">Product Price</label>
+                <input type="number" class="form-control" id="productPrice" name="price" placeholder="Enter price" required>
+            </div>
+        
+            <!-- Category Selection -->
+            <div class="mb-3">
+                <label for="productCategory" class="form-label">Category</label>
+                <select class="form-control" id="productCategory" name="category" required>
+                    <option value="">Select Category</option>
+                    <% categories.forEach(category => { %>
+                        <option value="<%= category._id %>"><%= category.name %></option>
+                    <% }); %>
+                </select>
+            </div>
+
+            <!-- Image Upload Section -->
+            <div id="imageUploadSection">
+                <label for="productImage" class="form-label">Product Image</label>
+                <input type="file" class="form-control" name="image[]" accept="image/*" onchange="previewAndCropImage(this)">
+            </div>
+            <button type="button" id="addImageBtn" onclick="addImageInput()">Add Another Image</button>
+        
+            <!-- Image Cropper Section -->
+            <div id="cropperSection" style="display: none;">
+                <h5>Crop the Image</h5>
+                <div>
+                    <img id="imagePreview" src="" alt="Image Preview" style="max-width: 100%;" />
+                </div>
+                <button type="button" class="btn btn-primary mt-2" onclick="cropImage()">Crop Image</button>
+            </div>
+
+            <!-- Size Variations -->
+            <h5 class="mt-4">Size Variations</h5>
+        
+            <div class="mb-3">
+                <label for="sizeS" class="form-label">Size S</label>
+                <input type="number" class="form-control" id="sizeS" name="sizeS" placeholder="Enter stock for Size S" oninput="updateTotalStock()" required>
+            </div>
+        
+            <div class="mb-3">
+                <label for="sizeM" class="form-label">Size M</label>
+                <input type="number" class="form-control" id="sizeM" name="sizeM" placeholder="Enter stock for Size M" oninput="updateTotalStock()" required>
+            </div>
+        
+            <div class="mb-3">
+                <label for="sizeL" class="form-label">Size L</label>
+                <input type="number" class="form-control" id="sizeL" name="sizeL" placeholder="Enter stock for Size L" oninput="updateTotalStock()" required>
+            </div>
+        
+            <div class="mb-3">
+                <label for="sizeXL" class="form-label">Size XL</label>
+                <input type="number" class="form-control" id="sizeXL" name="sizeXL" placeholder="Enter stock for Size XL" oninput="updateTotalStock()" required>
+            </div>
+        
+            <div class="mb-3">
+                <label for="sizeXXL" class="form-label">Size XXL</label>
+                <input type="number" class="form-control" id="sizeXXL" name="sizeXXL" placeholder="Enter stock for Size XXL" oninput="updateTotalStock()" required>
+            </div>
+        
+            <!-- Total Stock -->
+            <div class="mb-3">
+                <label for="totalStock" class="form-label">Total Stock</label>
+                <input type="number" class="form-control" id="totalStock" name="totalStock" placeholder="Total Stock" readonly>
+            </div>
+        
+            <!-- Submit Button -->
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary">Add Product</button>
+            </div>
+        
+        </form>
+        
+        <input type="hidden" id="base64Image" name="imageBase64">
+        
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" style="display: none;">Cropping image...</div>
+        
+        <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
+        
+        <script>
+            let cropper;
+        
+            function addImageInput() {
+                const container = document.getElementById('imageUploadSection');
+                const newInput = document.createElement('input');
+                newInput.type = 'file';
+                newInput.className = 'form-control';
+                newInput.name = 'image[]';  
+                newInput.accept = 'image/*';  
+        
+                newInput.addEventListener('change', function() {
+                    previewAndCropImage(this);
+                });
+        
+                container.appendChild(newInput);
+            }
+        
+            function previewAndCropImage(inputElement) {
+                if (inputElement.files.length === 0) {
+                    alert('Please select an image.');
+                    return;
+                }
+        
+                const file = inputElement.files[0];
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const image = document.getElementById('imagePreview');
+                    image.src = e.target.result;
+                    document.getElementById('cropperSection').style.display = 'block';
+        
+                    if (cropper) {
+                        cropper.destroy(); // Reset the cropper instance
+                    }
+        
+                    cropper = new Cropper(image, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        minCropBoxWidth: 100,
+                        minCropBoxHeight: 100
+                    });
+                };
+                reader.onerror = function () {
+                    alert('Error loading the image. Please try again.');
+                };
+                reader.readAsDataURL(file);
+            }
+        
+            function cropImage() {
+                if (!cropper) {
+                    alert('Please select and crop an image first.');
+                    return;
+                }
+        
+                document.getElementById('loadingIndicator').style.display = 'block';
+                setTimeout(() => {
+                    try {
+                        const croppedCanvas = cropper.getCroppedCanvas();
+                        if (!croppedCanvas) {
+                            throw new Error('Failed to crop image. Please try again.');
+                        }
+                        const croppedImage = croppedCanvas.toDataURL('image/jpeg');
+                        document.getElementById('base64Image').value = croppedImage;
+                        document.getElementById('cropperSection').style.display = 'none';
+                        document.getElementById('loadingIndicator').style.display = 'none';
+                    } catch (error) {
+                        alert(error.message);
+                        document.getElementById('loadingIndicator').style.display = 'none';
+                    }
+                }, 500);
+            }
+        
+            function validateForm() {
+                const base64Image = document.getElementById('base64Image').value;
+                if (!base64Image) {
+                    alert('Please crop and save the image before submitting.');
+                    return false;
+                }
+                return true;
+            }
+        
+            function updateTotalStock() {
+                let total = 0;
+                ['sizeS', 'sizeM', 'sizeL', 'sizeXL', 'sizeXXL'].forEach(size => {
+                    const value = document.getElementById(size).value;
+                    total += parseInt(value) || 0;
+                });
+                document.getElementById('totalStock').value = total;
+            }
+        
+            document.querySelectorAll('input[type="number"]').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    if (e.target.value < 0) {
+                        e.target.value = 0;
+                        alert('Stock value cannot be negative.');
+                    }
+                });
+            });
+        </script>
+        
+        
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

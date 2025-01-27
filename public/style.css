@@ -1,0 +1,513 @@
+
+body {
+    background-color: #f5f7fa;
+    font-family: Arial, sans-serif;
+}
+.signup-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+.signup-form-container { 
+    display: flex;
+    background-image: url('/image/basketball-equipment.jpg'); 
+    background-repeat: no-repeat;
+    background-size: cover; 
+    background-position: center; 
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    max-width: 900px; width: 100%; 
+    overflow: hidden; 
+}
+
+.signup-form, .logo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+.signup-form {
+    border-right: 1px solid #e0e0e0;
+}
+.signup-form h2 {
+    margin-bottom: 20px;
+    color: #333;
+    font-weight: bold;
+}
+.form-group label {
+    font-weight: bold;
+    color: white;
+}
+.form-group small {
+    color: #ff0000;
+}
+.form-control {
+    width: 320px;
+    height: 40px;
+    font-size: 16px;
+    margin-bottom: 15px; /* Spacing between inputs */
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+}
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+}
+.btn {
+    width: 100%;
+    height: 45px;
+    font-size: 16px;
+    border-radius: 5px;
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #ffffff;
+}
+.btn:hover {
+    background-color: #0056b3; /* Hover effect */
+    border-color: #0056b3;
+}
+.logo img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 190px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    position: relative;
+    top: -170px;
+    left: 10px;
+}
+.logo p {
+    margin-top: 10px;
+    text-align: center;
+    color: #333;
+    font-weight: bold;
+}
+.google{
+    width: 130px;
+    position: relative;
+    left: 128px;
+    top: -53px;
+    background-color: white;
+}
+
+/* login page */
+body {
+    background-color: #f5f7fa;
+    font-family: Arial, sans-serif;
+}
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+.login-form-container {
+    display: flex;
+    background-image: url(image/basketball-equipment.jpg);
+    background-repeat: no-repeat;
+    background-size: cover; 
+    background-position: center; 
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    max-width: 900px;
+    width: 100%;
+    overflow: hidden;
+}
+.login-form, .logo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+.login-form {
+    border-right: 1px solid #e0e0e0;
+}
+.login-form h2 {
+    margin-bottom: 20px;
+    color: white;
+    font-weight: bold;
+}
+.form-group label {
+    font-weight: bold;
+    color: white;
+}
+.form-group small {
+    color: #ff0000;
+}
+.form-control {
+    width: 320px;
+    height: 40px;
+    font-size: 16px;
+    margin-bottom: 15px; /* Spacing between inputs */
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+}
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+}
+.btn {
+    width: 100%;
+    height: 45px;
+    font-size: 16px;
+    border-radius: 5px;
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #ffffff;
+    
+}
+.google{
+    position: relative;
+    top: -46px;
+    left: 93px;
+    background-color: #007bff;
+    border-radius: 10px;
+    border-color: #0056b3;
+}
+.google:hover{
+    background-color: #0056b3; /* Hover effect */
+    border-color: #0056b3;
+}
+.btn:hover {
+    background-color: #0056b3; /* Hover effect */
+    border-color: #0056b3;
+}
+.logo img {
+    max-width: 80%;
+    height: auto;
+    border-radius: 130px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    position: relative;
+    top: -94px;
+    left: -13px;
+    width: 270px;
+}
+.login{
+    width: 100px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* dashboard */
+
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #1a1d24;
+    color: #fff;
+}
+
+/* Dashboard Layout */
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 250px;
+    background: linear-gradient(180deg, #010612 0%, #224abe 100%);
+    color: white;
+    padding: 20px;
+    position: fixed;
+    height: 100vh;
+    
+   
+}
+
+.logo h2 {
+    color: #000;
+    margin-bottom: 30px;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+}
+
+.sidebar-nav li {
+    margin-bottom: 5px;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    color: #666;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.sidebar-nav a i {
+    margin-right: 10px;
+    width: 20px;
+}
+
+.sidebar-nav a:hover,
+.sidebar-nav li.active a {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.sidebar-nav .logout {
+    color: #ff4d4f;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    margin-left: 250px;
+    padding: 20px 30px;
+    background-color: #1a1d24;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.profile-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+/* Stats Cards */
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stats-card {
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.stats-card .icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-size: 20px;
+}
+
+.stats-card.purple {
+    background-color: #6b21a8;
+}
+
+.stats-card.dark-purple {
+    background-color: #4c1d95;
+}
+
+.stats-card.blue {
+    background-color: #1e40af;
+}
+
+.stats-card.pink {
+    background-color: #9d174d;
+}
+
+.stats-info .label {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.stats-info h3 {
+    font-size: 24px;
+    margin-top: 5px;
+}
+
+/* Date Filter */
+.date-filter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.date-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-input {
+    background-color: #2d3748;
+    border: 1px solid #4a5568;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 5px;
+}
+
+.download-btn {
+    background-color: transparent;
+    border: none;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.pdf-tag {
+    background-color: #2d3748;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* Products Table */
+.products-table {
+    background-color: #1e1e1e;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #2d3748;
+}
+
+th {
+    background-color: #1a1a1a;
+    font-weight: 600;
+    color: #a0aec0;
+}
+
+td img {
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+/* Table Footer */
+.table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: #1a1a1a;
+}
+
+.pagination {
+    display: flex;
+    gap: 5px;
+}
+
+.pagination button {
+    background-color: transparent;
+    border: 1px solid #2d3748;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.pagination button.active {
+    background-color: #6b21a8;
+    border-color: #6b21a8;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .stats-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .stats-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .date-filter {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .products-table {
+        overflow-x: auto;
+    }
+}
+
+
+
+.stats-card.purple1 {
+    background-color: #6b21a8;
+    position:absolute;
+    left: 1000px;
+    
+}
+
+
+
+
+
+
+

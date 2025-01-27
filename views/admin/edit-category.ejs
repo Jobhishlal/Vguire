@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Category | VGURIE Admin</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+        }
+        .category-form-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .form-control {
+            background-color: #2a2a2a;
+            border-color: #444;
+            color: #fff;
+        }
+        .form-control:focus {
+            background-color: #333;
+            border-color: #2575fc;
+            box-shadow: 0 0 0 0.25rem rgba(37, 117, 252, 0.25);
+        }
+        .btn-submit {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            border: none;
+            transition: transform 0.3s ease;
+        }
+        .btn-submit:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="category-form-container">
+            <div class="text-center mb-4">
+                <i class="fas fa-edit fa-3x text-primary mb-3"></i>
+                <h2 class="text-white">Edit Category</h2>
+            </div>
+            <form action="/admin/edit-category/<%= category._id %>" method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="categoryName" class="form-label">Category Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark text-white"><i class="fas fa-folder"></i></span>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="categoryName" 
+                            name="name" 
+                            value="<%= category.name %>" 
+                            required 
+                        >
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="categoryDescription" class="form-label">Category Description</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark text-white"><i class="fas fa-info-circle"></i></span>
+                        <textarea 
+                            class="form-control" 
+                            id="categoryDescription" 
+                            name="description" 
+                            rows="4" 
+                            required
+                        ><%= category.description %></textarea>
+                    </div>
+                </div>
+            
+                <!-- Display Current Image -->
+                <div class="mb-4">
+                    <label class="form-label">Current Image</label>
+                    <div class="text-center mb-3">
+                        <img 
+                            src="/uploads/categories/<%= category.image %>" 
+                            alt="Category Image" 
+                            class="img-fluid rounded shadow" 
+                            style="max-height: 200px; object-fit: cover;"
+                        >
+                    </div>
+                    <input type="hidden" name="oldImage" value="<%= category.image %>">
+                </div>
+            
+                <!-- Upload New Image -->
+                <div class="mb-4">
+                    <label for="categoryImage" class="form-label">Upload New Image</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark text-white"><i class="fas fa-image"></i></span>
+                        <input  type="file"  class="form-control"  id="categoryImage" name="categoryImage" accept="image/*" >
+                    </div>
+                    <small class="text-muted">Leave blank if you don't want to change the image.</small>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-submit btn-lg text-white mb-2">
+                        <i class="fas fa-save me-2"></i>Update Category
+                    </button>
+                    <a href="/admin/categories" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </a>
+                </div>
+            </form>
+            
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
