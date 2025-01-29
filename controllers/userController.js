@@ -4,6 +4,10 @@ import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import User from '../models/userSchema.js'; 
 import { error } from 'console';
+import exp from 'constants';
+import Category from '../models/category.js';
+import Product from '../models/products.js'; 
+
 
 const generateOtp = () => {
     return crypto.randomInt(100000, 999999); 
@@ -187,7 +191,7 @@ export const loginUser = async (req, res) => {
         }
 
         req.session.user = user; 
-        res.render('user/home',{user:req.session.user})
+        res.redirect('/user/home')
     } catch (err) {
         console.error(err);
         res.status(500).send('Server error');
@@ -402,9 +406,103 @@ export const changePassword = async (req, res) => {
 
 
 
-
 //dont change top code//
 
+export const homepage = async (req, res) => {
+    try {
+       
+       const categories = await Category.find(); 
+       const product=await Product.find()
+       const createdAt= await Product.find().sort({createdAt:-1}).limit(1)
+       console.log(categories); 
+       console.log('hiiii');
+       
+ 
+       if (!categories || categories.length === 0) {
+          console.log("No categories found.");
+          return res.status(404).send("No categories found");
+       }
+       if(!product||product.length===0){
+        console.log("No product  found");
+        return res.status(505).send("No Products found")
+        
+       }
+ 
+         
+ 
+    
+       res.render('user/home', {
+          user: req.user,  
+          categories: categories ,
+          product:product,
+          date:createdAt
 
+       });
+    } catch (error) {
+       
+       console.error("Error fetching categories:", error);
+       return res.status(500).send("Internal server error");
+    }
+ };
+ 
+ export const shoppage =async(req,res)=>{
+    try {
+        console.log('enter');
+        
+        const category=req.query.category
+        console.log(category);
+        
+        let allProducts
+        if(category){
+            allProducts=await Product.aggregate([
+                {
+                    $lookup:{
+                        from:'categories',
+                        localField:'category',
+                        foreignField:'_id',
+                        as:'resultCategory'
+                    }
+                },
+                {
+                    $match:{
+                        'resultCategory.name':{
+                            $regex:`^${category}`, 
+                            $options:'i'
+                        }
+                    }
+                }
+            ])
+        }else{
+            allProducts=await Product.find()
+        }
+        
+        
 
+        res.render('user/shop',{
+            allProducts:allProducts
+        })
+        
+    } catch (error) {
+        console.error('error:"product is not working',error);
+        return res.status(500).send("its not working")
+        
+    }
+ }
 
+export const productview = async (req, res) => {
+    try {
+        const productId = req.params.id;  
+        const product = await Product.findById(productId);  
+        console.log(product);
+        
+
+        if (!product) {
+            return res.status(404).send("Product not found");
+        }
+
+        res.render('user/productview', { product: product });
+    } catch (error) {
+        console.error("Error fetching product:", error);
+        return res.status(500).send("Internal server error");
+    }
+};

@@ -18,6 +18,11 @@ import {
     changePassword,
     resendOtp,
     
+    shoppage,
+    homepage,
+    productview
+    
+    
 } from '../controllers/userController.js';
 
 const router = express.Router();
@@ -49,9 +54,9 @@ router.post('/resend-otp',resendOtp)
 
 
 
-router.get('/home', isAuthenticated, (req, res) => {
-    res.render('home', { user: req.user });
-});
+router.get('/home',homepage)
+router.get('/shop',shoppage)
+router.get('/productview/:id',productview)
 
 //google
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));

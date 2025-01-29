@@ -6,9 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add New Product</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.css">
-    
 </head>
 
 <body>
@@ -150,11 +148,21 @@
                     }
         
                     cropper = new Cropper(image, {
-                        aspectRatio: 1,
-                        viewMode: 1,
-                        minCropBoxWidth: 100,
-                        minCropBoxHeight: 100
-                    });
+         aspectRatio: 0, 
+  viewMode: 0,    
+  minCropBoxWidth: 100,
+  minCropBoxHeight: 100,
+  autoCropArea: 1, 
+  ready() {
+    this.cropper.setCropBoxData({
+      left: 0,
+      top: 0,
+      width: this.cropper.getImageData().naturalWidth,
+      height: this.cropper.getImageData().naturalHeight,
+    });
+  },
+});
+
                 };
                 reader.onerror = function () {
                     alert('Error loading the image. Please try again.');

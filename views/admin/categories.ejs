@@ -6,14 +6,17 @@
     <title>VGURIE - Full Category Management</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-    <link href="/admin/styles.css" rel="stylesheet">
     <style>
         :root {
             --dark-bg: #121212;
             --card-bg: #1e1e1e;
             --accent-color: #2575fc;
             --primary-color: #4e73df;
+            --success-gradient: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            --danger-gradient: linear-gradient(135deg, #dc3545 0%, #f86384 100%);
         }
+        
+        /* Previous styles remain the same until the category-card */
         body {
             background-color: var(--dark-bg);
             font-family: 'Arial', sans-serif;
@@ -65,147 +68,229 @@
             padding: 2.5rem 3rem;
             background-color: #181818;
         }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-        .header h1 {
-            font-size: 2rem;
-            color: white;
-            margin-bottom: 0;
-        }
-        .btn-add-category {
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-        .btn-add-category:hover {
-            transform: translateY(-3px);
-        }
+
+        /* Enhanced category card styling */
         .category-card {
             background-color: var(--card-bg);
-            border-radius: 10px;
-            padding: 1.5rem;
+            border-radius: 15px;
+            padding: 1.8rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
+
         .category-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
         }
+
+        .category-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
         .category-actions a {
-            padding: 0.6rem 1rem;
-            border-radius: 0.5rem;
-            margin-right: 1rem;
+            padding: 0.6rem;
+            border-radius: 8px;
             transition: all 0.3s ease;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+
         .category-actions a:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Enhanced list/unlist button styling */
+        .status-btn {
+            width: 100%;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-list {
+            background: var(--success-gradient);
+            color: white;
+        }
+
+        .btn-unlist {
+            background: var(--danger-gradient);
+            color: white;
+        }
+
+        .status-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-btn i {
+            font-size: 1.1rem;
+        }
+
+        /* Enhanced category details */
+        .category-details {
+            margin-top: 1.5rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .category-details p {
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .category-details i {
+            color: var(--accent-color);
+        }
+
+        /* Image container enhancement */
+        .category-image {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .category-image img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .category-image:hover img {
             transform: scale(1.05);
         }
-        .btn-group form button {
-            width: 100%;
-            border-radius: 0.5rem;
-            padding: 0.5rem;
-            margin-top: 0.5rem;
-            font-weight: 600;
-        }
-        .category-details {
-            margin-top: 1.2rem;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 1.2rem;
-        }
+        .btn-unlist {
+    background: var(--danger-gradient);
+    color: white;
+}
+
+/* For listed categories (green background) */
+.btn-list {
+    background: var(--success-gradient);
+    color: white;
+}
     </style>
 </head>
 <body>
     <div class="dashboard-container">
+        <!-- Sidebar -->
         <aside class="sidebar">
             <div class="logo">
-                <h2>VGURIE</h2>
+                <h2 style="color: white;">VGURIE</h2>
             </div>
+            
             <nav class="sidebar-nav">
                 <ul>
-                    <li><a href="/admin/dashboard"><i class="fas fa-th-large me-2"></i> Dashboard</a></li>
-                    <li><a href="/admin/product"><i class="fas fa-box me-2"></i> Product</a></li>
-                    <li><a href="#"><i class="fas fa-shopping-cart me-2"></i> Orders</a></li>
-                    <li><a href="/admin/usersmanagement"><i class="fas fa-users me-2"></i> Users</a></li>
-                    <li><a href="/admin/categories"><i class="fas fa-tags me-2"></i> Categories</a></li>
-                    <li><a href="#"><i class="fas fa-gift me-2"></i> Offers</a></li>
-                    <li><a href="#"><i class="fas fa-ticket-alt me-2"></i> Coupon</a></li>
-                    <li><a href="#"><i class="fas fa-image me-2"></i> Banner</a></li>
-                    <li><a href="#"><i class="fas fa-cog me-2"></i> Settings</a></li>
-                    <li><a href="#" class="logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                    <li class="">
+                        <a href="/admin/dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
+                    </li>
+                    <li>
+                        <a href="/admin/product"><i class="fas fa-box"></i> Product</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-shopping-cart"></i> Orders</a>
+                    </li>
+                    <li>
+                        <a href="/admin/usersmanagement"><i class="fas fa-users"></i> Users</a>
+                    </li>
+                    <li>
+                        <a href="/admin/categories"><i class="fas fa-tags"></i> Categories</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-gift"></i> Offers</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-ticket-alt"></i> Coupon</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-image"></i> Banner</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                    </li>
+                    <li>
+                        <a href="#" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </li>
                 </ul>
             </nav>
         </aside>
-
         <main class="main-content">
-            <div class="header">
+            <div class="header d-flex justify-content-between align-items-center">
                 <h1>Category Management</h1>
-                <a href="/admin/add-category" class="btn-add-category">
+                <a href="/admin/add-category" class="btn btn-primary d-flex align-items-center">
                     <i class="fas fa-plus me-2"></i> Add Category
                 </a>
             </div>
+            
         
             <div class="row">
                 <% categories.forEach(category => { %>
                 <div class="col-md-4 mb-4">
                     <div class="category-card">
-                        <div class="d-flex justify-content-between">
-                            <h4><%= category.name %></h4>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0"><%= category.name %></h4>
                             <div class="category-actions">
-                                <a href="/view-category/<%= category.id %>" class="btn btn-info text-white">
+                                <!-- <a href="/view-category/<%= category.id %>" class="btn btn-info text-white">
                                     <i class="fas fa-eye"></i>
-                                </a>
+                                </a> -->
                                 <a href="/admin/edit-category/<%= category.id %>" class="btn btn-warning text-white">
                                     <i class="fas fa-pencil-alt"></i>
                                 </a>
-                                <a href="/admin/delete-category/<%= category.id %>" class="btn btn-danger text-white">
+                                <!-- <a href="/admin/delete-category/<%= category.id %>" class="btn btn-danger text-white">
                                     <i class="fas fa-trash-alt"></i>
-                                </a>
+                                </a> -->
                             </div>
                         </div>
         
-                        <!-- Category Image -->
-                        <div class="text-center my-3">
-                            <img src="/uploads/categories/<%= category.image %>" alt="<%= category.name %>" class="img-fluid rounded" style="max-height: 200px; object-fit: cover;">
+                        <div class="category-image">
+                            <img src="/uploads/categories/<%= category.image %>" alt="<%= category.name %>" class="img-fluid">
                         </div>
         
                         <div class="category-details">
-                            <p><strong>Description:</strong> <%= category.description %></p>
-                            <p><small><i class="fas fa-cube me-2"></i>Total Products: <%= category.productCount %></small></p>
-                            <p><small><i class="fas fa-calendar-alt me-2"></i>Created: <%= category.createdAt %></small></p>
+                            <p><i class="fas fa-info-circle"></i> <strong>Description:</strong> <%= category.description %></p>
+                            <!-- <p><i class="fas fa-cube"></i> <strong>Total Products:</strong> <%= category.productCount %></p>
+                            <p><i class="fas fa-calendar-alt"></i> <strong>Created:</strong> <%= category.createdAt %></p> -->
                         </div>
         
                         <form action="/admin/listcategory/<%= category.id %>" method="POST">
-                            <% if (category.isisted) { %>
-                                <button type="submit" class="btn btn-danger"> <!-- Red color for "Unlist" -->
-                                    <i class="fas fa-ban me-2"></i> Unlist
+                            <% if (category.isListed) { %>
+                                <button type="submit" class="status-btn btn-unlist">
+                                    <i class="fas fa-ban"></i>
+                                    <span>Unlist Category</span>
                                 </button>
                             <% } else { %>
-                                <button type="submit" class="btn btn-success"> <!-- Green color for "List" -->
-                                    <i class="fas fa-check me-2"></i> List
+                                <button type="submit" class="status-btn btn-list">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>List Category</span>
                                 </button>
                             <% } %>
                         </form>
-
-
-                          
-                        </div>
                     </div>
                 </div>
                 <% }) %>
             </div>
         </main>
-        
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>

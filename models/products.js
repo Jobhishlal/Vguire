@@ -24,8 +24,9 @@ const productSchema = new mongoose.Schema({
   sizeL: { type: Number, default: 0 },
   sizeXL: { type: Number, default: 0 },
   sizeXXL: { type: Number, default: 0 },
-  totalStock: { type: Number, default: 0 }
-});
+  totalStock: { type: Number, default: 0 },
+  isdelete:{type:Boolean,default:false} 
+},{ timestamps: true });
 
 const Product = mongoose.model('Product', productSchema);
 export default Product;

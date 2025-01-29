@@ -66,13 +66,12 @@ const processProductImages = async (req, res, next) => {
                     throw new Error(`Invalid image file: ${file.filename}`);
                 }
 
-                // Process image if valid
                 await sharp(file.path)
-                    .resize(500, 500) // Resize to 500x500
-                    .jpeg({ quality: 80 }) // Compress the image to reduce size
+                    .resize(500, 500) 
+                    .jpeg({ quality: 80 }) 
                     .toFile(croppedImagePath);
 
-                return `uploads/products/cropped-${file.filename}`; // Save the cropped image
+                return `uploads/products/cropped-${file.filename}`; 
             })
         );
 

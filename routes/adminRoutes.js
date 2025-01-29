@@ -22,7 +22,12 @@ router.get('/product', isAuthenticatedAdmin, productController.showProducts);
 router.get('/add-product',productController.getproduct)
 router.post('/add-product', isAuthenticatedAdmin, productUpload, processProductImages, productController.addProduct);
 router.get('/edit-product/:id',productController.getEditProduct);
-router.post('/edit-product/:id',productUpload,productController.postEditProduct)
+router.post('/edit-product/:id',productUpload,processProductImages,productController.postEditProduct);
+router.post('/product/:id', productController.softDeleteProduct);
+
+
+
+
 
 
 // User management routes
@@ -39,5 +44,10 @@ router.post('/add-category', isAuthenticatedAdmin, categoryUpload, addCategory);
 router.get('/edit-category/:id', isAuthenticatedAdmin, getEditCategory);
 router.post('/edit-category/:id', isAuthenticatedAdmin, categoryUpload, updateCategory);
 router.post("/listcategory/:id" ,list)
+
+
+router.post('/delete-image', productController.deleteimage)
+   
+
 
 export default router;

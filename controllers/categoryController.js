@@ -56,24 +56,22 @@ export const updateCategory = async (req, res) => {
     }
 };
 
-export const   list = async (req,res)=>{
-
+export const list = async (req, res) => {
     try {
-        
-        const id = req.params.id
+        const id = req.params.id;
 
-        const category = await Category.findOne({_id:id})
-        category.isListed = !category.isListed
-
+        const category = await Category.findOne({ _id: id });
+        console.log("Before toggle:", category.isListed); // Check initial state
         
+        category.isListed = !category.isListed;
+
+        console.log("After toggle:", category.isListed); // Check updated state
+
         await category.save();
 
-
-        res.redirect("/admin/categories")
-        console.log(category.isListed)
-
-
+        res.redirect("/admin/categories");
     } catch (error) {
-        
+        console.error(error);
+        return res.status(500).send("It's not working");
     }
-}
+};

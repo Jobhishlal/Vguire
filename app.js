@@ -26,8 +26,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Middleware configuration
-app.use(express.json({ limit: '50mb' }));  // Increase request body size limit
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json({ limit: '150mb' }));  // Increase request body size limit
+app.use(express.urlencoded({ limit: '150mb', extended: true }));
 app.use(cookieParser());
 app.use(methodOverride('_method'));
 app.use(flash());
@@ -61,9 +61,9 @@ app.use(passport.session());
 app.use(authRoutes);
 
 // Google OAuth routes
-app.get('/auth/google',
-    passport.authenticate('google', { scope: ['profile', 'email'] })
-);
+// app.get('/auth/google',
+//     passport.authenticate('google', { scope: ['profile', 'email'] })
+// );
 
 app.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: '/' }),
@@ -72,12 +72,12 @@ app.get('/auth/google/callback',
     }
 );
 
-app.get('/user/home', (req, res) => {
-    if (!req.user) {
-        return res.redirect('/auth/google'); // Redirect to Google login if not authenticated
-    }
-    res.render('user/home', { user: req.user }); // Pass the user data to the home.ejs template
-});
+// app.get('/user/home', (req, res) => {
+//     if (!req.user) {
+//         return res.redirect('/auth/google'); // Redirect to Google login if not authenticated
+//     }
+//     res.render('user/home', { user: req.user }); // Pass the user data to the home.ejs template
+// });
 
 // Logout route to destroy session
 app.get('/logout', (req, res) => {
