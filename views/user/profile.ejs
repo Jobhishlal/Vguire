@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        :root {
+            --primary-color: black;
+            --secondary-color: #2ecc71;
+            --text-color: #2c3e50;
+            --background-color: #f4f7f6;
+        }
+
+        body {
+            background-color: var(--background-color);
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+        }
+
+        .profile-container {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 130px;
+            overflow: hidden;
+        }
+
+        .profile-sidebar {
+            background: linear-gradient(135deg, var(--primary-color), #2980b9);
+            color: white;
+            padding: 30px;
+        }
+
+        .profile-image {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 5px solid white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .profile-image:hover {
+            transform: scale(1.05) rotate(3deg);
+        }
+
+        .settings-nav .nav-link {
+            color: rgba(255,255,255,0.7);
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .settings-nav .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .settings-nav .nav-link.active {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .form-control {
+            border-radius: 10px;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52,152,219,0.25);
+        }
+
+        .password-section {
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .footer {
+    background: var(--primary-color);
+    color: white;
+    padding: 4rem 0 2rem;
+}
+
+@media (max-width: 768px) {
+    .footer {
+        padding: 2rem 0 1rem;
+        text-align: center;
+        background-color: black;
+    }
+    
+    .footer .col-md-4 {
+        margin-bottom: 2rem;
+    }
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 1rem;
+}
+
+.footer-links a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: var(--secondary-color);
+}
+
+    </style>
+</head>
+<body>
+     <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="/image/Screenshot 2025-01-02 185508.png" alt="Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/shop">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                    <li class="nav-item">   
+                        <a class="nav-link" href="#">Profile</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    
+                    <a href="#" class="me-3"><i class="fas fa-search"></i></a>
+                    <a href="#" class="me-3"><i class="fas fa-shopping-cart"></i></a>
+                    <a href="#"><i class="fas fa-heart"></i></a>
+                </div>
+            </div>
+        </div>
+    </nav> 
+
+
+    <div class="container" style="padding-bottom: 40px;">
+        <div class="row profile-container">
+            <!-- Sidebar -->
+            <div class="col-md-3 profile-sidebar">
+                <div class="text-center mb-4">
+                    <img src="<%= user.profileImage ? user.profileImage : '/uploads/default-profile.png' %>" 
+                         alt="Profile Image" class="profile-image mb-3">
+                    <h4 class="text-white"><%= user.fname %> <%= user.lname %></h4>
+                    <p class="text-white-50"><%= user.email %></p>
+                </div>
+
+                <nav class="settings-nav">
+                    <h5 class="mb-3 text-white">Account Settings</h5>
+                    <div class="nav flex-column">
+                        <a href="#basicInfo" class="nav-link active">
+                            <i class="bi bi-person me-2"></i>Basic Info
+                        </a>
+                        <a href="#address" class="nav-link">
+                            <i class="bi bi-geo-alt me-2"></i>Address
+                        </a>
+                        <a href="#orders" class="nav-link">
+                            <i class="bi bi-bag me-2"></i>Order Info
+                        </a>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Profile Form -->
+            <div class="col-md-9 p-4">
+                <form action="/user/profile/edit" method="POST" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="fname" class="form-label" style="color: black;">First Name</label>
+                            <input type="text" class="form-control" id="fname" name="fname" 
+                                   value="<%= user.fname %>" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="lname" class="form-label" style="color: black;">Last Name</label>
+                            <input type="text" class="form-control" id="lname" name="lname" 
+                                   value="<%= user.lname %>" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label" style="color: black;">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" 
+                               value="<%= user.email %>" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label d-block" style="color: black;">Gender</label>
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="gender" id="male" 
+                                   value="male" <%= user.gender === 'male' ? 'checked' : '' %>>
+                            <label class="btn btn-outline-primary" for="male">Male</label>
+
+                            <input type="radio" class="btn-check" name="gender" id="female" 
+                                   value="female" <%= user.gender === 'female' ? 'checked' : '' %>>
+                            <label class="btn btn-outline-primary" for="female">Female</label>
+
+                            <input type="radio" class="btn-check" name="gender" id="other" 
+                                   value="other" <%= user.gender === 'other' ? 'checked' : '' %>>
+                            <label class="btn btn-outline-primary" for="other">Other</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="profileImage" class="form-label" style="color: black;">Change Profile Image</label>
+                        <input type="file" class="form-control" name="profileImage" id="profileImage">
+                    </div>
+
+                    <div class="password-section mb-3">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="currentPassword" class="form-label" style="color: black;">Current Password</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="currentPassword" 
+                                           name="currentPassword" required>
+                                    <button class="btn btn-primary" type="button" 
+                                            onclick="validateCurrentPassword()">
+                                        Verify
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="passwordUpdateSection" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="newPassword" class="form-label" style="color: black;">New Password</label>
+                                    <input type="password" class="form-control" id="newPassword" 
+                                           name="newPassword">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="confirmPassword" class="form-label" style="color: black;">Confirm Password</label>
+                                    <input type="password" class="form-control" id="confirmPassword" 
+                                           name="confirmPassword">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Placeholder -->
+    <footer class="footer" style="display: block;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h4>About Us</h4>
+                    <p>We are committed to providing the best products and services to our customers.</p>
+                </div>
+                <div class="col-md-4">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Shop</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4>Contact Us</h4>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-phone me-2"></i> +1 234 567 890</li>
+                        <li><i class="fas fa-envelope me-2"></i> info@example.com</li>
+                        <li><i class="fas fa-map-marker-alt me-2"></i> 123 Street, City, Country</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <p>&copy; 2025 Your Company. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    
+    <script>
+        function validateCurrentPassword() {
+            let currentPassword = document.getElementById('currentPassword').value;
+
+            fetch('/user/profile/validate-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ currentPassword })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.valid) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Password Verified',
+                        text: 'You can now update your password',
+                        showConfirmButton: false,
+                        timer: 1500,
+                        background: '#f0f4f8',
+                        iconColor: '#2ecc71'
+                    });
+                    document.getElementById('passwordUpdateSection').style.display = 'block';
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Incorrect Password',
+                        text: 'The current password you entered is incorrect',
+                        confirmButtonColor: '#3498db',
+                        background: '#f8d7da',
+                        iconColor: '#dc3545'
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Server Error',
+                    text: 'Unable to validate password. Please try again.',
+                    confirmButtonColor: '#3498db',
+                    background: '#fff3cd',
+                    iconColor: '#ffc107'
+                });
+            });
+        }
+    </script>
+</body>
+</html>

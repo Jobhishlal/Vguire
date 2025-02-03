@@ -6,9 +6,11 @@
     <title>Product View Page</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="/style.css"> -->
+    
     <style>
         :root {
-            --primary-color: #3498db;
+            --primary-color:black;
             --secondary-color: #2ecc71;
             --accent-color: #e74c3c;
         }
@@ -22,6 +24,172 @@
             border-radius: 20px;
             box-shadow: 0 0 20px rgba(0,0,0,0.05);
             padding: 30px;
+        }
+
+        .product-image {
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-image:hover {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Additional styling for carousel images */
+        .carousel-item img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+
+        .size-btn {
+            width: 45px;
+            height: 45px;
+            margin: 5px;
+            border: 2px solid #eee;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .size-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .size-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .quantity-input {
+            width: 100px;
+            border-radius: 25px;
+            text-align: center;
+            border: 2px solid #eee;
+            padding: 8px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-custom {
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-buy-now {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: white;
+            width: auto;
+        }
+
+        .btn-buy-now:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-add-cart {
+            background: white;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-add-cart:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .product-price {
+            font-size: 2rem;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: #6c757d;
+            font-size: 1.2rem;
+        }
+
+        .discount-badge {
+            background: var(--accent-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+
+        .feature-badge {
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 10px 20px;
+            margin: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .feature-badge i {
+            color: var(--primary-color);
+        }
+
+        .thumbnail-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .thumbnail:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .product-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .stock-status {
+            color: var(--secondary-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 20px;
         }
 
         .product-image {
@@ -194,38 +362,254 @@
             gap: 5px;
             margin-bottom: 20px;
         }
+        .carousel-inner {
+    position: relative;
+    width: 500px;
+    overflow: hidden;
+    }
+
+   .zoom-image {
+    width: 100%;
+    transition: transform 0.1s ease-in-out;
+    }
+    .footer {
+    background: var(--primary-color);
+    color: white;
+    padding: 4rem 0 2rem;
+}
+
+@media (max-width: 768px) {
+    .footer {
+        padding: 2rem 0 1rem;
+        text-align: center;
+    }
+    
+    .footer .col-md-4 {
+        margin-bottom: 2rem;
+    }
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 1rem;
+}
+
+.footer-links a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: var(--secondary-color);
+}
+.navbar {
+    padding: 1rem;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.navbar-brand img {
+    width: 60px;
+    margin-right: 50px;
+}
+
+@media (max-width: 992px) {
+    .navbar-brand img {
+        margin-right: 0;
+    }
+    
+    .nav-link {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .navbar .d-flex {
+        margin-top: 1rem;
+        justify-content: center;
+    }
+}
+
+.nav-link {
+    color: var(--primary-color);
+    margin: 0 1rem;
+    position: relative;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--secondary-color);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.login-btn {
+    background: var(--secondary-color);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.login-btn:hover {
+    background: #ff2e43;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Banner Slider */
+.carousel-item {
+    height: 500px;
+}
+
+@media (max-width: 768px) {
+    .carousel-item {
+        height: 300px;
+    }
+}
+
+.carousel-item img {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.carousel-caption {
+   
+    padding: 1.5rem;
+    border-radius: 10px;
+    animation: fadeInUp 1s ease;
+}
+
+@media (max-width: 576px) {
+    .carousel-caption {
+        padding: 1rem;
+    }
+    .carousel-caption h2 {
+        font-size: 1.5rem;
+    }
+    .carousel-caption p {
+        font-size: 0.9rem;
+    }
+}
+
+
+
     </style>
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="/image/Screenshot 2025-01-02 185508.png" alt="Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/shop">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                    <li class="nav-item">   
+                        <a class="nav-link" href="#">Profile</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    
+                    <a href="#" class="me-3"><i class="fas fa-search"></i></a>
+                    <a href="#" class="me-3"><i class="fas fa-shopping-cart"></i></a>
+                    <a href="#"><i class="fas fa-heart"></i></a>
+                </div>
+               
+            </div>
+        </div>
+        
+    </nav>
+
+
+    
+   
+
+
+
+
     <div class="container py-5">
-        <div class="product-container">
+       
+        <div class="product-container" style="margin-top: 50px;">
+            <div style="font-size: 16px; font-weight: 500; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                <a href="/user/home" style="text-decoration: none; color:black; font-weight: bold;">Home</a> 
+                <span style="color: #6c757d; margin: 0 5px;"> &gt; </span>  
+                <a href="/user/shop" style="text-decoration: none; color: black; font-weight: bold;">Shop</a>
+                <span style="color: #6c757d; margin: 0 5px;"> &gt; </span>  
+                <a href="#" style="text-decoration: none; color: black; font-weight: bold;">Product Details</a>
+            </div>
             <!-- Main Product Section -->
             <div class="row mb-5">
                 <!-- Product Images -->
                 <div class="col-md-6">
-                    <div class="product-image">
-                        <img src="/api/placeholder/400/400" alt="Main Product" class="img-fluid rounded">
-                    </div>
-                    <div class="thumbnail-container">
-                        <img src="/api/placeholder/80/80" alt="Thumbnail 1" class="thumbnail">
-                        <img src="/api/placeholder/80/80" alt="Thumbnail 2" class="thumbnail">
-                        <img src="/api/placeholder/80/80" alt="Thumbnail 3" class="thumbnail">
-                        <img src="/api/placeholder/80/80" alt="Thumbnail 4" class="thumbnail">
-                    </div>
+                    <% if (product.images.length > 0) { %>
+                        <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                <% product.images.forEach((image, index) => { %>
+                                    <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                                        <img src="<%= image %>" alt="Product Image <%= index + 1 %>" class="d-block w-100 zoom-image">
+                                    </div>
+                                    
+                                <% }); %>
+                            </div>
+                            
+                            
+                            <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+                    <% } else { %>
+                        <p>No images available</p>
+                    <% } %>
                 </div>
                 
+              
+
                 <!-- Product Details -->
                 <div class="col-md-6">
-                    <h2 class="product-title">Premium Football Jersey #10</h2>
+                    <h2 class="product-title" ><%= product.name %></h2>
                     <div class="stock-status">
                         <i class="fas fa-check-circle"></i>
-                        In Stock
+                        In Stock <%=product.totalStock%>
                     </div>
                     
                     <div class="mb-4">
-                        <span class="product-price">₹899</span>
-                        <span class="original-price ms-2">₹1599</span>
-                        <span class="discount-badge">44% OFF</span>
+                        <span class="product-price"><%= product.price %></span>
+                        <span class="original-price ms-2">₹3599</span>
+                        <span class="discount-badge">25% OFF</span>
                     </div>
 
                     <div class="features mb-4">
@@ -253,10 +637,17 @@
                             <button class="size-btn">XXL</button>
                         </div>
                     </div>
+                   
+                    
                     
                     <div class="mb-4">
                         <h5 class="fw-bold">Quantity</h5>
-                        <input type="number" class="form-control quantity-input" value="1" min="1">
+                        <input 
+                            type="number" 
+                            class="form-control quantity-input" 
+                            
+                            min="1" value="1">
+                            
                     </div>
                     
                     <div class="action-buttons">
@@ -273,45 +664,81 @@
             <!-- Related Products -->
             <div class="row mt-5">
                 <h3 class="mb-4 fw-bold">Others Also Bought</h3>
+                <% for(let i=0;i<simProducts.length;i++){ %>
                 <div class="col-md-3 col-6 mb-4">
                     <div class="card related-product">
-                        <img src="/api/placeholder/200/200" class="card-img-top" alt="Related Product 1">
+                        <a href="/user/productview/<%= simProducts[i]._id %>">
+
+                            <img src="<%= simProducts[i].images[0] %>" class="card-img-top" alt="Related Product 1">
+                        </a>
+                        
                         <div class="card-body">
-                            <h6 class="card-title fw-bold">Sports Jersey</h6>
-                            <p class="card-text text-primary fw-bold mb-0">₹799</p>
+                            <h6 class="card-title fw-bold"><%= simProducts[i].name %></h6>
+                            <p class="card-text text-primary fw-bold mb-0">₹<%= simProducts[i].price %></p>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3 col-6 mb-4">
-                    <div class="card related-product">
-                        <img src="/api/placeholder/200/200" class="card-img-top" alt="Related Product 2">
-                        <div class="card-body">
-                            <h6 class="card-title fw-bold">Team Jersey</h6>
-                            <p class="card-text text-primary fw-bold mb-0">₹899</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6 mb-4">
-                    <div class="card related-product">
-                        <img src="/api/placeholder/200/200" class="card-img-top" alt="Related Product 3">
-                        <div class="card-body">
-                            <h6 class="card-title fw-bold">Sports Wear</h6>
-                            <p class="card-text text-primary fw-bold mb-0">₹699</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6 mb-4">
-                    <div class="card related-product">
-                        <img src="/api/placeholder/200/200" class="card-img-top" alt="Related Product 4">
-                        <div class="card-body">
-                            <h6 class="card-title fw-bold">Training Kit</h6>
-                            <p class="card-text text-primary fw-bold mb-0">₹999</p>
-                        </div>
-                    </div>
-                </div>
+                <% } %>
             </div>
         </div>
     </div>
+
+
+
+
+    <footer class="footer" style="display: block;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h4>About Us</h4>
+                    <p>We are committed to providing the best products and services to our customers.</p>
+                </div>
+                <div class="col-md-4">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Shop</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4>Contact Us</h4>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-phone me-2"></i> +1 234 567 890</li>
+                        <li><i class="fas fa-envelope me-2"></i> info@example.com</li>
+                        <li><i class="fas fa-map-marker-alt me-2"></i> 123 Street, City, Country</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <p>&copy; 2025 Your Company. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+
+    <script>
+     
+     
+         
+     document.querySelectorAll(".zoom-image").forEach(image => {
+    image.addEventListener("mousemove", function (e) {
+        let rect = this.getBoundingClientRect();
+        let x = ((e.clientX - rect.left) / rect.width) * 100;
+        let y = ((e.clientY - rect.top) / rect.height) * 100;
+        this.style.transformOrigin = `${x}% ${y}%`;
+        this.style.transform = "scale(2)"; 
+    });
+
+    image.addEventListener("mouseleave", function () {
+        this.style.transform = "scale(1)";
+    });
+});
+
+      
+
+    </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 </body>

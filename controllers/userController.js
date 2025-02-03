@@ -3,10 +3,14 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import User from '../models/userSchema.js'; 
-import { error } from 'console';
+import { error, log } from 'console';
 import exp from 'constants';
 import Category from '../models/category.js';
 import Product from '../models/products.js'; 
+import flash from 'express-flash';
+import passport from 'passport';
+
+
 
 
 const generateOtp = () => {
@@ -39,23 +43,95 @@ async function sendVerificationEmail(email, otp) {
     }
 }
 
+// export const loadSignup = (req, res) => {
+//     res.render('user/signup', { flashMessage: req.flash('msg') });
+// };
+
+
+// const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/;
+// const validatepassword=(password)=>{
+//     return passwordRegex.test(password)
+// }
+
+
+// export const signup = async (req, res) => {
+//     const { fname, lname, email, password, cpassword } = req.body;
+//     console.log(req.body);
+
+//     const data = {
+//         fname: fname,
+//         lname: lname,
+//         email: email,
+//         password: password,
+//         cpassword: cpassword
+//     };
+
+//     req.session.details = data;
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//         return res.status(400).json({ errors: errors.array() });
+//     }
+//     if(!validatepassword(password)){
+        
+//         req.flash(msg, 'Password must be 8-16 chars, include uppercase, lowercase, number & special char.');
+
+//         return res.redirect('/user/signup')
+//     }   
+
+//     if (password !== cpassword) {
+//         req.flash('msg', 'Passwords do not match');
+//         return res.redirect('/user/signup' ); 
+//     }
+
+//     try {
+//         const existingUser = await User.findOne({ email });
+//         if (existingUser) {
+//             req.flash(msg, 'User with this email already exists');
+//             return res.redirect('/user/signup'); 
+//         }
+
+//         const saltRounds = 10;
+//         const hashedPassword = await bcrypt.hash(password, saltRounds);
+//         const otp = generateOtp();  
+//         const emailSent = await sendVerificationEmail(email, otp);
+//         console.log("Email sent: ", emailSent);
+
+//         if (!emailSent) {
+//             req.flash(msg, 'Failed to send verification email. Try again later.');
+//             return res.redirect('/user/signup'); 
+//         }
+
+//         req.session.otp = otp;
+//         req.session.email = email;
+//         req.flash(msg, 'OTP sent to your email. Please verify.');
+//         return res.redirect('/user/otp'); 
+//     } catch (err) {
+//         console.error('Error in signup:', err);
+//         res.status(500).send('Server error');
+//     }
+// };
+
+
+
 export const loadSignup = (req, res) => {
-    res.render('user/signup', { flashMessage: req.flash('msg') });
+    res.render('user/signup', {  message: req.flash('err') });
 };
 
-
+const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/;
+const validatepassword = (password) => {
+    return passwordRegex.test(password);
+};
 
 
 export const signup = async (req, res) => {
     const { fname, lname, email, password, cpassword } = req.body;
-    console.log(req.body);
-
+    
     const data = {
-        fname: fname,
-        lname: lname,
-        email: email,
-        password: password,
-        cpassword: cpassword
+        fname,
+        lname,
+        email,
+        password,
+        cpassword
     };
 
     req.session.details = data;
@@ -64,46 +140,59 @@ export const signup = async (req, res) => {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    if (password !== cpassword) {
-        req.flash('msg', 'Passwords do not match');
-        return res.render('user/signup', { flashMessage: req.flash('msg') }); // Render signup with the message
+    if (!validatepassword(password)) {
+        req.flash('err', 'Password must be 8-16 chars, include uppercase, lowercase, number & special char.');
+        return res.redirect('/user/signup');
     }
+
+    if (password !== cpassword) {
+        req.flash('err', 'Passwords do not match');
+        return res.redirect('/user/signup');
+    }
+   
 
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            req.flash('msg', 'User with this email already exists');
-            return res.render('user/signup', { flashMessage: req.flash('msg') }); // Render signup with the message
+            req.flash('err', 'User with this email already exists');
+            return res.redirect('/user/signup');
         }
 
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
-        const otp = generateOtp();  
+        const otp = generateOtp();
         const emailSent = await sendVerificationEmail(email, otp);
-        console.log("Email sent: ", emailSent);
 
         if (!emailSent) {
-            req.flash('msg', 'Failed to send verification email. Try again later.');
-            return res.render('user/signup', { flashMessage: req.flash('msg') }); // Render signup with the message
+            req.flash('err', 'Failed to send verification email. Try again later.');
+            return res.redirect('/user/signup');
         }
 
         req.session.otp = otp;
         req.session.email = email;
-        req.flash('msg', 'OTP sent to your email. Please verify.');
-        return res.redirect('/user/otp');  // Redirect to OTP page
-
+        req.flash('err', 'OTP sent to your email. Please verify.');
+        console.log(otp);
+        
+        return res.redirect('/user/otp');
     } catch (err) {
         console.error('Error in signup:', err);
         res.status(500).send('Server error');
     }
 };
 
+
+// export const otprecieve = (req, res) => {
+//     const email = req.session.userEmail; 
+//     const msg= req.flash('msg','message')
+//     res.render('user/otp', { userEmail: email ,msg:msg.length?msg[0]:null});  
+// };
+
 export const otprecieve = (req, res) => {
-    const email = req.session.userEmail;  // Retrieve email from session
-    res.render('user/otp', { userEmail: email , msg:req.flash('msg')});  // Pass email to the view
+    const email = req.session.userEmail;
+    const err = req.flash('err');  // Use 'err' instead of 'msg' for flash message
+    console.log('Flash message passed to OTP page:', err); // Log the flash message for debugging
+    res.render('user/otp', { userEmail: email, err: err.length > 0 ? err[0] : null }); // Pass 'err' to the OTP page
 };
-
-
 
 export const verifyOtp = async (req, res) => {
     const { otp } = req.body;
@@ -111,49 +200,47 @@ export const verifyOtp = async (req, res) => {
     const email = data.email;
     const storedOtp = req.session.otp;
     const otpSentAt = req.session.otpSentAt;
-    console.log(storedOtp)
-    console.log(otpSentAt);
-    
 
+    // If either email or OTP is missing, set a flash message and redirect
     if (!email || !otp) {
-        req.flash('msg', 'Please enter both OTP and Email');
+        req.flash('err', 'Please enter both OTP and Email');  // Use 'err' instead of 'msg'
         return res.redirect('/user/otp');
     }
+    console.log('Flash message set:', req.flash('err')); // Log the flash message
 
     try {
-        // Check if OTP has expired (1 minute expiry)
-        const otpExpiryTime = 1 * 60 * 1000; // OTP expires after 1 minute (in milliseconds)
+        // OTP expiry check
+        const otpExpiryTime = 1 * 60 * 1000; // OTP expiry time of 1 minute
         if (Date.now() - otpSentAt > otpExpiryTime) {
-            req.flash('msg', 'OTP has expired. Please request a new OTP.');
-            req.session.otp = null;  // Clear OTP
+            req.flash('err', 'OTP has expired. Please request a new OTP.');  // Use 'err' instead of 'msg'
+            req.session.otp = null; // Clear OTP in session
             return res.redirect('/user/otp');
         }
 
-        // Check if OTP entered is correct
         if (parseInt(otp) !== storedOtp) {
-            req.flash('msg', 'Invalid OTP');
+            req.flash('err', 'Invalid OTP');  // Use 'err' instead of 'msg'
             return res.redirect('/user/otp');
         }
 
-        // OTP is correct, now store the user data in DB
-        const hashedPassword = await bcrypt.hash(data.password, 10); // Hash password
+        const hashedPassword = await bcrypt.hash(data.password, 10);
 
         const newUser = new User({
             fname: data.fname,
             lname: data.lname,
             email: data.email,
             password: hashedPassword,
-            otp: null,  
-            verified: true,  
+            otp: null,  // Reset OTP
+            verified: true,  // Set the user as verified
         });
 
-        await newUser.save();  
+        await newUser.save();
 
-        req.session.otp = null; 
-        req.session.details = null;  
+        // Clear OTP and user details after saving
+        req.session.otp = null;
+        req.session.details = null;
 
-        req.flash('msg', 'User verified successfully. Redirecting to homepage...');
-        return res.redirect('/user/home'); 
+        req.flash('err', 'User verified successfully.');  // Use 'err' instead of 'msg'
+        return res.redirect('/user/home'); // Redirect to user home page after successful registration
 
     } catch (error) {
         console.error('Error verifying OTP:', error);
@@ -162,14 +249,20 @@ export const verifyOtp = async (req, res) => {
 };
 
 
-
-
 export const getLoginPage = (req, res) => {
-    res.render('user/login', { error: '' })
+    if (req.session.isLogged) {
+        return res.redirect('/user/home'); 
+    }
+    const error = req.flash("error"); 
+    res.render("user/login", { error: error.length > 0 ? error[0] : null }); 
 };
 
-// User Login Logic
+
+
+
+
 export const loginUser = async (req, res) => {
+    
     const { email, password } = req.body;
 
     try {
@@ -182,15 +275,25 @@ export const loginUser = async (req, res) => {
             return res.render('user/login', { error: 'Please verify your account first.' });
         }
         if (user.blocked) {
-            return res.render('user/login',{error:'User is blocked'})
+            return res.render('user/login',{error:'User  blocked'})
           }
+        
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
+        if (!isMatch ) {
             return res.render('user/login', { error: 'Invalid email or password' });
         }
-
-        req.session.user = user; 
+        
+        req.session.isLogged=true
+        console.log('done');
+        console.log( req.session.isLogged);
+        
+        
+        req.session.user = user._id; 
+        console.log(user._id);
+        console.log(req.session.user);
+        
+        
         res.redirect('/user/home')
     } catch (err) {
         console.error(err);
@@ -198,11 +301,25 @@ export const loginUser = async (req, res) => {
     }
 };
 
+
+export const logoutUser=(req,res)=>{
+    try {
+        req.session.destroy(err=>{
+            if(err){
+                 return res.redirect('/user/home')
+            }
+            res.redirect('/user/login')
+
+        })
+    } catch (error) {
+        
+    }
+}
+
 export const forgot = async (req, res) => {
     res.render('user/forgot-password');
 };
 
-// Handle forgot password and send OTP
 
 export const forgotpasswordhandler = async (req, res) => {
     const { email } = req.body;
@@ -214,22 +331,25 @@ export const forgotpasswordhandler = async (req, res) => {
         }
 
         const otpSentAt = req.session.otpSentAt || 0;  
-        const otpExpiryTime = 1 * 60 * 1000/2;  // 
+        const otpExpiryTime = 1 * 60 * 1000;  
 
-        // Check if OTP was sent within the last minute
+    
         if (Date.now() - otpSentAt < otpExpiryTime) {
             const timeRemaining = Math.floor((otpExpiryTime - (Date.now() - otpSentAt)) / 1000);
             return res.render('user/forgot-password', { msg: `Please wait ${timeRemaining} seconds to resend OTP.` });
         }
 
-        // OTP has expired or hasn't been sent yet, generate a new OTP
-        const otp = Math.floor(100000 + Math.random() * 900000);  // 6-digit OTP
-        req.session.otp = otp;  // Store OTP in session
-        req.session.otpSentAt = Date.now();  // Store the timestamp when OTP was sent
+       
+        const otp = Math.floor(100000 + Math.random() * 900000);  
+        req.session.otp=otp;
+        req.session.userEmail=email
+        req.session.otpSentAt = Date.now();  
+      console.log('genarate:',otp);
+      
+        console.log(otp);
+        
 
-        console.log("New OTP:", req.session.otp);
-
-        // Send the OTP to user's email
+       
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -247,7 +367,7 @@ export const forgotpasswordhandler = async (req, res) => {
 
         await transporter.sendMail(mailOptions);
         req.session.user=email
-        // Render OTP verification page
+       
         res.render('user/verify-otp', { msg: "OTP sent to your email. Please verify." });
 
     } catch (error) {
@@ -259,21 +379,21 @@ export const forgotpasswordhandler = async (req, res) => {
 export const resendOtp = async (req, res) => {
     console.log('resend otpyil kayri');
     
-    const email = req.session.email; // Retrieve the email from the session
+    const email = req.session.email; 
     if (!email) {
-        return res.redirect('/user/login'); // If no email in session, redirect to login
+        return res.redirect('/user/login'); 
     }
 
     try {
-        const otp = Math.floor(10000 + Math.random() * 900000); // Generate a 5-digit OTP
+        const otp = Math.floor(10000 + Math.random() * 900000); 
         req.session.otp = otp;
-        req.session.otpSentAt = Date.now(); // Store the time the OTP was sent
+        req.session.otpSentAt = Date.now(); 
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: process.env.EMAIL_USER, // Your Gmail address
-                pass: process.env.EMAIL_PASS  // Your Gmail password or App password
+                user: process.env.EMAIL_USER, 
+                pass: process.env.EMAIL_PASS  
             }
         });
 
@@ -286,7 +406,7 @@ export const resendOtp = async (req, res) => {
 
         await transporter.sendMail(mailOptions);
         
-        // Send success response
+        
         res.json({ success: true, msg: 'OTP has been sent to your email account' });
     } catch (error) {
         console.error(error);
@@ -301,13 +421,13 @@ export const otpVerification = async (req, res) => {
         const user = req.session.user;
         const checkOtp = req.session.otp;
 
-        // Check if OTP is valid and not expired
+       
         if (checkOtp != otp) {
             return res.render('user/verify-otp', { msg: "Invalid or expired OTP" });
         }
 
-        // OTP is valid, allow user to reset password
-        res.render('user/reset-password');  // Pass email to reset page
+        
+        res.render('user/reset-password');  
 
     } catch (error) {
         console.error(error);
@@ -330,8 +450,9 @@ export const resetchange = async (req, res) => {
         if (!user || user.resetpasswordexpires < Date.now()) {
             return res.render('user/reset-password', { msg: "Invalid or expired token", email });
         }
+       
 
-        // Hash the new password and save
+        
         const saltRounds = 10;
         user.password = await bcrypt.hash(password, saltRounds);
         user.resetPasswordtoken = null;
@@ -354,37 +475,39 @@ export const changePassword = async (req, res) => {
     
     
     try {
-        // Extract password from request body
+        
         const { password } = req.body;
         console.log('Request body:', req.body);
-
-        // Validate password
         if (!password || typeof password !== 'string') {
             console.error('Invalid password');
-            return res.render('user/reset-password', { msg: "Password is required and must be a valid string" });
+            return res.render('user/reset-password', { 'err': "Password is required and must be a valid string" });
         }
+        if(!validatepassword(password)){
+            return res.render('user/reset-password',{'err':'password make strong'})
+        }
+        
  
         console.log('Password validation passed');
 
-        // Get user email from session
+      
         const email = req.session.user;
         console.log('Email from session:', email);
 
-        // Find user by email
+       
         const user = await User.findOne({ email });
         console.log('User found:', user);
 
         if (!user) {
             console.error('User not found');
-            return res.render('user/reset-password', { msg: "User not found" });
+            return res.render('user/reset-password', { 'err': "User not found" });
         }
 
         console.log('Hashing password...');
-        // Hash the new password
+      
         const hashedPassword = await bcrypt.hash(password, 10);
         console.log('Password hashed successfully');
 
-        // Update user password with the hashed version
+        
         const updatedUser = await User.findOneAndUpdate(
             { email: email },  
             { password: hashedPassword },  
@@ -411,9 +534,11 @@ export const changePassword = async (req, res) => {
 export const homepage = async (req, res) => {
     try {
        
-       const categories = await Category.find(); 
-       const product=await Product.find()
+       const categories = await Category.find({isListed:false}); 
+       const product=await Product.find({isdelete:false})
        const createdAt= await Product.find().sort({createdAt:-1}).limit(1)
+      
+       
        console.log(categories); 
        console.log('hiiii');
        
@@ -435,9 +560,12 @@ export const homepage = async (req, res) => {
           user: req.user,  
           categories: categories ,
           product:product,
-          date:createdAt
+          date:createdAt,
+          session:req.session
 
        });
+       console.log(req.user);
+       
     } catch (error) {
        
        console.error("Error fetching categories:", error);
@@ -450,7 +578,7 @@ export const homepage = async (req, res) => {
         console.log('enter');
         
         const category=req.query.category
-        console.log(category);
+      
         
         let allProducts
         if(category){
@@ -467,13 +595,13 @@ export const homepage = async (req, res) => {
                     $match:{
                         'resultCategory.name':{
                             $regex:`^${category}`, 
-                            $options:'i'
+                            $options:'i',
                         }
                     }
                 }
             ])
         }else{
-            allProducts=await Product.find()
+            allProducts=await Product.find({isdelete:false})
         }
         
         
@@ -492,17 +620,223 @@ export const homepage = async (req, res) => {
 export const productview = async (req, res) => {
     try {
         const productId = req.params.id;  
+        console.log(productId);
         const product = await Product.findById(productId);  
         console.log(product);
+
+
+        const similarProducts=await Product.aggregate([
+            {$lookup:{
+                from: 'categories',
+                foreignField: '_id',
+                localField: 'category',
+                as: 'resultProducts'
+            }},
+            {
+                $unwind: '$resultProducts'
+            },
+            {
+                $match: {
+                    'resultProducts._id':product.category,
+                }
+          }
+       ])
+
+
         
 
         if (!product) {
             return res.status(404).send("Product not found");
         }
 
-        res.render('user/productview', { product: product });
+        const randomNumbers=new Set()
+        while (randomNumbers.size<4){
+            const randomNum=Math.floor(Math.random()*10)+1
+            if(randomNum<=similarProducts.length){
+                randomNumbers.add(randomNum)
+            }
+        }
+        let simProducts=[]
+        const randomNums=Array.from(randomNumbers)
+        for(let i=0;i<randomNums.length;i++){
+            simProducts[i]=similarProducts[randomNums[i]-1]
+        }
+
+        res.render('user/productview', { product: product, simProducts:simProducts});
     } catch (error) {
         console.error("Error fetching product:", error);
         return res.status(500).send("Internal server error");
+    }
+};
+
+
+
+// export const getprofile = async (req, res) => {
+//     console.log("Session user:", req.session.user);
+//     console.log("Req user:", req.user); // Log req.user for debugging
+
+//     try {
+//         if (!req.user) {
+//             return res.status(401).send("User not authenticated");
+//         }
+
+//         const user = await User.findById(req.user._id).select('fname lname email');
+
+//         res.render('user/profile', { user });
+//     } catch (error) {
+//         console.error("Error fetching profile:", error);
+//         return res.status(500).send("Profile could not be retrieved");
+//     }
+// };
+
+
+
+// export const postprofile = async (req, res) => {
+//     const { fname, lname, email, dob } = req.body;
+
+//     try {
+//         const user = await User.findById(req.user._id);
+
+//         if (!user) {
+//             return res.status(404).send('User not found');
+//         }
+
+//         // Update user details
+//         user.fname = fname || user.fname;
+//         user.lname = lname || user.lname;
+//         user.email = email || user.email;
+//         user.dob = dob ? new Date(dob) : user.dob;
+
+//         // If a new profile image is uploaded
+//         if (req.file) {
+//             // If the current image is a manually uploaded file, delete it
+//             if (user.profileImage && user.profileImage.startsWith('/uploads/profiles/')) {
+//                 const oldImagePath = path.join('public', user.profileImage);
+//                 fs.unlink(oldImagePath, (err) => {
+//                     if (err) console.error(`Error deleting old image: ${err.message}`);
+//                 });
+//             }
+
+//             // Update with the new image path
+//             user.profileImage = `/uploads/profiles/${req.file.filename}`;
+//         }
+
+//         await user.save();
+//         res.redirect('/user/profile');
+//     } catch (error) {
+//         console.error('Error updating profile:', error);
+//         return res.status(500).send('Server error');
+//     }
+// };
+
+
+
+
+
+export const getprofile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id); 
+
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        res.render('user/profile', { user ,
+            success: req.flash('success'), 
+            error: req.flash('error')
+        });
+    } catch (error) {
+        console.error('Error fetching profile:', error);
+        return res.status(500).send('Server error');
+    }
+};
+
+
+export const postprofile = async (req, res) => {
+    try {
+        const { fname, lname, gender, dob, newPassword, confirmPassword } = req.body;
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            req.flash('error', 'User not found');
+            return res.redirect('/user/profile');
+        }
+
+
+        const allowedGenders = ['male', 'female', 'other'];
+        if (!allowedGenders.includes(gender)) {
+            req.flash('error', 'Invalid gender selected');
+            return res.redirect('/user/profile');
+        }
+
+  
+        const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (newPassword) {
+            if (newPassword.length < 8) {
+                req.flash('error', 'Password should be at least 8 characters long.');
+                return res.redirect('/user/profile');
+            }
+            if (!passwordRegex.test(newPassword)) {
+                req.flash('error', 'Password must contain uppercase, lowercase, number, and special character.');
+                return res.redirect('/user/profile');
+            }
+            if (newPassword !== confirmPassword) {
+                req.flash('error', 'New password and confirm password do not match');
+                return res.redirect('/user/profile');
+            }
+
+            
+            user.password = await bcrypt.hash(newPassword, 10);
+        }
+
+        
+        user.fname = fname || user.fname;
+        user.lname = lname || user.lname;
+    
+        user.gender = gender || user.gender;
+        if (dob && !isNaN(new Date(dob).getTime())) {
+            user.dob = new Date(dob);
+        }
+        console.log(user);
+        
+
+        await user.save();
+        req.flash('success', 'Profile updated successfully');
+        res.redirect('/user/profile');
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        req.flash('error', 'Server error. Please try again.');
+        return res.redirect('/user/profile');
+    }
+};
+
+export const validatepass = async (req, res) => {
+    try {
+        const { currentPassword } = req.body;
+        console.log("Received password:", currentPassword); 
+
+        if (!currentPassword) {
+            return res.status(400).json({ valid: false, message: 'Current password is required' });
+        }
+
+        if (!req.user || !req.user._id) {
+            return res.status(401).json({ valid: false, message: 'User not authenticated' });
+        }
+
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ valid: false, message: 'User not found' });
+        }
+
+        const isPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
+        if (!isPasswordCorrect) {
+            return res.status(400).json({ valid: false, message: 'Incorrect password' });
+        }
+
+        return res.json({ valid: true, message: 'Password is correct' });
+
+    } catch (error) {
+        console.error('Error validating password:', error);
+        return res.status(500).json({ valid: false, message: 'Server error' });
     }
 };

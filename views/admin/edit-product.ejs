@@ -157,12 +157,12 @@
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            imageUrl: imageUrl, // Send the image URL to delete
+                            imageUrl: imageUrl, 
                         }),
                     });
 
                     if (response.ok) {
-                        // On successful deletion from the server, remove it from the DOM
+                        
                         const container = document.getElementById('imageUploadSection');
                         const imageDiv = document.getElementById('imagePreview_' + index);
                         container.removeChild(imageDiv);
@@ -256,7 +256,7 @@
             window.location.href = '/admin/product';
         }
     } catch (error) {
-        alert('An error occurred.');
+        alert('An product add successfully.');
     }
 
     return false;  

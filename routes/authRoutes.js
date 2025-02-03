@@ -3,10 +3,7 @@ import passport from 'passport';
 import { loginPage, homePage, logout } from '../controllers/authController.js';
 
 
-
-import ensureAuth  from '../middlewares/authMiddleware.js';
-import ensureGuest from '../middlewares/authMiddleware.js';
-
+import { ensureAuth,ensureGuest } from '../middlewares/authMiddleware.js';
 const router = express.Router();
 
 // Login Page

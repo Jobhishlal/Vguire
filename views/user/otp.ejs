@@ -15,13 +15,14 @@
                 <h2 class="text-center">OTP Verification</h2>
 
                 <!-- Error Message -->
-                <% if (msg) { %>
-                    <p class="text-danger text-center"><%= msg %></p>
+                <% if (err) { %>
+                    <p class="text-danger text-center"><%= err %></p> 
                 <% } %>
 
                 <!-- OTP Form -->
                 <form action="/user/verify-otp" method="POST">
                     <div class="form-group">
+
                         <label for="otp">Enter the OTP:</label>
                         <input type="text" 
                                class="form-control" 

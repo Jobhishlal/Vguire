@@ -7,223 +7,555 @@
     <title>Add New Product</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+         :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-bg: #f8f9fa;
+            --border-radius: 8px;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 1rem;
+            margin: 0 auto;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 900px;
+                padding: 2rem;
+                margin: 2rem auto;
+            }
+        }
+
+        .form-header {
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .form-header {
+                padding: 2rem;
+                margin-bottom: 2rem;
+            }
+        }
+
+        .form-header i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .form-header i {
+                font-size: 2.5rem;
+                margin-bottom: 1rem;
+            }
+        }
+
+        .form-section {
+            background: var(--light-bg);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .form-section {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        @media (min-width: 768px) {
+            .form-label {
+                font-size: 1rem;
+            }
+        }
+
+        .form-control {
+            border: 1px solid #e2e8f0;
+            padding: 0.75rem;
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        @media (min-width: 768px) {
+            .form-control {
+                font-size: 1rem;
+            }
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .btn {
+                width: auto;
+                margin-bottom: 0;
+            }
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-1px);
+        }
+
+        .size-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 576px) {
+            .size-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 992px) {
+            .size-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        #imageUploadSection {
+            border: 2px dashed #cbd5e0;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            background: var(--light-bg);
+        }
+
+        @media (min-width: 768px) {
+            #imageUploadSection {
+                padding: 1.5rem;
+            }
+        }
+
+        .input-group {
+            flex-wrap: nowrap;
+        }
+
+        .input-group-text {
+            background-color: var(--light-bg);
+            border-color: #e2e8f0;
+        }
+
+        #cropperSection {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        .cropper-container {
+            max-width: 100%;
+        }
+
+        #imagePreview {
+            max-width: 100%;
+            height: auto;
+        }
+
+        @media (max-width: 576px) {
+            .form-section h4 {
+                font-size: 1.2rem;
+            }
+
+            .container {
+                padding: 0.5rem;
+            }
+
+            .form-header h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Floating Labels for Better Mobile UX */
+        .form-floating {
+            position: relative;
+        }
+
+        .form-floating > .form-control {
+            height: calc(3.5rem + 2px);
+            padding: 1rem 0.75rem;
+        }
+
+        .form-floating > label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 1rem 0.75rem;
+            pointer-events: none;
+            transform-origin: 0 0;
+            transition: opacity .1s ease-in-out,transform .1s ease-in-out;
+        }
+
+        /* Touch-friendly Improvements */
+        @media (max-width: 768px) {
+            input, select, textarea, button {
+                font-size: 16px !important; /* Prevents iOS zoom on focus */
+            }
+
+            .form-control, .btn {
+                min-height: 44px; /* Minimum touch target size */
+            }
+        }
+
+        /* Loading Indicator Responsive Positioning */
+        #loadingIndicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            z-index: 1000;
+            width: 90%;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .swal2-popup {
+            border-radius: var(--border-radius);
+        }
+
+        .swal2-confirm {
+            background-color: var(--primary-color) !important;
+        }
+    </style>
 </head>
 
 <body>
     <div class="container my-5">
-        <div class="text-center mb-4">
-            <i class="fas fa-cogs fa-3x text-primary mb-3"></i>
+        <div class="form-header">
+            <i class="fas fa-box-open"></i>
             <h2>Add New Product</h2>
+            <p class="mb-0">Enter product details below</p>
         </div>
 
-        <!-- Form for adding a new product -->
         <form id="productForm" action="/admin/add-product" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
-
-            <!-- Product Name -->
-            <div class="mb-3">
-                <label for="productName" class="form-label">Product Name</label>
-                <input type="text" class="form-control" id="productName" name="name" placeholder="Enter product name" required>
-            </div>
-        
-            <!-- Product Description -->
-            <div class="mb-3">
-                <label for="productDescription" class="form-label">Product Description</label>
-                <textarea class="form-control" id="productDescription" name="description" placeholder="Describe the product" rows="4" required></textarea>
-            </div>
-        
-            <!-- Product Price -->
-            <div class="mb-3">
-                <label for="productPrice" class="form-label">Product Price</label>
-                <input type="number" class="form-control" id="productPrice" name="price" placeholder="Enter price" required>
-            </div>
-        
-            <!-- Category Selection -->
-            <div class="mb-3">
-                <label for="productCategory" class="form-label">Category</label>
-                <select class="form-control" id="productCategory" name="category" required>
-                    <option value="">Select Category</option>
-                    <% categories.forEach(category => { %>
-                        <option value="<%= category._id %>"><%= category.name %></option>
-                    <% }); %>
-                </select>
-            </div>
-
-            <!-- Image Upload Section -->
-            <div id="imageUploadSection">
-                <label for="productImage" class="form-label">Product Image</label>
-                <input type="file" class="form-control" name="image[]" accept="image/*" onchange="previewAndCropImage(this)">
-            </div>
-            <button type="button" id="addImageBtn" onclick="addImageInput()">Add Another Image</button>
-        
-            <!-- Image Cropper Section -->
-            <div id="cropperSection" style="display: none;">
-                <h5>Crop the Image</h5>
-                <div>
-                    <img id="imagePreview" src="" alt="Image Preview" style="max-width: 100%;" />
+            <div class="form-section">
+                <h4 class="mb-3">Basic Information</h4>
+                <div class="mb-3">
+                    <label for="productName" class="form-label">Product Name</label>
+                    <input type="text" class="form-control" id="productName" name="name" placeholder="Enter product name" required>
                 </div>
-                <button type="button" class="btn btn-primary mt-2" onclick="cropImage()">Crop Image</button>
+
+                <div class="mb-3">
+                    <label for="productDescription" class="form-label">Product Description</label>
+                    <textarea class="form-control" id="productDescription" name="description" placeholder="Describe the product" rows="4" required></textarea>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="productPrice" class="form-label">Product Price</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="productPrice" name="price" placeholder="Enter price" required>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="productCategory" class="form-label">Category</label>
+                        <select class="form-control" id="productCategory" name="category" required>
+                            <option value="">Select Category</option>
+                            <% categories.forEach(category => { %>
+                                <option value="<%= category._id %>"><%= category.name %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                </div>
             </div>
 
-            <!-- Size Variations -->
-            <h5 class="mt-4">Size Variations</h5>
-        
-            <div class="mb-3">
-                <label for="sizeS" class="form-label">Size S</label>
-                <input type="number" class="form-control" id="sizeS" name="sizeS" placeholder="Enter stock for Size S" oninput="updateTotalStock()" required>
+            <div class="form-section">
+                <h4 class="mb-3">Product Images</h4>
+                <div id="imageUploadSection">
+                    <label for="productImage" class="form-label">Product Image</label>
+                    <input type="file" class="form-control" name="image[]" accept="image/*" onchange="previewAndCropImage(this)">
+                </div>
+                <button type="button" id="addImageBtn" class="btn btn-secondary">
+                    <i class="fas fa-plus me-2"></i>Add Another Image
+                </button>
+
+                <div id="cropperSection" style="display: none;">
+                    <h5>Crop the Image</h5>
+                    <div class="cropper-container">
+                        <img id="imagePreview" src="" alt="Image Preview" style="max-width: 100%;" />
+                    </div>
+                    <button type="button" class="btn btn-primary mt-3" onclick="cropImage()">
+                        <i class="fas fa-crop me-2"></i>Crop Image
+                    </button>
+                </div>
             </div>
-        
-            <div class="mb-3">
-                <label for="sizeM" class="form-label">Size M</label>
-                <input type="number" class="form-control" id="sizeM" name="sizeM" placeholder="Enter stock for Size M" oninput="updateTotalStock()" required>
+
+            <div class="form-section">
+                <h4 class="mb-3">Size Variations</h4>
+                <div class="size-grid">
+                    <div class="mb-3">
+                        <label for="sizeS" class="form-label">Size S</label>
+                        <input type="number" class="form-control" id="sizeS" name="sizeS" placeholder="Stock" oninput="updateTotalStock()" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="sizeM" class="form-label">Size M</label>
+                        <input type="number" class="form-control" id="sizeM" name="sizeM" placeholder="Stock" oninput="updateTotalStock()" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="sizeL" class="form-label">Size L</label>
+                        <input type="number" class="form-control" id="sizeL" name="sizeL" placeholder="Stock" oninput="updateTotalStock()" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="sizeXL" class="form-label">Size XL</label>
+                        <input type="number" class="form-control" id="sizeXL" name="sizeXL" placeholder="Stock" oninput="updateTotalStock()" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="sizeXXL" class="form-label">Size XXL</label>
+                        <input type="number" class="form-control" id="sizeXXL" name="sizeXXL" placeholder="Stock" oninput="updateTotalStock()" required>
+                    </div>
+                </div>
+
+                <div class="total-stock">
+                    <label for="totalStock" class="form-label">Total Stock</label>
+                    <input type="number" class="form-control" id="totalStock" name="totalStock" placeholder="Total Stock" readonly>
+                </div>
             </div>
-        
-            <div class="mb-3">
-                <label for="sizeL" class="form-label">Size L</label>
-                <input type="number" class="form-control" id="sizeL" name="sizeL" placeholder="Enter stock for Size L" oninput="updateTotalStock()" required>
-            </div>
-        
-            <div class="mb-3">
-                <label for="sizeXL" class="form-label">Size XL</label>
-                <input type="number" class="form-control" id="sizeXL" name="sizeXL" placeholder="Enter stock for Size XL" oninput="updateTotalStock()" required>
-            </div>
-        
-            <div class="mb-3">
-                <label for="sizeXXL" class="form-label">Size XXL</label>
-                <input type="number" class="form-control" id="sizeXXL" name="sizeXXL" placeholder="Enter stock for Size XXL" oninput="updateTotalStock()" required>
-            </div>
-        
-            <!-- Total Stock -->
-            <div class="mb-3">
-                <label for="totalStock" class="form-label">Total Stock</label>
-                <input type="number" class="form-control" id="totalStock" name="totalStock" placeholder="Total Stock" readonly>
-            </div>
-        
-            <!-- Submit Button -->
+
             <div class="text-center mt-4">
-                <button type="submit" class="btn btn-primary">Add Product</button>
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus-circle me-2"></i>Add Product
+                </button>
             </div>
-        
         </form>
-        
+
         <input type="hidden" id="base64Image" name="imageBase64">
-        
-        <!-- Loading Indicator -->
-        <div id="loadingIndicator" style="display: none;">Cropping image...</div>
-        
-        <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
-        
-        <script>
-            let cropper;
-        
-            function addImageInput() {
-                const container = document.getElementById('imageUploadSection');
-                const newInput = document.createElement('input');
-                newInput.type = 'file';
-                newInput.className = 'form-control';
-                newInput.name = 'image[]';  
-                newInput.accept = 'image/*';  
-        
-                newInput.addEventListener('change', function() {
-                    previewAndCropImage(this);
-                });
-        
-                container.appendChild(newInput);
-            }
-        
-            function previewAndCropImage(inputElement) {
-                if (inputElement.files.length === 0) {
-                    alert('Please select an image.');
-                    return;
-                }
-        
-                const file = inputElement.files[0];
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const image = document.getElementById('imagePreview');
-                    image.src = e.target.result;
-                    document.getElementById('cropperSection').style.display = 'block';
-        
-                    if (cropper) {
-                        cropper.destroy(); // Reset the cropper instance
-                    }
-        
-                    cropper = new Cropper(image, {
-         aspectRatio: 0, 
-  viewMode: 0,    
-  minCropBoxWidth: 100,
-  minCropBoxHeight: 100,
-  autoCropArea: 1, 
-  ready() {
-    this.cropper.setCropBoxData({
-      left: 0,
-      top: 0,
-      width: this.cropper.getImageData().naturalWidth,
-      height: this.cropper.getImageData().naturalHeight,
+        <div id="loadingIndicator" style="display: none;">
+            <i class="fas fa-spinner fa-spin me-2"></i>Cropping image...
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+ let cropper;
+
+function addImageInput() {
+    const container = document.getElementById('imageUploadSection');
+    const newInput = document.createElement('input');
+    newInput.type = 'file';
+    newInput.className = 'form-control';
+    newInput.name = 'image[]';
+    newInput.accept = 'image/*';
+
+    newInput.addEventListener('change', function () {
+        previewAndCropImage(this);
     });
-  },
+
+    container.appendChild(newInput);
+}
+
+function previewAndCropImage(inputElement) {
+    if (inputElement.files.length === 0) {
+        Swal.fire({
+            title: 'Error',
+            text: 'Please select an image.',
+            icon: 'error',
+            confirmButtonText: 'OK',
+            customClass: {
+                confirmButton: 'swal2-confirm',
+                cancelButton: 'swal2-cancel'
+            }
+        });
+        return;
+    }
+
+    const file = inputElement.files[0];
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const image = document.getElementById('imagePreview');
+        image.src = e.target.result;
+        document.getElementById('cropperSection').style.display = 'block';
+
+        if (cropper) {
+            cropper.destroy(); // Reset the cropper instance
+        }
+
+        cropper = new Cropper(image, {
+            aspectRatio: 0,
+            viewMode: 0,
+            minCropBoxWidth: 100,
+            minCropBoxHeight: 100,
+            autoCropArea: 1,
+            ready() {
+                this.cropper.setCropBoxData({
+                    left: 0,
+                    top: 0,
+                    width: this.cropper.getImageData().naturalWidth,
+                    height: this.cropper.getImageData().naturalHeight,
+                });
+            },
+        });
+    };
+    reader.onerror = function () {
+        Swal.fire({
+            title: 'Error',
+            text: 'Error loading the image. Please try again.',
+            icon: 'error',
+            confirmButtonText: 'OK',
+            customClass: {
+                confirmButton: 'swal2-confirm',
+                cancelButton: 'swal2-cancel'
+            }
+        });
+    };
+    reader.readAsDataURL(file);
+}
+
+function cropImage() {
+    if (!cropper) {
+        Swal.fire({
+            title: 'Error',
+            text: 'Please select and crop an image first.',
+            icon: 'error',
+            confirmButtonText: 'OK',
+            customClass: {
+                confirmButton: 'swal2-confirm',
+                cancelButton: 'swal2-cancel'
+            }
+        });
+        return;
+    }
+
+    document.getElementById('loadingIndicator').style.display = 'block';
+    setTimeout(() => {
+        try {
+            const croppedCanvas = cropper.getCroppedCanvas();
+            if (!croppedCanvas) {
+                throw new Error('Failed to crop image. Please try again.');
+            }
+            const croppedImage = croppedCanvas.toDataURL('image/jpeg');
+            document.getElementById('base64Image').value = croppedImage;
+            document.getElementById('cropperSection').style.display = 'none';
+            document.getElementById('loadingIndicator').style.display = 'none';
+            Swal.fire({
+                title: 'Success',
+                text: 'Image cropped successfully!',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                customClass: {
+                    confirmButton: 'swal2-confirm',
+                    cancelButton: 'swal2-cancel'
+                }
+            });
+        } catch (error) {
+            Swal.fire({
+                title: 'Error',
+                text: error.message,
+                icon: 'error',
+                confirmButtonText: 'OK',
+                customClass: {
+                    confirmButton: 'swal2-confirm',
+                    cancelButton: 'swal2-cancel'
+                }
+            });
+            document.getElementById('loadingIndicator').style.display = 'none';
+        }
+    }, 500);
+}
+
+function validateForm() {
+    const base64Image = document.getElementById('base64Image').value;
+    if (!base64Image) {
+        Swal.fire({
+            title: 'Error',
+            text: 'Please crop and save the image before submitting.',
+            icon: 'error',
+            confirmButtonText: 'OK',
+            customClass: {
+                confirmButton: 'swal2-confirm',
+                cancelButton: 'swal2-cancel'
+            }
+        });
+        return false;
+    }
+    return true;
+}
+
+function updateTotalStock() {
+    let total = 0;
+    ['sizeS', 'sizeM', 'sizeL', 'sizeXL', 'sizeXXL'].forEach(size => {
+        const value = document.getElementById(size).value;
+        total += parseInt(value) || 0;
+    });
+    document.getElementById('totalStock').value = total;
+}
+
+document.querySelectorAll('input[type="number"]').forEach(input => {
+    input.addEventListener('input', (e) => {
+        if (e.target.value < 0) {
+            e.target.value = 0;
+            Swal.fire({
+                title: 'Warning',
+                text: 'Stock value cannot be negative.',
+                icon: 'warning',
+                confirmButtonText: 'OK',
+                customClass: {
+                    confirmButton: 'swal2-confirm',
+                    cancelButton: 'swal2-cancel'
+                }
+            });
+        }
+    });
 });
 
-                };
-                reader.onerror = function () {
-                    alert('Error loading the image. Please try again.');
-                };
-                reader.readAsDataURL(file);
-            }
-        
-            function cropImage() {
-                if (!cropper) {
-                    alert('Please select and crop an image first.');
-                    return;
-                }
-        
-                document.getElementById('loadingIndicator').style.display = 'block';
-                setTimeout(() => {
-                    try {
-                        const croppedCanvas = cropper.getCroppedCanvas();
-                        if (!croppedCanvas) {
-                            throw new Error('Failed to crop image. Please try again.');
-                        }
-                        const croppedImage = croppedCanvas.toDataURL('image/jpeg');
-                        document.getElementById('base64Image').value = croppedImage;
-                        document.getElementById('cropperSection').style.display = 'none';
-                        document.getElementById('loadingIndicator').style.display = 'none';
-                    } catch (error) {
-                        alert(error.message);
-                        document.getElementById('loadingIndicator').style.display = 'none';
-                    }
-                }, 500);
-            }
-        
-            function validateForm() {
-                const base64Image = document.getElementById('base64Image').value;
-                if (!base64Image) {
-                    alert('Please crop and save the image before submitting.');
-                    return false;
-                }
-                return true;
-            }
-        
-            function updateTotalStock() {
-                let total = 0;
-                ['sizeS', 'sizeM', 'sizeL', 'sizeXL', 'sizeXXL'].forEach(size => {
-                    const value = document.getElementById(size).value;
-                    total += parseInt(value) || 0;
-                });
-                document.getElementById('totalStock').value = total;
-            }
-        
-            document.querySelectorAll('input[type="number"]').forEach(input => {
-                input.addEventListener('input', (e) => {
-                    if (e.target.value < 0) {
-                        e.target.value = 0;
-                        alert('Stock value cannot be negative.');
-                    }
-                });
-            });
-        </script>
-        
-        
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-</body>
 
-</html>
+    </script>
+ 
+        
+    </body>
+    </html>

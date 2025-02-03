@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { type } from 'os';
 
 const userSchema = new mongoose.Schema({
   fname: {
@@ -37,8 +38,10 @@ const userSchema = new mongoose.Schema({
   },
   blocked: {
     type: Boolean,
-    default: false,  // Default to false, meaning users are not blocked by default
+    default: false,  
   },
+  dob: { type: Date },
+  gender:{type:String ,enum: ['male', 'female', 'other'] },
 }, { timestamps: true });
 
 export default mongoose.model("User", userSchema);

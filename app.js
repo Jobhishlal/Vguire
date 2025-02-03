@@ -8,9 +8,12 @@ import passport from './config/passport.js';
 import authRoutes from './routes/authRoutes.js'; 
 import adminRoutes from './routes/adminRoutes.js';
 import path from 'path';
+import nocache from 'nocache';
 import cookieParser from 'cookie-parser';
 import methodOverride from 'method-override';
 import { fileURLToPath } from 'url';
+import { isCheckAuth } from './middlewares/authMiddleware.js';
+
 
 // Load environment variables
 dotenv.config();
@@ -31,6 +34,9 @@ app.use(express.urlencoded({ limit: '150mb', extended: true }));
 app.use(cookieParser());
 app.use(methodOverride('_method'));
 app.use(flash());
+app.use(nocache())
+
+
 
 app.use(
     session({
@@ -45,17 +51,16 @@ app.use(
     })
 );
 
-// Set EJS as the view engine
+
 app.set('views', path.join(process.cwd(), 'views'));
 app.set('view engine', 'ejs');
 
-// Flash message middleware
 app.use((req, res, next) => {
-    res.locals.msg = req.flash('msg');
+    res.locals.flashMessage = req.flash('msg');
     next();
 });
 
-// Initialize passport authentication
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(authRoutes);
@@ -64,25 +69,22 @@ app.use(authRoutes);
 // app.get('/auth/google',
 //     passport.authenticate('google', { scope: ['profile', 'email'] })
 // );
-
 app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/' }),
+    passport.authenticate('google', { failureRedirect: '/user/login', failureFlash: true }),
     (req, res) => {
-        res.redirect('/user/home'); // Redirect to home after successful login
+       
+        req.session.user = req.user._id; 
+        
+        res.redirect('/user/home'); 
     }
 );
 
-// app.get('/user/home', (req, res) => {
-//     if (!req.user) {
-//         return res.redirect('/auth/google'); // Redirect to Google login if not authenticated
-//     }
-//     res.render('user/home', { user: req.user }); // Pass the user data to the home.ejs template
-// });
+
 
 // Logout route to destroy session
 app.get('/logout', (req, res) => {
     req.logout((err) => {
-        res.redirect('/'); // Redirect to homepage after logging out
+        res.redirect('/'); 
     });
 });
 

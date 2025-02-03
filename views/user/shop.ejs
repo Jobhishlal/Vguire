@@ -304,35 +304,7 @@
     </div>
     
     
-    <!-- Feature Boxes -->
-    <!-- <div class="container my-5">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="feature-box" style="background-image: url('/image/austrian-national-library-aHMpOhw7u1E-unsplash.jpg')">
-                    <div class="feature-content">
-                        <h3>New Arrivals</h3>
-                        <p>Check out our latest collection</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="feature-box" style="background-image: url('/api/placeholder/400/300')">
-                    <div class="feature-content">
-                        <h3>Best Sellers</h3>
-                        <p>Our most popular items</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="feature-box" style="background-image: url('/api/placeholder/400/300')">
-                    <div class="feature-content">
-                        <h3>Special Offers</h3>
-                        <p>Limited time deals</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> -->
+   
 
       <!-- Product Categories -->
      
@@ -362,16 +334,18 @@
             <div class="row">
                 <!-- Loop through all products -->
                 <% for (let i = 0; i < allProducts.length; i++) { %>
-                <div class="col-md-4">
+                <div class="col-md-4 margin-bottom:10px">
                     <div class="product-card">
+                        <a href="/user/productview/<%= allProducts[i]._id %>">
                         <div class="product-image-wrapper">
                             <!-- Link to the product view page with the product ID -->
-                            <a href="/user/productview/<%= allProducts[i]._id %>">
+                           
                                 <img src="<%= allProducts[i].images[0] %>" 
                                      alt="<%= allProducts[i].name %>" 
                                      class="product-image">
-                            </a>
+                            
                             <div class="product-overlay"></div>
+                        </a>
                             <button class="wishlist-btn">
                                 <i class="far fa-heart"></i>
                             </button>

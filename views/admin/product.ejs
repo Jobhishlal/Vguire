@@ -7,11 +7,223 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <style>
+
+
+.product-table {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+        }
+
+        .table {
+            margin-bottom: 0;
+            color: whitesmoke
+        }
+
+        .table > :not(caption) > * > * {
+            padding: 1rem 1.5rem;
+            background: none;
+            border-bottom-color: rgb(243, 240, 240);
+            color: white;
+           
+        }
+
+        .table > thead {
+            background: rgba(211, 213, 216, 0.1);
+        }
+
+        .table > thead th {
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.85rem;
+            border-bottom: none;
+        }
+
+        /* Product Image Styles */
+        .product-image-container {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .product-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .product-image:hover {
+            transform: scale(1.1);
+        }
+
+        /* Status Badge Styles */
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-in-stock {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+
+        .status-low-stock {
+            background: rgba(241, 196, 15, 0.2);
+            color: #f1c40f;
+        }
+
+        .status-out-of-stock {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        /* Action Button Styles */
+        .btn-action {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-action i {
+            font-size: 1rem;
+        }
+
+        /* Enhanced Page Header */
+        .page-header {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .page-title i {
+            color: var(--primary-color);
+        }
+
+        .btn-add-product {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(45deg, var(--primary-color), #6610f2);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add-product:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78, 115, 223, 0.3);
+        }
+
+        /* Product Info Styles */
+        .product-info {
+            max-width: 300px;
+        }
+
+        .product-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-color);
+        }
+
+        .product-description {
+            font-size: 0.875rem;
+            color: var(--secondary-color);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Size and Stock Indicators */
+        .size-indicator {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .stock-warning {
+            color: #f1c40f;
+        }
+
+        .stock-danger {
+            color: #e74c3c;
+        }
+
+        /* Search and Filter Section */
+        .filters-section {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            color: var(--text-color);
+        }
+
+        .filter-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            color: var(--text-color);
+            min-width: 150px;
+        }
+
         :root {
             --sidebar-width: 250px;
             --sidebar-collapsed-width: 70px;
             --header-height: 60px;
-            --primary-color: #4e73df;
+            --primary-color: #cbcfda;
             --secondary-color: #858796;
             --dark-bg: #1a1a1a;
             --card-bg: #242424;
@@ -20,7 +232,7 @@
 
         body {
             background-color: var(--dark-bg);
-            color: var(--text-color);
+            color:white
             min-height: 100vh;
             overflow-x: hidden;
         }
@@ -200,7 +412,107 @@
             .content-header {
                 left: 0 !important;
             }
+            .green {
+    background-color: green;
+    color: white;
+}
+
+.red {
+    background-color: red;
+    color: white;
+}
+
         }
+
+
+         @media (max-width: 1200px) {
+            .size-indicator {
+                width: 30px;
+                height: 30px;
+                font-size: 0.8rem;
+            }
+            
+            .product-image {
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .product-image-container {
+                flex-wrap: wrap;
+            }
+            
+            .product-image {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .table > :not(caption) > * > * {
+                padding: 0.5rem;
+            }
+            
+            .size-indicator {
+                width: 25px;
+                height: 25px;
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .table-responsive {
+                overflow-x: auto;
+            }
+            
+            .product-info {
+                max-width: 150px;
+            }
+            
+            .filters-section {
+                flex-direction: column;
+            }
+            
+            .search-input, .filter-select {
+                width: 100%;
+            }
+            
+            .btn-action {
+                width: 30px;
+                height: 30px;
+            }
+        }
+
+        /* Pagination Styles */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .pagination {
+            background: var(--card-bg);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .pagination .page-item .page-link {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            margin: 0 0.25rem;
+            border-radius: 0.25rem;
+        }
+
+        .pagination .page-item.active .page-link {
+            background: var(--primary-color);
+            color: var(--dark-bg);
+        }
+
+        .pagination .page-item .page-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
     </style>
 </head>
 <body>
@@ -281,7 +593,6 @@
 
     <!-- Main Content -->
     <main class="main-content">
-        <!-- Content Header
         <header class="content-header">
             <button class="toggle-sidebar">
                 <i class="fas fa-bars"></i>
@@ -302,110 +613,128 @@
             </div>
         </header>
 
-        <!-- Your existing content goes here -->
         <div class="container-fluid">
-            <main class="main-content">
-                <header class="content-header">
-                    <!-- Previous header content -->
-                </header>
-        
-                <!-- Product Management Content -->
-                <div class="container-fluid">
-                    <!-- Page Header -->
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h1 class="h3 mb-0 text-light">Product Management</h1>
-                        <a href="/admin/add-product" class="btn btn-primary">
-                            <i class="fas fa-plus me-2"></i>Add New Product
-                        </a>
-                    </div>
-        
-                    <!-- Product Table -->
-                    <div class="card product-table">
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Image</th>
-                                            <th>Product</th>
-                                            <th>Category</th>
-                                            <th>Price</th>
-                                            <th>Stock</th>
-                                            <th>S</th>
-                                            <th>M</th>
-                                            <th>L</th>
-                                            <th>XL</th>
-                                            <th>XXL</th>
-                                            <th>Status</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% products.forEach(product => { %>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex gap-2">
-                                                    <% if (product.images && product.images.length > 0) { %>
-                                                        <% product.images.forEach(image => { %>
-                                                            <img src="/uploads/products/<%= image.split('/').pop() %>" 
-                                                                 class="product-image" 
-                                                                 alt="<%= product.name %>" 
-                                                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
-                                                        <% }); %>
-                                                    <% } else { %>
-                                                        <div class="product-image bg-secondary d-flex align-items-center justify-content-center" 
-                                                             style="width: 50px; height: 50px; border-radius: 5px;">
-                                                            <i class="fas fa-image text-white"></i>
-                                                        </div>
-                                                    <% } %>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="fw-bold"><%= product.name %></div>
-                                                <small class="text-muted"><%= product.description.substring(0, 50) %>...</small>
-                                            </td>
-                                            <td><%= product.category ? product.category.name : 'N/A' %></td>
-                                            <td>$<%= product.price %></td>
-                                            <td><%= product.totalStock %></td>
-                                            <td><%= product.sizeS %></td>
-                                            <td><%= product.sizeM %></td>
-                                            <td><%= product.sizeL %></td>
-                                            <td><%= product.sizeXL %></td>
-                                            <td><%= product.sizeXXL %></td>
-                                            <td>
-                                                <% if (product.totalStock > 10) { %>
-                                                    <span class="status-badge status-in-stock">In Stock</span>
-                                                <% } else if (product.totalStock > 0) { %>
-                                                    <span class="status-badge status-low-stock">Low Stock</span>
-                                                <% } else { %>
-                                                    <span class="status-badge status-out-of-stock">Out of Stock</span>
-                                                <% } %>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex gap-1">
-                                                    <a href="/product/<%= product._id %>" class="btn btn-primary btn-action">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                    <a href="/admin/edit-product/<%= product._id %>" class="btn btn-success btn-action">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <form id="delete-form-<%= product._id %>" action="/admin/product/<%= product._id %>" method="POST" class="d-inline">
-                                                        <button type="submit" class="btn btn-action <%= product.deleted ? 'btn-warning' : 'btn-danger' %>">
-                                                            <i class="fas <%= product.deleted ? 'fa-undo' : 'fa-trash-alt' %>"></i>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <% }) %>
-                                    </tbody>
-                                    
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Enhanced Page Header -->
+            <div class="page-header">
+                <h1 class="page-title " style="color: #e4e4e4;">
+                    <i class="fas fa-box"></i>
+                    Product Management
+                </h1>
+               <a href="/admin/add-product">
+                <button class="btn btn-add-product">
+                    <i class="fas fa-plus"></i>
+                    Add New Product
+                </button>
+
+               </a>
+            </div>
+
+            <!-- Search and Filters -->
+            <div class="filters-section">
+               
+                <select class="filter-select">
+                    <option value="">Stock Status</option>
+                    <option value="in-stock">In Stock</option>
+                    <option value="low-stock">Low Stock</option>
+                    <option value="out-of-stock">Out of Stock</option>
+                </select>
+            </div>
+
+            <!-- Enhanced Product Table -->
+            <div class="card product-table">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Sizes [S,M,L,XL,XXL]</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% products.forEach(product => { %>
+                            <tr>
+                                <td>
+                                    <div class="product-image-container">
+                                        <% if (product.images && product.images.length > 0) { %>
+                                            <% product.images.slice(0, 5).forEach(image => { %>
+                                                <img src="/uploads/products/<%= image.split('/').pop() %>" 
+                                                     class="product-image" 
+                                                     alt="<%= product.name %>">
+                                            <% }); %>
+                                        <% } else { %>
+                                            <div class="product-image bg-secondary d-flex align-items-center justify-content-center">
+                                                <i class="fas fa-image"></i>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="product-info">
+                                        <div class="product-name"><%= product.name %></div>
+                                        <div class="product-description"><%= product.description.substring(0, 100) %>...</div>
+                                    </div>
+                                </td>
+                                <td><%= product.category ? product.category.name : 'N/A' %></td>
+                                <td>
+                                    <div class="fw-bold">$<%= product.price %></div>
+                                </td>
+                                <td>
+                                    <div class="<%= product.totalStock < 5 ? 'stock-danger' : (product.totalStock < 10 ? 'stock-warning' : '') %>">
+                                        <%= product.totalStock %>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <div class="size-indicator"><%=product.sizeS%></div>
+                                        <div class="size-indicator"><%=product.sizeM%></div>
+                                        <div class="size-indicator"><%=product.sizeL%></div>
+                                        <div class="size-indicator"><%=product.sizeXL%></div>
+                                        <div class="size-indicator"><%=product.sizeXXL%></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <% if (product.totalStock > 10) { %>
+                                        <span class="status-badge status-in-stock">In </span>
+                                    <% } else if (product.totalStock > 0) { %>
+                                        <span class="status-badge status-low-stock">Low</span>
+                                    <% } else { %>
+                                        <span class="status-badge status-out-of-stock">Out of</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-action btn-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <a href="/admin/edit-product/<%=product._id%>">
+                                            <button class="btn btn-action btn-success">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </a>
+                                        
+                                        <form action="/admin/listproduct/<%= product._id %>" method="POST">
+                                            <button type="submit" 
+                                                style="background-color: <%= product.isDelete === true ? 'red' : 'green' %>; 
+                                                       color: white; padding: 10px 15px; border: none; cursor: pointer; border-radius: 5px;">
+                                                <i class="<%= product.isDelete === true ? 'fas fa-ban' : 'fas fa-check-circle' %>"></i>
+                                                <span><%= product.isDelete === true ? 'Unlist product' : 'List product' %></span>
+                                            </button>
+                                        </form>
+                                        
+                                    </div>
+                                </td>
+                            </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
                 </div>
-            </main>
+            </div>
         </div>
     </main>
 

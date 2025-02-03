@@ -10,7 +10,7 @@ export const showProducts = async (req, res) => {
     try {
         const products = await Product.find().populate('category');
 
-        // Generate cropped image paths based on the original image names
+        
         const productsWithCroppedImages = products.map(product => ({
             ...product._doc,
             croppedImages: product.images.map(image => {
@@ -131,6 +131,7 @@ export const addProduct = async (req, res) => {
 
 
 
+
 export const getEditProduct = async (req, res) => {
     try {
         const { id } = req.params;
@@ -155,13 +156,13 @@ export const deleteimage = async (req, res) => {
             return res.status(400).json({ error: 'Image URL is required' });
         }
 
-        // Find the product containing the image
+      
         const product = await Product.findOne({ images: imageUrl });
         if (!product) {
             return res.status(404).json({ error: 'Product not found with this image' });
         }
 
-        // Remove the image from the product's image array (handle duplicates)
+      
         const imageExists = product.images.includes(imageUrl);
         if (imageExists) {
             product.images = product.images.filter(image => image !== imageUrl);
@@ -171,15 +172,15 @@ export const deleteimage = async (req, res) => {
 
         await product.save();
 
-        // Delete the image from the file system
+    
         const imagePath = path.join(process.cwd(), 'public', imageUrl);
         try {
-            // Check if the file exists before attempting to delete it
-            await fs.promises.access(imagePath, fs.constants.F_OK); // File should exist
-            await fs.promises.unlink(imagePath); // Try deleting it
+           
+            await fs.promises.access(imagePath, fs.constants.F_OK); 
+            await fs.promises.unlink(imagePath); 
             console.log(`Image deleted: ${imagePath}`);
         } catch (err) {
-            // Log the error but allow the deletion to succeed without file deletion
+            
             console.warn(`Image not found on server, skipping deletion: ${imagePath}`, err);
             return res.status(404).json({ error: 'Image not found on server' });
         }
@@ -193,7 +194,8 @@ export const deleteimage = async (req, res) => {
 export const postEditProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, price, category, sizeS, sizeM, sizeL, sizeXL, sizeXXL, imageBase64, deleteCurrentImage } = req.body;
+        const { name, description, price, category, sizeS, sizeM, sizeL, sizeXL, sizeXXL, imageBase64, deleteCurrentImage 
+        } = req.body;
 
         if (!name || !price || !category) {
             return res.status(400).json({ error: 'All fields are required' });
@@ -212,22 +214,22 @@ export const postEditProduct = async (req, res) => {
         let imagePaths = [];
         let croppedImagePaths = [];
 
-        // Handle image deletion if requested
+
         if (deleteCurrentImage === 'true' && product.images.length > 0) {
-            // Delete current images from server
+            
             for (let image of product.images) {
                 const imagePath = path.join(process.cwd(), 'public', image);
                 try {
-                    await fs.promises.access(imagePath);  // Check if file exists
-                    await fs.promises.unlink(imagePath);  // Delete file
+                    await fs.promises.access(imagePath);  
+                    await fs.promises.unlink(imagePath);  
                 } catch (err) {
                     console.error(`Error deleting image: ${imagePath}`, err);
                 }
             }
-            product.images = []; // Clear images from database only if deletion is requested
+            product.images = []; 
         }
 
-        // Handle base64 image upload
+       
         if (imageBase64) {
             const base64Data = imageBase64.split(',')[1];
             const buffer = Buffer.from(base64Data, 'base64');
@@ -240,16 +242,15 @@ export const postEditProduct = async (req, res) => {
                 await fs.promises.mkdir(uploadDir, { recursive: true });
             }
 
-            // Save original image
+           
             const fullImagePath = path.join(uploadDir, imageName);
             await fs.promises.writeFile(fullImagePath, buffer);
             imagePaths.push(`/uploads/products/${imageName}`);
 
-            // Save cropped image
             const croppedImagePath = path.join(uploadDir, croppedImageName);
             try {
                 await sharp(buffer)
-                    .resize(500, 500)  // Resize to 500x500
+                    .resize(500, 500) 
                     .toFile(croppedImagePath);
                 croppedImagePaths.push(`/uploads/products/${croppedImageName}`);
             } catch (error) {
@@ -258,7 +259,7 @@ export const postEditProduct = async (req, res) => {
             }
         }
 
-        // Handle file uploads
+        
         if (req.files && req.files.length > 0) {
             for (const file of req.files) {
                 const originalPath = `/uploads/products/${file.filename}`;
@@ -267,7 +268,7 @@ export const postEditProduct = async (req, res) => {
                 const croppedPath = `/uploads/products/cropped-${file.filename}`;
                 try {
                     await sharp(file.path)
-                        .resize(500, 500)  // Resize to 500x500
+                        .resize(500, 500) 
                         .toFile(`public${croppedPath}`);
                     croppedImagePaths.push(croppedPath);
                 } catch (error) {
@@ -277,14 +278,12 @@ export const postEditProduct = async (req, res) => {
             }
         }
 
-        // Combine existing images with new ones
         const finalImagePaths = croppedImagePaths.length > 0 ? [...product.images, ...croppedImagePaths] : product.images;
 
-        // Update product sizes and stock
         const sizes = [sizeS, sizeM, sizeL, sizeXL, sizeXXL].map(size => parseInt(size) || 0);
         const totalStock = sizes.reduce((acc, size) => acc + size, 0);
 
-        // Update product details
+    
         product.name = name;
         product.description = description;
         product.price = price;
@@ -307,23 +306,24 @@ export const postEditProduct = async (req, res) => {
     }
 };
 
-
-export const softDeleteProduct = async (req, res) => {
+export const list = async(req,res)=>{
     try {
-        const { id } = req.params;
-        const product = await Product.findById(id);
-
-        if (!product) {
-            return res.status(404).send('Product not found');
-        }
+        const id= req.params.id;
+        console.log(id);
+        
+        const product = await Product.findById(id)
+        console.log(product);
+        
+        product.isdelete=!product.isdelete;
+        console.log(product.isdelete);
+        
+        await product.save()
+        res.redirect('/admin/product')
 
         
-        product.deleted = !product.deleted;  
-        await product.save();
-
-        res.redirect('/admin/product');  
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Error soft deleting product');
+        console.error('its not working');
+        return res.status(500).send("its not  working now")
+        
     }
-};
+}
