@@ -78,7 +78,7 @@ app.get('/auth/google/callback',
         res.redirect('/user/home'); 
     }
 );
-
+ 
 
 
 // Logout route to destroy session

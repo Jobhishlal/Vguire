@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Address</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4">Edit Address</h2>
+
+        <form id="editAddressForm">
+            <input type="hidden" id="editAddressId" value="<%= address._id %>">  <!-- Hidden field for ID -->
+
+            <div class="mb-3">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="editFullName" value="<%= address.fullName %>" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Phone</label>
+                <input type="text" class="form-control" id="editPhone" value="<%= address.phone %>" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Street Address</label>
+                <input type="text" class="form-control" id="editStreetAddress" value="<%= address.streetAddress %>" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">City</label>
+                <input type="text" class="form-control" id="editCity" value="<%= address.city %>" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">State</label>
+                <input type="text" class="form-control" id="editState" value="<%= address.state %>" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Pincode</label>
+                <input type="text" class="form-control" id="editPincode" value="<%= address.pincode %>" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Address Type</label>
+                <select class="form-control" id="editAddressType">
+                    <option value="Home" <%= address.addressType === "Home" ? "selected" : "" %>>Home</option>
+                    <option value="Work" <%= address.addressType === "Work" ? "selected" : "" %>>Work</option>
+                    <option value="Other" <%= address.addressType === "Other" ? "selected" : "" %>>Other</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Update Address</button>
+        </form>
+    </div>
+
+    <script>
+       $(document).ready(function () {
+    $("#editAddressForm").submit(function (e) {
+        e.preventDefault();
+
+        let addressId = $("#editAddressId").val();
+        let phone = $("#editPhone").val().trim();
+        let phoneRegex = /^[1-9][0-9]{9}$/;  // Ensures 10 digits and not starting with 0
+
+        // Validate phone number
+        if (!phoneRegex.test(phone)) {
+            Swal.fire({
+                icon: "error",
+                title: "Invalid Phone Number",
+                text: "Please enter a valid 10-digit phone number.",
+                showConfirmButton: false,
+                timer: 2000
+            });
+            return;
+        }
+
+        let updatedAddress = {
+            fullName: $("#editFullName").val(),
+            phone: phone,
+            streetAddress: $("#editStreetAddress").val(),
+            city: $("#editCity").val(),
+            state: $("#editState").val(),
+            pincode: $("#editPincode").val(),
+            addressType: $("#editAddressType").val()
+        };
+
+        $.ajax({
+            url: `/user/edit-address/${addressId}`,
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(updatedAddress),
+            success: function (response) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Address Updated!",
+                    text: "Your address has been updated successfully.",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+
+                setTimeout(() => window.location.href = "/user/address", 1500);
+            },
+            error: function () {
+                Swal.fire({
+                    icon: "error",
+                    title: "Update Failed",
+                    text: "An error occurred while updating the address.",
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
+        });
+    });
+});
+
+    </script>
+</body>
+</html>

@@ -24,10 +24,15 @@ import {
     logoutUser,
     getprofile,
     postprofile,
-    validatepass
-    
+    validatepass,
+    getaddress,
+    postaddress,geteditaddress
+    ,posteditaddress,
+    deleteaddress
     
 } from '../controllers/userController.js';
+
+import {getcart,addToCart,updateCartQuantity,removeFromCart,checkout} from '../controllers/CartController.js'
 import { profileUpload } from '../middlewares/multerConfig.js';
 
 const router = express.Router();
@@ -73,6 +78,21 @@ router.post('/profile/edit',isAuth,profileUpload,postprofile)
 router.post('/profile/validate-password', isAuth, validatepass);
 
 
+
+router.get('/address',isAuth,getaddress);
+router.post('/add-address',isAuth,postaddress)
+router.get('/edit-address/:id',isAuth,geteditaddress)
+router.post('/edit-address/:id',isAuth,posteditaddress)
+
+router.post('/delete-address/:id',deleteaddress)
+
+
+
+router.get("/cart",isAuth, getcart);
+router.post("/add-to-cart",isAuth ,addToCart);
+router.post("/update-cart-quantity",isAuth, updateCartQuantity);
+router.post("/remove-from-cart/:itemId",isAuth ,removeFromCart);
+router.post("/checkout",isAuth, checkout);
 
 export default router;
 

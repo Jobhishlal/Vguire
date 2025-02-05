@@ -7,6 +7,8 @@ import { error, log } from 'console';
 import exp from 'constants';
 import Category from '../models/category.js';
 import Product from '../models/products.js'; 
+import Address from '../models/address.js';
+import Cart from '../models/cart.js'
 import flash from 'express-flash';
 import passport from 'passport';
 
@@ -526,52 +528,36 @@ export const changePassword = async (req, res) => {
 
 
 
-
-
-
-//dont change top code//
-
+   
 export const homepage = async (req, res) => {
     try {
-       
-       const categories = await Category.find({isListed:false}); 
-       const product=await Product.find({isdelete:false})
-       const createdAt= await Product.find().sort({createdAt:-1}).limit(1)
-      
-       
-       console.log(categories); 
-       console.log('hiiii');
-       
- 
-       if (!categories || categories.length === 0) {
-          console.log("No categories found.");
-          return res.status(404).send("No categories found");
-       }
-       if(!product||product.length===0){
-        console.log("No product  found");
-        return res.status(505).send("No Products found")
-        
-       }
- 
-         
- 
-    
-       res.render('user/home', {
-          user: req.user,  
-          categories: categories ,
-          product:product,
-          date:createdAt,
-          session:req.session
-
-       });
-       console.log(req.user);
-       
+      const categories = await Category.find({ isListed: false });
+      const product = await Product.find({ isdelete: false });
+      const latestProduct = await Product.find().sort({ createdAt: -1 }).limit(1);
+  
+      let cartItems = [];
+      if (req.user) {
+        const cart = await Cart.findOne({ userId: req.user._id });
+        cartItems = cart ? cart.items : [];
+      }
+  
+      res.render("user/home", {
+        user: req.user,
+        categories,
+        product,
+        date: latestProduct,
+        cartItems,
+        session:req.session // Pass cartItems to EJS
+      });
     } catch (error) {
-       
-       console.error("Error fetching categories:", error);
-       return res.status(500).send("Internal server error");
+      console.error("Error fetching homepage data:", error);
+      res.status(500).send("Internal Server Error");
     }
- };
+  };
+
+
+
+
  
  export const shoppage =async(req,res)=>{
     try {
@@ -840,3 +826,104 @@ export const validatepass = async (req, res) => {
         return res.status(500).json({ valid: false, message: 'Server error' });
     }
 };
+export const getaddress = async (req, res) => {
+    try {
+        const address = await Address.find({ userId: req.user._id });  
+       
+        res.render('user/address', { address, error: req.flash('error') });
+    } catch (error) {
+        console.error(error, "Address fetching error");
+        res.status(500).send("Address not fetched");
+    }
+};
+
+export const postaddress = async (req, res) => {
+    try {
+        const { fullName, phone, streetAddress, city, state, pincode, addressType } = req.body;
+
+        console.log('Received address data:', req.body);  // Verify data is received
+
+        // Validate that all fields are provided
+        if (!fullName || !phone || !streetAddress || !city || !state || !pincode || !addressType) {
+            return res.status(400).json({ success: false, message: "All fields are required" });
+        }
+
+        // Create and save the new address
+        const newAddress = new Address({
+            userId: req.user._id,
+            fullName,
+            phone,
+            streetAddress,
+            city,
+            state,
+            pincode,
+            addressType
+        });
+
+        const savedAddress = await newAddress.save();
+        console.log('Address saved:', savedAddress);  // Log saved address
+
+        // Return the saved address in the response
+        res.json({ success: true, data: savedAddress });
+
+    } catch (error) {
+        console.error("Error adding address:", error);
+        res.status(500).json({ success: false, message: "Failed to add address" });
+    }
+};
+
+
+export const geteditaddress = async(req,res)=>{
+    try {
+        const AddressId= req.params.id;
+        const address = await Address.findById(AddressId);
+        if(!address){
+            req.flash("error","Address not found");
+            return res.redirect("/user/address")
+        }
+        res.render("user/edit-address",{address})
+    } catch (error) {
+        console.error("edit address error");
+        return res.status(500).send("edit address is not working")
+    }
+}
+
+export const posteditaddress = async(req,res)=>{
+    try {
+        const AddressId = req.params.id;
+        const {fullName,phone,city,state,pincode,streetAddress,addressType}=req.body
+
+
+        const updateaddress= await Address.findByIdAndUpdate(AddressId,
+            {fullName,phone,city,state,pincode,streetAddress,addressType},
+            {new:true}
+        );
+        if(!updateaddress){
+            return res.status(404).json({ success: false, message: "Address not found" });
+        }
+        res.redirect("/user/address")
+    } catch (error) {
+        console.error("edit address not work",err);
+        return res.status(500).send("its not working")
+    }
+}
+
+
+export const deleteaddress = async(req,res)=>{
+    try {
+        const addressId = req.params.id;
+        const deletedAddress = await Address.findByIdAndDelete(addressId);
+
+        if (!deletedAddress) {
+            req.flash("error", "Address not found");
+            return res.redirect("/user/address");
+        }
+
+        req.flash("success", "Address deleted successfully!");
+        res.redirect("/user/address");  // Redirect after deletion
+    } catch (error) {
+        console.error("Error deleting address:", error);
+        req.flash("error", "Failed to delete address.");
+        res.redirect("/user/address");
+    }
+}

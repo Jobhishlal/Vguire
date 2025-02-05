@@ -61,7 +61,17 @@
          <% } %>
  
                     <a href="#" class="me-3"><i class="fas fa-search"></i></a>
-                    <a href="#" class="me-3"><i class="fas fa-shopping-cart"></i></a>
+                    <a href="/user/cart" class="me-3">
+                        <i class="fas fa-shopping-cart"></i>
+                        <% if (cartItems && cartItems.length > 0) { %>
+                            <span class="badge bg-danger">
+                                <%= cartItems.length %>
+                            </span>
+                        <% } %>
+                        
+                    </a>
+                    
+                    
                     <a href="#"><i class="fas fa-heart"></i></a>
                 </div>
             </div>

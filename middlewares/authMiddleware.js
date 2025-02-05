@@ -74,24 +74,45 @@ export const redirectIfAuthenticated = (req, res, next) => {
 
 
 
+// export const isAuth = async (req, res, next) => {
+//   if (!req.session.user) {
+//       return res.redirect("/user/login"); 
+//   }
+
+//   try {
+//       const user = await User.findById(req.session.user);  // Correctly cast ObjectId here
+//       if (!user) {
+//           return res.redirect("/user/login");
+//       }
+
+//       req.user = user;  // Ensure req.user is the actual user object
+//       next();
+//   } catch (error) {
+//       console.error("Error in authentication:", error);
+//       return res.redirect("/user/login");
+//   }
+// };
+
+
 export const isAuth = async (req, res, next) => {
   if (!req.session.user) {
       return res.redirect("/user/login"); 
   }
 
   try {
-      const user = await User.findById(req.session.user);  // Correctly cast ObjectId here
+      const user = await User.findById(req.session.user);  
       if (!user) {
           return res.redirect("/user/login");
       }
 
-      req.user = user;  // Ensure req.user is the actual user object
+      req.user = user;  
       next();
   } catch (error) {
       console.error("Error in authentication:", error);
       return res.redirect("/user/login");
   }
 };
+
 
 
 export const isCheckAuth = (req,res,next)=>{

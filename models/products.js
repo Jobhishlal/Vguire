@@ -1,4 +1,4 @@
-// models/product.js
+
 import mongoose from 'mongoose';
 
 const sizeVariationSchema = new mongoose.Schema({

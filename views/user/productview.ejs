@@ -514,58 +514,39 @@
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <img src="/image/Screenshot 2025-01-02 185508.png" alt="Logo">
+                <img src="/image/Screenshot 2025-01-02 185508.png" alt="Logo" width="60">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/user/home">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/user/shop">Shop</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Contact</a>
-                    </li>
-                    <li class="nav-item">   
-                        <a class="nav-link" href="#">Profile</a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link" href="/user/home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/user/shop">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
                 </ul>
                 <div class="d-flex align-items-center">
-                    
                     <a href="#" class="me-3"><i class="fas fa-search"></i></a>
-                    <a href="#" class="me-3"><i class="fas fa-shopping-cart"></i></a>
+                    <a href="/user/cart" class="me-3"><i class="fas fa-shopping-cart"></i></a>
                     <a href="#"><i class="fas fa-heart"></i></a>
                 </div>
-               
             </div>
         </div>
-        
     </nav>
-
-
     
-   
-
-
-
-
-    <div class="container py-5">
-       
-        <div class="product-container" style="margin-top: 50px;">
+    <!-- Product View Section -->
+    <div class="container py-5" style="margin-top: 100px;">
+        <div class="product-container">
             <div style="font-size: 16px; font-weight: 500; padding: 10px; background: #f8f9fa; border-radius: 8px;">
-                <a href="/user/home" style="text-decoration: none; color:black; font-weight: bold;">Home</a> 
-                <span style="color: #6c757d; margin: 0 5px;"> &gt; </span>  
+                <a href="/user/home" style="text-decoration: none; color:black; font-weight: bold;">Home</a>
+                <span style="color: #6c757d; margin: 0 5px;"> &gt; </span>
                 <a href="/user/shop" style="text-decoration: none; color: black; font-weight: bold;">Shop</a>
-                <span style="color: #6c757d; margin: 0 5px;"> &gt; </span>  
+                <span style="color: #6c757d; margin: 0 5px;"> &gt; </span>
                 <a href="#" style="text-decoration: none; color: black; font-weight: bold;">Product Details</a>
             </div>
+    
             <!-- Main Product Section -->
             <div class="row mb-5">
                 <!-- Product Images -->
@@ -577,11 +558,8 @@
                                     <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
                                         <img src="<%= image %>" alt="Product Image <%= index + 1 %>" class="d-block w-100 zoom-image">
                                     </div>
-                                    
                                 <% }); %>
                             </div>
-                            
-                            
                             <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
                                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                 <span class="visually-hidden">Previous</span>
@@ -595,15 +573,12 @@
                         <p>No images available</p>
                     <% } %>
                 </div>
-                
-              
-
+    
                 <!-- Product Details -->
                 <div class="col-md-6">
-                    <h2 class="product-title" ><%= product.name %></h2>
+                    <h2 class="product-title"><%= product.name %></h2>
                     <div class="stock-status">
-                        <i class="fas fa-check-circle"></i>
-                        In Stock <%=product.totalStock%>
+                        <i class="fas fa-check-circle"></i> In Stock <%= product.totalStock %>
                     </div>
                     
                     <div class="mb-4">
@@ -611,81 +586,82 @@
                         <span class="original-price ms-2">₹3599</span>
                         <span class="discount-badge">25% OFF</span>
                     </div>
-
+    
                     <div class="features mb-4">
-                        <div class="feature-badge">
-                            <i class="fas fa-tshirt"></i>
-                            Premium Quality
-                        </div>
-                        <div class="feature-badge">
-                            <i class="fas fa-shipping-fast"></i>
-                            Fast Delivery
-                        </div>
-                        <div class="feature-badge">
-                            <i class="fas fa-sync"></i>
-                            Easy Returns
-                        </div>
+                        <div class="feature-badge"><i class="fas fa-tshirt"></i> Premium Quality</div>
+                        <div class="feature-badge"><i class="fas fa-shipping-fast"></i> Fast Delivery</div>
+                        <div class="feature-badge"><i class="fas fa-sync"></i> Easy Returns</div>
                     </div>
+    
+                    <!-- Add to Cart Form -->
+                    <form action="/user/add-to-cart" method="POST" class="mt-4">
+                        <input type="hidden" name="productId" value="<%= product._id %>">
                     
-                    <div class="mb-4">
-                        <h5 class="fw-bold">Select Size</h5>
-                        <div class="size-buttons">
-                            <button class="size-btn">S</button>
-                            <button class="size-btn active">M</button>
-                            <button class="size-btn">L</button>
-                            <button class="size-btn">XL</button>
-                            <button class="size-btn">XXL</button>
+                        <!-- Size Selection -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold">Select Size</h5>
+                            <div class="size-buttons d-flex gap-2">
+                                <% if (product.sizeS > 0) { %>
+                                    <input type="radio" name="size" value="S" id="sizeS" class="d-none">
+                                    <label for="sizeS" class="size-btn">S</label>
+                                <% } %>
+                                <% if (product.sizeM > 0) { %>
+                                    <input type="radio" name="size" value="M" id="sizeM" class="d-none">
+                                    <label for="sizeM" class="size-btn">M</label>
+                                <% } %>
+                                <% if (product.sizeL > 0) { %>
+                                    <input type="radio" name="size" value="L" id="sizeL" class="d-none">
+                                    <label for="sizeL" class="size-btn">L</label>
+                                <% } %>
+                                <% if (product.sizeXL > 0) { %>
+                                    <input type="radio" name="size" value="XL" id="sizeXL" class="d-none">
+                                    <label for="sizeXL" class="size-btn">XL</label>
+                                <% } %>
+                                <% if (product.sizeXXL > 0) { %>
+                                    <input type="radio" name="size" value="XXL" id="sizeXXL" class="d-none">
+                                    <label for="sizeXXL" class="size-btn">XXL</label>
+                                <% } %>
+                            </div>
                         </div>
-                    </div>
-                   
                     
+                        <!-- Quantity Input -->
+                        <div class="mb-3">
+                            <h5 class="fw-bold">Quantity</h5>
+                            <input type="number" class="form-control quantity-input" name="quantity" min="1" value="1" required>
+                        </div>
                     
-                    <div class="mb-4">
-                        <h5 class="fw-bold">Quantity</h5>
-                        <input 
-                            type="number" 
-                            class="form-control quantity-input" 
-                            
-                            min="1" value="1">
-                            
-                    </div>
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn btn-custom btn-add-cart">
+                                <i class="fas fa-plus me-2"></i>Add to Cart
+                            </button>
+                        </div>
+                    </form>
                     
-                    <div class="action-buttons">
-                        <button class="btn btn-custom btn-buy-now">
-                            <i class="fas fa-shopping-cart me-2"></i>Buy Now
-                        </button>
-                        <button class="btn btn-custom btn-add-cart">
-                            <i class="fas fa-plus me-2"></i>Add to Cart
-                        </button>
-                    </div>
                 </div>
             </div>
-            
+    
             <!-- Related Products -->
             <div class="row mt-5">
                 <h3 class="mb-4 fw-bold">Others Also Bought</h3>
-                <% for(let i=0;i<simProducts.length;i++){ %>
-                <div class="col-md-3 col-6 mb-4">
-                    <div class="card related-product">
-                        <a href="/user/productview/<%= simProducts[i]._id %>">
-
-                            <img src="<%= simProducts[i].images[0] %>" class="card-img-top" alt="Related Product 1">
-                        </a>
-                        
-                        <div class="card-body">
-                            <h6 class="card-title fw-bold"><%= simProducts[i].name %></h6>
-                            <p class="card-text text-primary fw-bold mb-0">₹<%= simProducts[i].price %></p>
+                <% for (let i = 0; i < simProducts.length; i++) { %>
+                    <div class="col-md-3 col-6 mb-4">
+                        <div class="card related-product">
+                            <a href="/user/productview/<%= simProducts[i]._id %>">
+                                <img src="<%= simProducts[i].images[0] %>" class="card-img-top" alt="Related Product 1">
+                            </a>
+                            <div class="card-body">
+                                <h6 class="card-title fw-bold"><%= simProducts[i].name %></h6>
+                                <p class="card-text text-primary fw-bold mb-0">₹<%= simProducts[i].price %></p>
+                            </div>
                         </div>
                     </div>
-                </div>
                 <% } %>
             </div>
         </div>
     </div>
-
-
-
-
+    
+    <!-- Footer -->
     <footer class="footer" style="display: block;">
         <div class="container">
             <div class="row">
@@ -717,7 +693,6 @@
         </div>
     </footer>
 
-
     <script>
      
      
@@ -736,10 +711,28 @@
     });
 });
 
+document.getElementById("productForm").addEventListener("submit", function (e) {
+        const selectedSize = document.querySelector('input[name="size"]:checked');
+        if (!selectedSize) {
+            e.preventDefault();
+            Swal.fire({
+                icon: "error",
+                title: "Size Required!",
+                text: "Please select a size before adding to cart.",
+                showConfirmButton: true
+            });
+        }
+    });
       
+
+    document.querySelectorAll(".size-buttons input[type='radio']").forEach(sizeBtn => {
+        sizeBtn.addEventListener("change", function () {
+            document.getElementById("selectedSize").innerText = this.value;
+        });
+    });
 
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 </body>
-</html>
+</html> 
