@@ -1,10 +1,6 @@
 
 import mongoose from 'mongoose';
 
-const sizeVariationSchema = new mongoose.Schema({
-  size: { type: String, required: true },
-  stock: { type: Number, required: true },
-});
 
 const productSchema = new mongoose.Schema({
   name: { type: String, required: true },

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+  <style>
+    .checkout-container { margin: 20px; }
+    .order-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; }
+    .form-control { padding: 8px; margin-bottom: 10px; width: 100%; }
+    .btn { padding: 8px 15px; margin-right: 5px; }
+    .address-section { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <h2>Checkout</h2>
+
+  <!-- Order Details Section -->
+  <div class="checkout-container">
+    <h3>Your Items:</h3>
+    <% items.forEach(item => { %>
+      <div class="order-card">
+        <h4><%= item.product.name %> (<%= item.size %>)</h4>  
+        <p>Quantity: <%= item.quantity %></p>  
+        <p>Unit Price: ₹<%= item.price %></p>
+        <p><strong>Total: ₹<%= item.totalPrice %></strong></p> 
+        <img src="<%= item.product.images[0] %>" width="200">
+        <input type="hidden" name="productId" value="<%= item.product._id %>">
+      </div>
+    <% }); %>
+    <h3>Grand Total: ₹<%= totalAmount %></h3> 
+</div>
+
+
+  <!-- Address Management Section -->
+  <div class="checkout-container address-section">
+    <h3>Shipping Address</h3>
+    <% if (addresses && addresses.length > 0) { %>
+      <label for="addressSelect">Select a saved address:</label>
+      <select id="addressSelect" class="form-control">
+        <% addresses.forEach(addr => { %>
+          <option value="<%= addr._id %>" 
+                  data-fullname="<%= addr.fullName %>" 
+                  data-phone="<%= addr.phone %>" 
+                  data-street="<%= addr.streetAddress %>" 
+                  data-city="<%= addr.city %>" 
+                  data-state="<%= addr.state %>" 
+                  data-pincode="<%= addr.pincode %>" 
+                  data-addresstype="<%= addr.addressType %>">
+            <%= addr.fullName %> - <%= addr.streetAddress %>, <%= addr.city %>, <%= addr.state %>, <%= addr.pincode %>
+          </option>
+        <% }); %>
+      </select>
+      <button type="button" class="btn btn-warning" id="editAddressBtn" data-bs-toggle="modal" data-bs-target="#editAddressModal">
+        Edit Address
+      </button>
+    <% } else { %>
+      <p>No saved address found.</p>
+    <% } %>
+    
+    <button type="button" class="btn btn-info" id="addNewAddressBtn" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+      Add New Address
+    </button>
+  </div>
+
+  <!-- Edit Address Modal -->
+  <div class="modal fade" id="editAddressModal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Address</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form id="editAddressForm" action="/user/address/edit" method="POST">
+                <input type="hidden" name="redirectUrl" value="<%= currentCheckoutUrl %>">
+                <input type="hidden" name="addressId" id="editAddressId">
+                <input type="text" name="fullName" id="editFullName" class="form-control" required placeholder="Full Name">
+                <input type="text" name="phone" id="editPhone" class="form-control" required placeholder="Phone">
+                <input type="text" name="streetAddress" id="editStreetAddress" class="form-control" required placeholder="Street Address">
+                <input type="text" name="city" id="editCity" class="form-control" required placeholder="City">
+                <input type="text" name="state" id="editState" class="form-control" required placeholder="State">
+                <input type="text" name="pincode" id="editPincode" class="form-control" required placeholder="Pincode">
+                <select name="addressType" id="editAddressType" class="form-control" required>
+                    <option value="Home">Home</option>
+                    <option value="Work">Work</option>
+                    <option value="Other">Other</option>
+                </select>
+                <button type="submit" class="btn btn-primary mt-2">Update Address</button>
+            </form>
+            
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Address Modal -->
+  <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add New Address</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form id="addAddressForm" action="/user/address/add" method="POST">
+                <input type="hidden" name="redirectUrl" value="<%= currentCheckoutUrl %>">
+                <input type="text" name="fullName" class="form-control" required placeholder="Full Name">
+                <input type="text" name="phone" class="form-control" required placeholder="Phone">
+                <input type="text" name="streetAddress" class="form-control" required placeholder="Street Address">
+                <input type="text" name="city" class="form-control" required placeholder="City">
+                <input type="text" name="state" class="form-control" required placeholder="State">
+                <input type="text" name="pincode" class="form-control" required placeholder="Pincode">
+                <select name="addressType" class="form-control" required>
+                    <option value="Home">Home</option>
+                    <option value="Work">Work</option>
+                    <option value="Other">Other</option>
+                </select>
+                <button type="submit" class="btn btn-success mt-2">Save Address</button>
+            </form>
+            
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Final Order Submission Form -->
+  <form action="/user/checkout/place-order" method="POST" id="orderForm" class="checkout-container">
+    <input type="hidden" name="addressId" id="finalAddressId" value="<%= addresses && addresses.length > 0 ? addresses[0]._id : '' %>">
+    <button type="submit" class="btn btn-success">Place Order</button>
+  </form>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+
+document.getElementById("editAddressBtn").addEventListener("click", () => {
+    const selectedOption = document.getElementById("addressSelect").selectedOptions[0];
+
+    if (!selectedOption) {
+        alert("Please select an address to edit.");
+        return;
+    }
+
+    
+    document.getElementById("editAddressId").value = selectedOption.value;
+    document.getElementById("editFullName").value = selectedOption.getAttribute("data-fullname");
+    document.getElementById("editPhone").value = selectedOption.getAttribute("data-phone");
+    document.getElementById("editStreetAddress").value = selectedOption.getAttribute("data-street");
+    document.getElementById("editCity").value = selectedOption.getAttribute("data-city");
+    document.getElementById("editState").value = selectedOption.getAttribute("data-state");
+    document.getElementById("editPincode").value = selectedOption.getAttribute("data-pincode");
+    document.getElementById("editAddressType").value = selectedOption.getAttribute("data-addresstype");
+});
+
+document.getElementById("editAddressForm").addEventListener("submit", function (e) {
+    e.preventDefault(); 
+
+    const addressId = document.getElementById("editAddressId").value;
+    if (!addressId) {
+        alert("Address ID is missing.");
+        return;
+    }
+
+    this.action = "/user/address/edit/" + addressId; 
+    this.submit(); 
+});
+
+
+
+  </script>
+
+</body>
+</html>
