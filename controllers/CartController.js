@@ -121,6 +121,9 @@ export const updateCartQuantity = async (req, res) => {
         if (!product || product[item.size] < quantity) { 
             return res.redirect("/user/cart")
         }
+        if(item.quantity>5){
+            return res.redirect("/user/cart")
+        }
 
         item.quantity = parseInt(quantity);
         await cart.save();

@@ -536,6 +536,22 @@
 .buy-now-btn i {
     margin-right: 8px;
 }
+
+.size-btn {
+        padding: 10px 20px;
+        border: 2px solid #ccc;
+        background-color: white;
+        color: black;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: 0.3s;
+    }
+
+    .size-btn.selected {
+        background-color: #007bff; /* Change to your preferred color */
+        color: white;
+        border-color: #007bff;
+    }
     </style>
 </head>
 <body>
@@ -631,27 +647,28 @@
                             <h5 class="fw-bold">Select Size</h5>
                             <div class="size-buttons d-flex gap-2">
                                 <% if (product.sizeS > 0) { %>
-                                    <input type="radio" name="size" value="S" id="sizeS" class="d-none">
+                                    <input type="radio" name="size" value="S" id="sizeS" class="d-none" onchange="selectSize('sizeS',event)">
                                     <label for="sizeS" class="size-btn">S</label>
                                 <% } %>
                                 <% if (product.sizeM > 0) { %>
-                                    <input type="radio" name="size" value="M" id="sizeM" class="d-none">
+                                    <input type="radio" name="size" value="M" id="sizeM" class="d-none" onchange="selectSize('sizeM',event)">
                                     <label for="sizeM" class="size-btn">M</label>
                                 <% } %>
                                 <% if (product.sizeL > 0) { %>
-                                    <input type="radio" name="size" value="L" id="sizeL" class="d-none">
+                                    <input type="radio" name="size" value="L" id="sizeL" class="d-none" onchange="selectSize('sizeL',event)">
                                     <label for="sizeL" class="size-btn">L</label>
                                 <% } %>
                                 <% if (product.sizeXL > 0) { %>
-                                    <input type="radio" name="size" value="XL" id="sizeXL" class="d-none">
+                                    <input type="radio" name="size" value="XL" id="sizeXL" class="d-none" onchange="selectSize('sizeXL',event)">
                                     <label for="sizeXL" class="size-btn">XL</label>
                                 <% } %>
                                 <% if (product.sizeXXL > 0) { %>
-                                    <input type="radio" name="size" value="XXL" id="sizeXXL" class="d-none">
+                                    <input type="radio" name="size" value="XXL" id="sizeXXL" class="d-none" onchange="selectSize('sizeXXL',event)">
                                     <label for="sizeXXL" class="size-btn">XXL</label>
                                 <% } %>
                             </div>
                         </div>
+                        
                     
                         <!-- Quantity Input -->
                         <div class="mb-3">
@@ -668,9 +685,10 @@
                         </div>
                     </form>
 
-                    <form action="/user/checkout/buy-now" method="post" class="buy-now-form">
+                    <form onsubmit="a(event)">
                         <input type="hidden" name="productId" value="<%= product._id %>">
                         <input type="hidden" name="quantity" value="1">
+                        <input type="hidden" name="size" id="hh">
                         <input type="hidden" name="price" value="<%= product.price %>">
                         
                         <button type="submit" class="btn buy-now-btn">
@@ -735,7 +753,7 @@
 
     <script>
      
-     
+     let selectedSize=''
          
      document.querySelectorAll(".zoom-image").forEach(image => {
     image.addEventListener("mousemove", function (e) {
@@ -765,47 +783,11 @@ document.getElementById("productForm").addEventListener("submit", function (e) {
     });
       
 
-    document.querySelectorAll(".size-buttons input[type='radio']").forEach(sizeBtn => {
-        sizeBtn.addEventListener("change", function () {
-            document.getElementById("selectedSize").innerText = this.value;
-        });
-    });
-
+  
 
  
 
-    document.querySelectorAll(".add-to-cart-form").forEach(form => {
-        form.addEventListener("submit", async function(event) {
-            event.preventDefault(); // Prevent default form submission
-
-            const formData = new FormData(this);
-            const response = await fetch("/user/add-to-cart", {
-                method: "POST",
-                body: formData
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                Swal.fire({
-                    icon: "success",
-                    title: "Success!",
-                    text: result.message,
-                    timer: 2000
-                }).then(() => {
-                    location.reload(); // Refresh the page after success
-                });
-            } else {
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops!",
-                    text: result.message
-                });
-            }
-        });
-    });
-
-
+ 
     document.querySelectorAll(".add-to-cart-form").forEach(form => {
         form.addEventListener("submit", async function(event) {
             event.preventDefault(); // Prevent default form submission
@@ -837,6 +819,53 @@ document.getElementById("productForm").addEventListener("submit", function (e) {
             }
         });
     });
+
+
+    function selectSize(selectedId) {
+        
+        document.querySelectorAll(".size-btn").forEach(btn => {
+            btn.classList.remove("selected");
+        });
+        selectedSize=event.target.value
+       
+        
+        
+        document.querySelector(`label[for='${selectedId}']`).classList.add("selected");
+    }
+
+
+    async function a(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    const selectedSize = document.querySelector('input[name="size"]:checked')?.value;
+    if (!selectedSize) {
+        alert("Please select a size before buying.");
+        return;
+    }
+
+    const formData = {
+        productId: "<%= product._id %>",
+        quantity: 1,
+        size: selectedSize,
+        price: "<%= product.price %>"
+    };
+
+    try {
+        const response = await fetch("/user/checkout/buy-now", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) throw new Error("Failed to load content");
+
+        const html = await response.text(); // Get response as HTML
+        document.body.innerHTML = html; // Replace entire body content
+    } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred. Please try again.");
+    }
+}
 
     </script>
        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

@@ -33,7 +33,7 @@ import {
 } from '../controllers/userController.js';
 
 import {getcart,addToCart,updateCartQuantity,removeFromCart} from '../controllers/CartController.js'
-import {singlecheckout,cartproduct,placeorder,buyNowCartView,addaddress,editaddress,getcheckout,singleCheckoutView} from '../controllers/checkoutController.js'
+import {singlecheckout,cartproduct,placeorder,buyNowCartView,addaddress,editaddress,getcheckout,singleCheckoutView,updateCheckoutQuantity} from '../controllers/checkoutController.js'
 import { profileUpload } from '../middlewares/multerConfig.js';
 
 const router = express.Router();
@@ -101,8 +101,10 @@ router.post("/checkout/buy-now-cart",isAuth,cartproduct)
 router.get("/checkout/buy-now-cart", isAuth, buyNowCartView);
 router.post("/address/add",isAuth,addaddress)
 router.post("/address/edit/:id",isAuth,editaddress)
+router.post("/checkout/update-quantity", isAuth,updateCheckoutQuantity);
 
-router.post("/checkout/place-order",isAuth,placeorder)
+
+router.post("/checkout/placeorder",isAuth,placeorder)
 
 
 

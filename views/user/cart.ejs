@@ -305,6 +305,7 @@
                             <img src="<%= item.product.images[0] %>" alt="<%= item.product.name %>" />
                             <div class="cart-item-details flex-grow-1">
                                 <h5><%= item.product.name %></h5>
+                               
                                 <p>Size: <%= item.size.replace('size', '') %></p>
                                 <p>Price: ₹<%= item.product.price %></p>
 
@@ -404,13 +405,24 @@
         });
 
         function validateQuantity(input, maxStock) {
-            const value = parseInt(input.value);
-            if (value > maxStock) {
-                input.setCustomValidity(`Cannot exceed stock limit. Only ${maxStock} items available.`);
-            } else {
-                input.setCustomValidity('');
-            }
-        }
+    const value = parseInt(input.value);
+
+    if (value > 5) {
+        input.value = 5; 
+        Swal.fire({
+            title: "Limit Reached!",
+            text: "You can only add up to 5 items per product.",
+            icon: "warning",
+            confirmButtonColor: "#d33",
+            confirmButtonText: "OK"
+        });
+    } else if (value > maxStock) {
+        input.setCustomValidity(`Cannot exceed stock limit. Only ${maxStock} items available.`);
+    } else {
+        input.setCustomValidity('');
+    }
+}
+
     </script>
 </body>
 </html>
