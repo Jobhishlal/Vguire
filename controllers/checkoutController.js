@@ -73,7 +73,20 @@ export const cartproduct = async (req, res) => {
             return res.redirect("/user/cart");
         }
 
-        const address = await Address.findOne({ userId });
+        const addresses = await Address.find({ userId });
+        console.log("Available Addresses:", addresses);
+
+        const selectedAddressId = addresses.length > 0 ? addresses[0]._id.toString() : null;
+        console.log("Selected Address ID:", selectedAddressId); 
+
+        if (!selectedAddressId) {
+            req.session.flashMessage = {
+                type: "error",
+                message: "Please add a shipping address before proceeding."
+            };
+            return res.redirect("/user/cart");
+        }
+
         const totalAmount = cart.items.reduce((total, item) => total + (item.productId.price * item.quantity), 0);
 
         res.render("user/checkout", {
@@ -83,9 +96,10 @@ export const cartproduct = async (req, res) => {
                 quantity: item.quantity,
                 price: item.productId.price
             })),
-            address,
+            addresses,
+            selectedAddressId, 
             totalAmount,
-            checkoutType: "cart" 
+            checkoutType: "cart"
         });
     } catch (error) {
         console.error("Cart Checkout Error:", error);
@@ -93,18 +107,25 @@ export const cartproduct = async (req, res) => {
     }
 };
 
+
 export const placeorder = async (req, res) => {
     try {
+        console.log("Request Body:", req.body);
+
         let { addressId, items, paymentMethod = "COD" } = req.body;
         const userId = req.user?._id;
-
+        console.log(addressId);
         if (!mongoose.Types.ObjectId.isValid(addressId)) {
             return res.status(400).send("Invalid address selected. Please choose a valid address.");
         }
+        console.log(addressId);
+        
 
         if (!items || !Array.isArray(items) || items.length === 0) {
             return res.status(400).send("No items found in the order.");
         }
+
+        console.log("Valid items received:", items);
 
         const productIds = items.map(item => item.productId);
         const products = await Product.find({ _id: { $in: productIds } });
@@ -113,24 +134,63 @@ export const placeorder = async (req, res) => {
             return res.status(400).send("Invalid products in order.");
         }
 
-        const updatedItems = items.map(item => {
-            const product = products.find(p => p._id.toString() === item.productId);
-            if (!product) return null;
+        let outOfStockItems = [];
+        let updatedItems = [];
 
-            if (product[item.size] < item.quantity) {
-                return res.status(400).send(`Only ${product[item.size]} items available for size ${item.size}`);
+
+        for (let item of items) {
+            const product = products.find(p => p._id.toString() === item.productId);
+            if (!product) {
+                console.error(`Product not found: ${item.productId}`);
+                continue;
             }
 
-            return { productId: product._id, quantity: item.quantity, size: item.size, price: product.price, totalprice: product.price * item.quantity };
-        }).filter(item => item !== null);
+            const sizeKey = `size${item.size.toUpperCase()}`;
+            const sizeStock = product[sizeKey] || 0;
 
-        const totalAmount = updatedItems.reduce((sum, item) => sum + item.totalprice, 0);
+            console.log(`Checking stock for ${product.name} (Size: ${item.size}): Available ${sizeStock}, Ordered ${parseInt(item.quantity)}`);
 
-        for (let item of updatedItems) {
-            await Product.findByIdAndUpdate(item.productId, {
-                $inc: { [`${item.size}`]: -item.quantity, totalStock: -item.quantity }
+            if (sizeStock < parseInt(item.quantity)) {
+                outOfStockItems.push({
+                    productName: product.name,
+                    availableStock: sizeStock,
+                    size: item.size
+                });
+                continue;
+            }
+
+            
+            const updatedProduct = await Product.findByIdAndUpdate(
+                item.productId,
+                {
+                    $inc: {
+                        [sizeKey]: -parseInt(item.quantity), // Reduce stock for selected size
+                        totalStock: -parseInt(item.quantity) // Reduce total stock
+                    }
+                },
+                { new: true }
+            );
+
+            console.log(`Updated stock for ${updatedProduct.name} - Size: ${item.size}, New Stock: ${updatedProduct[sizeKey]}, New Total Stock: ${updatedProduct.totalStock}`);
+
+            updatedItems.push({
+                productId: product._id,
+                quantity: parseInt(item.quantity),
+                size: item.size,
+                price: parseInt(product.price),
+                totalprice: parseInt(product.price) * parseInt(item.quantity)
             });
         }
+
+        if (outOfStockItems.length > 0) {
+            req.session.flashMessage = {
+                type: "error",
+                message: `Some items are out of stock: ${outOfStockItems.map(i => `${i.productName} (Size: ${i.size}) - Available: ${i.availableStock}`).join(", ")}`
+            };
+            return res.redirect("/user/cart");
+        }
+
+        const totalAmount = updatedItems.reduce((sum, item) => sum + item.totalprice, 0);
 
         const newOrder = new Order({
             userId,
@@ -142,16 +202,18 @@ export const placeorder = async (req, res) => {
             transactionId: `TXN-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
             trackingNumber: `TRK-${Math.random().toString(36).substr(2, 10).toUpperCase()}`
         });
-              console.log(newOrder);
-              
+
         await newOrder.save();
-        res.redirect("/user/orders");
+        console.log("Order placed successfully:", newOrder);
+
+        return res.redirect("/user/orders");
 
     } catch (error) {
         console.error("Order Placement Error:", error);
-        res.status(500).send("Server Error");
+        return res.status(500).send("Server Error");
     }
 };
+
 
 export const addaddress = async (req, res) => {
     try {
@@ -231,7 +293,7 @@ export const getcheckout = async (req, res) => {
             return res.redirect("/user/cart");
         }
 
-        // Check stock availability
+
         let totalAmount = 0;
         let outOfStockItems = [];
 

@@ -606,7 +606,7 @@ export const homepage = async (req, res) => {
 export const productview = async (req, res) => {
     try {
         const productId = req.params.id;  
-        console.log(productId);
+        
         const product = await Product.findById(productId);  
         console.log(product);
 
