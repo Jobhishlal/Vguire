@@ -58,10 +58,9 @@
                 <i class="fas fa-tags fa-3x text-primary mb-3"></i>
                 <h2 class="text-white">Add New Category</h2>
             </div>
-            <%if(error){%>
-                <p style="color: red; "><b><%=error%></b</p>
+           
                 
-          <%  }%>
+                
             <form action="/admin/add-category" method="POST" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label for="categoryName" class="form-label">Category Name</label>
@@ -73,7 +72,7 @@
                             id="categoryName" 
                             name="name" 
                             placeholder="Enter category name" 
-                            required 
+                             
                         >
                     </div>
                 </div>
@@ -88,7 +87,7 @@
                             name="description" 
                             placeholder="Describe the category" 
                             rows="4" 
-                            required
+                          
                         ></textarea>
                     </div>
                 </div>
@@ -104,7 +103,7 @@
                             name="categoryImage" 
                             accept="image/*" 
                             multiple 
-                            required
+                           
                         >
                         <label for="categoryImages" class="file-label">Choose Images</label>
                     </div>
@@ -120,6 +119,29 @@
             
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <% if (messages.error.length > 0) { %>
+        <script>
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "<%= messages.error[0] %>",
+                confirmButtonColor: "#d33"
+            });
+        </script>
+    <% } %>
+    
+    <% if (messages.success.length > 0) { %>
+        <script>
+            Swal.fire({
+                icon: "success",
+                title: "Success!",
+                text: "<%= messages.success[0] %>",
+                confirmButtonColor: "#28a745"
+            });
+        </script>
+    <% } %>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 </body>

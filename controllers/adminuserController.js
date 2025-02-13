@@ -28,28 +28,29 @@ export const getUsers = async (req, res) => {
     }
   };
 
+  
   export const toggleBlockUser = async (req, res) => {
+   
+    
     try {
-        const email = req.params.email; 
-
-      
-        if (!email) {
-            return res.status(400).send("Email is required");
-        }
-
-        
-        const user = await User.findOne({ email: email });
+        const email = req.params.email;
 
         if (!email) {
-            return res.status(404).send("User not found");
+            return res.status(400).json({ error: "Email is required" });
         }
 
+        const user = await User.findOne({ email });
+
+        if (!user) {  
+            return res.status(404).json({ error: "User not found" });
+        }
+ 
         user.blocked = !user.blocked;
         await user.save();
 
-        res.redirect(`/admin/usersmanagement?page=${req.query.page || 1}`);
+        res.json({ blocked: user.blocked });
     } catch (error) {
         console.error("Error toggling user block status:", error);
-        res.status(500).send("Internal Server Error");
+        res.status(500).json({ error: "Internal Server Error" });
     }
 };

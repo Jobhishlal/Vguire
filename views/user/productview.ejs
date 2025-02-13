@@ -569,7 +569,7 @@
                     <li class="nav-item"><a class="nav-link" href="/user/shop">Shop</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">About</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/user/profile">Profile</a></li>
                 </ul>
                 <div class="d-flex align-items-center">
                     <a href="#" class="me-3"><i class="fas fa-search"></i></a>
@@ -630,6 +630,22 @@
                         <span class="original-price ms-2">₹3599</span>
                         <span class="discount-badge">25% OFF</span>
                     </div>
+
+                    <% if (avgRating && avgRating !== "No ratings yet") { %>
+                        <div class="product-rating d-flex align-items-center">
+                            <% let rating = Math.round(avgRating); %>
+                            <% for (let i = 1; i <= 5; i++) { %>
+                                <% if (i <= rating) { %>
+                                    <i class="fas fa-star text-warning"></i> 
+                                <% } else { %>
+                                    <i class="far fa-star text-warning"></i> 
+                                <% } %>
+                            <% } %>
+                        
+                        </div>
+                    <% } %>
+                    
+                      
     
                     <div class="features mb-4">
                         <div class="feature-badge"><i class="fas fa-tshirt"></i> Premium Quality</div>
@@ -638,7 +654,6 @@
                     </div>
                     
     
-                    <!-- Add to Cart Form -->
                     <form action="/user/add-to-cart" method="POST" class="mt-4">
                         <input type="hidden" name="productId" value="<%= product._id %>">
                     
@@ -670,11 +685,7 @@
                         </div>
                         
                     
-                        <!-- Quantity Input -->
-                        <div class="mb-3">
-                            <h5 class="fw-bold">Quantity</h5>
-                            <input type="number" class="form-control quantity-input" name="quantity" min="1" value="1" readonly required>
-                        </div>
+                       
                         
                     
                         <!-- Action Buttons -->
@@ -684,6 +695,7 @@
                             </button>
                         </div>
                     </form>
+                    
 
                     <form onsubmit="a(event)">
                         <input type="hidden" name="productId" value="<%= product._id %>">
@@ -691,7 +703,7 @@
                         <input type="hidden" name="size" id="hh">
                         <input type="hidden" name="price" value="<%= product.price %>">
                         
-                        <button type="submit" class="btn buy-now-btn">
+                        <button type="submit" class="btn buy-now-btn" style="position: relative;     left: 240px;  top: -52px;">
                             <i class="fas fa-shopping-cart"></i> Buy Now
                         </button>
                     </form>
@@ -750,126 +762,129 @@
             </div>
         </div>
     </footer>
+   
 
     <script>
      
-     let selectedSize=''
+        let selectedSize=''
+            
+        document.querySelectorAll(".zoom-image").forEach(image => {
+       image.addEventListener("mousemove", function (e) {
+           let rect = this.getBoundingClientRect();
+           let x = ((e.clientX - rect.left) / rect.width) * 100;
+           let y = ((e.clientY - rect.top) / rect.height) * 100;
+           this.style.transformOrigin = `${x}% ${y}%`;
+           this.style.transform = "scale(2)"; 
+       });
+   
+       image.addEventListener("mouseleave", function () {
+           this.style.transform = "scale(1)";
+       });
+   });
+   
+   document.getElementById("productForm").addEventListener("submit", function (e) {
+           const selectedSize = document.querySelector('input[name="size"]:checked');
+           if (!selectedSize) {
+               e.preventDefault();
+               Swal.fire({
+                   icon: "error",
+                   title: "Size Required!",
+                   text: "Please select a size before adding to cart.",
+                   showConfirmButton: true
+               });
+           }
+       });
          
-     document.querySelectorAll(".zoom-image").forEach(image => {
-    image.addEventListener("mousemove", function (e) {
-        let rect = this.getBoundingClientRect();
-        let x = ((e.clientX - rect.left) / rect.width) * 100;
-        let y = ((e.clientY - rect.top) / rect.height) * 100;
-        this.style.transformOrigin = `${x}% ${y}%`;
-        this.style.transform = "scale(2)"; 
-    });
+   
+     
+   
+    
+   
+    
+       document.querySelectorAll(".add-to-cart-form").forEach(form => {
+           form.addEventListener("submit", async function(event) {
+               event.preventDefault(); // Prevent default form submission
+   
+               const formData = new FormData(this);
+               const response = await fetch("/user/add-to-cart", {
+                   method: "POST",
+                   body: formData
+               });
+   
+               const result = await response.json();
+   
+               if (result.success) {
+                   Swal.fire({
+                       icon: "success",
+                       title: "Added to Cart!",
+                       text: result.message,
+                       timer: 2000,
+                       showConfirmButton: false
+                   }).then(() => {
+                       window.location.href = "/user/cart"; 
+                   });
+               } else {
+                   Swal.fire({
+                       icon: "error",
+                       title: "Oops!",
+                       text: result.message
+                   });
+               }
+           });
+       });
+   
+   
+       function selectSize(selectedId) {
+           
+           document.querySelectorAll(".size-btn").forEach(btn => {
+               btn.classList.remove("selected");
+           });
+           selectedSize=event.target.value
+          
+           
+           
+           document.querySelector(`label[for='${selectedId}']`).classList.add("selected");
+       }
+   
+   
+       async function a(event) {
+       event.preventDefault(); 
+   
+       const selectedSize = document.querySelector('input[name="size"]:checked')?.value;
+       if (!selectedSize) {
+           alert("Please select a size before buying.");
+           return;
+       }
+   
+       const formData = {
+           productId: "<%= product._id %>",
+           quantity: 1,
+           size: selectedSize,
+           price: "<%= product.price %>"
+       };
+   
+       try {
+           const response = await fetch("/user/checkout/buy-now", {
+               method: "POST",
+               headers: { "Content-Type": "application/json" },
+               body: JSON.stringify(formData)
+           });
+   
+           if (!response.ok) throw new Error("Failed to load content");
+   
+           const html = await response.text(); 
+           document.body.innerHTML = html; 
+       } catch (error) {
+           console.error("Error:", error);
+           alert("An error occurred. Please try again.");
+       }
+   }
+   
+       </script>
+          <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+   
+       <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 
-    image.addEventListener("mouseleave", function () {
-        this.style.transform = "scale(1)";
-    });
-});
 
-document.getElementById("productForm").addEventListener("submit", function (e) {
-        const selectedSize = document.querySelector('input[name="size"]:checked');
-        if (!selectedSize) {
-            e.preventDefault();
-            Swal.fire({
-                icon: "error",
-                title: "Size Required!",
-                text: "Please select a size before adding to cart.",
-                showConfirmButton: true
-            });
-        }
-    });
-      
-
-  
-
- 
-
- 
-    document.querySelectorAll(".add-to-cart-form").forEach(form => {
-        form.addEventListener("submit", async function(event) {
-            event.preventDefault(); // Prevent default form submission
-
-            const formData = new FormData(this);
-            const response = await fetch("/user/add-to-cart", {
-                method: "POST",
-                body: formData
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                Swal.fire({
-                    icon: "success",
-                    title: "Added to Cart!",
-                    text: result.message,
-                    timer: 2000,
-                    showConfirmButton: false
-                }).then(() => {
-                    window.location.href = "/user/cart"; 
-                });
-            } else {
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops!",
-                    text: result.message
-                });
-            }
-        });
-    });
-
-
-    function selectSize(selectedId) {
-        
-        document.querySelectorAll(".size-btn").forEach(btn => {
-            btn.classList.remove("selected");
-        });
-        selectedSize=event.target.value
-       
-        
-        
-        document.querySelector(`label[for='${selectedId}']`).classList.add("selected");
-    }
-
-
-    async function a(event) {
-    event.preventDefault(); // Prevent default form submission
-
-    const selectedSize = document.querySelector('input[name="size"]:checked')?.value;
-    if (!selectedSize) {
-        alert("Please select a size before buying.");
-        return;
-    }
-
-    const formData = {
-        productId: "<%= product._id %>",
-        quantity: 1,
-        size: selectedSize,
-        price: "<%= product.price %>"
-    };
-
-    try {
-        const response = await fetch("/user/checkout/buy-now", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formData)
-        });
-
-        if (!response.ok) throw new Error("Failed to load content");
-
-        const html = await response.text(); // Get response as HTML
-        document.body.innerHTML = html; // Replace entire body content
-    } catch (error) {
-        console.error("Error:", error);
-        alert("An error occurred. Please try again.");
-    }
-}
-
-    </script>
-       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 </body>
 </html> 

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>user blocked</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        :root {
+            --primary: #00ff88;
+            --secondary: #2c3e50;
+            --accent: #ff3366;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: white;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        /* Blocked User Page Styles */
+.blocked-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: white
+}
+
+.blocked-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    width: 70%;
+    max-width: 600px;
+    text-align: center;
+}
+
+.hero-section {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    background: url('/path/to/your/blocked-background.jpg') center center no-repeat;
+    background-size: cover;
+    border-radius: 15px;
+}
+
+.blocked-track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.blocked-user {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 40px;
+    color: white;
+}
+
+.blocked-icons {
+    position: absolute;
+    bottom: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 30px;
+    color: white;
+}
+
+.blocked-card {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    width: 100%;
+}
+
+.blocked-badge {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+    background: #ff6b6b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.blocked-text {
+    font-size: 30px;
+    font-weight: bold;
+    color: #ff6b6b;
+    margin-bottom: 20px;
+}
+
+.text-center {
+    color: #6c757d;
+}
+
+.blocked-action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.blocked-action-buttons .btn-contact-support,
+.blocked-action-buttons .btn-login {
+    padding: 10px 20px;
+    background-color: #ff6b6b;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.blocked-action-buttons .btn-contact-support:hover,
+.blocked-action-buttons .btn-login:hover {
+    background-color: #e03e3e;
+}
+
+        
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="/image/Screenshot 2025-01-02 185508.png" alt="Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/shop">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                    <li class="nav-item">   
+                        <a class="nav-link" href="#">Profile</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    
+                    <a href="#" class="me-3"><i class="fas fa-search"></i></a>
+                    <a href="#" class="me-3"><i class="fas fa-shopping-cart"></i></a>
+                    <a href="#"><i class="fas fa-heart"></i></a>
+                </div>
+            </div>
+        </div>
+    </nav> 
+    <div class="blocked-wrapper">
+        <div class="blocked-container">
+            <div class="hero-section">
+                <div class="blocked-track" style="background-image: url(/image/4k.jpg); background-size: cover;background-position: center; background-repeat: no-repeat;" ></div>
+                <div class="blocked-user"></div>
+                <div class="blocked-icons"></div>
+            </div>
+    
+            <div class="blocked-card">
+                <div class="blocked-badge">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19 13H5v-2h14v2z"/>
+                    </svg>
+                </div>
+    
+                <div class="blocked-text">Account Blocked 🚫</div>
+                <p class="text-center text-white-50">Your account has been blocked. Please contact support to resolve the issue.</p>
+                <div class="blocked-action-buttons">
+                    <a href="/contact-support" class="btn-contact-support">Contact Support</a>
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <footer class="footer" style="display: block;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h4>About Us</h4>
+                    <p>We are committed to providing the best products and services to our customers.</p>
+                </div>
+                <div class="col-md-4">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Shop</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4>Contact Us</h4>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-phone me-2"></i> +1 234 567 890</li>
+                        <li><i class="fas fa-envelope me-2"></i> info@example.com</li>
+                        <li><i class="fas fa-map-marker-alt me-2"></i> 123 Street, City, Country</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <p>&copy; 2025 Your Company. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+   
+</body>
+</html>

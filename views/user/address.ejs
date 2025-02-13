@@ -313,43 +313,43 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="mb-2">Full Name</label>
-                                    <input type="text" id="fullName" placeholder="Enter your full name" required class="form-control">
+                                    <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required class="form-control">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="mb-2">Phone Number</label>
-                                    <input type="text" id="phone" placeholder="Enter your phone number" required class="form-control">
+                                    <input type="text" id="phone" name="phone" placeholder="Enter your phone number" required class="form-control">
                                 </div>
                             </div>
                             <div class="col-12">
                                 <div class="form-group">
                                     <label class="mb-2">Street Address</label>
-                                    <input type="text" id="streetAddress" placeholder="Enter street address" required class="form-control">
+                                    <input type="text" id="streetAddress" name="streetAddress" placeholder="Enter street address" required class="form-control">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="mb-2">City</label>
-                                    <input type="text" id="city" placeholder="Enter city" required class="form-control">
+                                    <input type="text" id="city" name="city" placeholder="Enter city" required class="form-control">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="mb-2">State</label>
-                                    <input type="text" id="state" placeholder="Enter state" required class="form-control">
+                                    <input type="text" id="state" name="state" placeholder="Enter state" required class="form-control">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="mb-2">Pincode</label>
-                                    <input type="text" id="pincode" placeholder="Enter pincode" required class="form-control">
+                                    <input type="text" id="pincode" name="pincode" placeholder="Enter pincode" required class="form-control">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="mb-2">Address Type</label>
-                                    <select id="addressType" class="form-control" required>
+                                    <select id="addressType"   name="addressType" class="form-control" required>
                                         <option value="Home">Home</option>
                                         <option value="Work">Work</option>
                                         <option value="Other">Other</option>
@@ -448,48 +448,55 @@
                 }
             });
     
-            // Form submission
             $("#addAddressForm").submit(function (e) {
-                e.preventDefault();
-    
-                // Validate phone number
-                const phone = $("#phone").val();
-                const phoneRegex = /^\d{10}$/;
-                if (!phoneRegex.test(phone)) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Invalid Phone Number',
-                        text: 'Please enter a valid 10-digit phone number',
-                        showConfirmButton: false,
-                        timer: 2000
-                    });
-                    return;
-                }
-    
-                // Show loading state
-                const submitBtn = $(this).find('button[type="submit"]');
-                const originalText = submitBtn.html();
-                submitBtn.html('<i class="fas fa-spinner fa-spin me-2"></i>Adding...');
-                submitBtn.prop('disabled', true);
-    
-                // Simulate API call (replace with your actual API call)
-                setTimeout(() => {
-                    submitBtn.html(originalText);
-                    submitBtn.prop('disabled', false);
-    
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Address Added!',
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-    
-                    this.reset();
-                }, 1500);
+    e.preventDefault();
+
+    const formData = {
+        fullName: $("#fullName").val(),
+        phone: $("#phone").val(),
+        streetAddress: $("#streetAddress").val(),
+        city: $("#city").val(),
+        state: $("#state").val(),
+        pincode: $("#pincode").val(),
+        addressType: $("#addressType").val(),
+    };
+
+    $.ajax({
+        type: "POST",
+        url: "/user/address/add",
+        contentType: "application/json", 
+        data: JSON.stringify(formData),  
+        success: function (response) {
+            if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Address Added!',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                $("#addAddressForm")[0].reset();
+            } else {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Address-added',
+                    text: response.message,
+                });
+            }
+        },
+        error: function (xhr) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Server Error',
+                text: xhr.responseJSON?.message || 'Failed to add address, try again later.',
             });
+        }
+    });
+});
+
+
         });
     
-        // Edit address function
+       
         function editAddress(id) {
             Swal.fire({
                 title: 'Edit Address',
@@ -510,7 +517,6 @@
             });
         }
     
-        // Delete address function
         function deleteAddress(addressId) {
             Swal.fire({
                 title: "Delete Address?",

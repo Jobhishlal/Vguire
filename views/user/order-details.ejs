@@ -1,0 +1,518 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4853e4;
+            --secondary-color: #ff3b54;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #2d3748;
+            padding-top: 80px; /* Added to account for fixed navbar */
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            padding: 1rem;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand img {
+            width: 60px;
+            height: auto;
+        }
+
+        .nav-link {
+            color: var(--primary-color) !important;
+            margin: 0 1rem;
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--secondary-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .navbar .fa-search,
+        .navbar .fa-shopping-cart,
+        .navbar .fa-heart {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .navbar .fa-search:hover,
+        .navbar .fa-shopping-cart:hover,
+        .navbar .fa-heart:hover {
+            color: var(--secondary-color);
+        }
+
+        /* Main Content Styles */
+        .order-details-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            min-height: calc(100vh - 350px); /* Ensures content pushes footer down */
+        }
+
+        /* Your existing order table styles remain the same */
+        .order-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .order-table th {
+            background: #f8fafc;
+            color: #4a5568;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #edf2f7;
+        }
+
+        .order-table td {
+            padding: 1rem;
+            background: white;
+            border-top: 1px solid #edf2f7;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: black;
+            color: white;
+            padding: 4rem 0 2rem;
+            margin-top: auto;
+        }
+
+        .footer h4 {
+            color: white;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .footer-links a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-color);
+            text-decoration: none;
+        }
+
+        .footer i {
+            margin-right: 10px;
+            color: var(--secondary-color);
+        }
+
+        .order-details-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            color: #2d3748;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #f0f2f5;
+            padding-bottom: 1rem;
+        }
+
+        .empty-orders {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .empty-orders h3 {
+            color: #4a5568;
+            margin: 1rem 0;
+        }
+
+        .empty-orders p {
+            color: #718096;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-primary {
+            background: #4853e4;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background: #3a45d6;
+            transform: translateY(-1px);
+        }
+
+        .order-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .order-table th {
+            background: #f8fafc;
+            color: #4a5568;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #edf2f7;
+        }
+
+        .order-table td {
+            padding: 1rem;
+            background: white;
+            border-top: 1px solid #edf2f7;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .order-table tr:hover td {
+            background: #f8fafc;
+            cursor: pointer;
+        }
+
+        .product-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .status {
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            border-radius: 6px;
+            display: inline-block;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.5px;
+        }
+
+        .delivered {
+            background-color: #def7ec;
+            color: #046c4e;
+        }
+
+        .canceled {
+            background-color: #fde8e8;
+            color: #c81e1e;
+        }
+
+        .pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .pagination {
+            margin: 2rem 0;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .pagination a {
+            padding: 0.75rem 1.25rem;
+            text-decoration: none;
+            background: white;
+            color: #4853e4;
+            border-radius: 6px;
+            font-weight: 500;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+
+        .pagination a:hover {
+            background: #4853e4;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .pagination span {
+            font-size: 0.95rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .order-details-container {
+                padding: 1rem;
+            }
+
+            .order-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .pagination {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .navbar-brand img {
+                margin-right: 0;
+            }
+            
+            .nav-link {
+                padding: 0.5rem 0;
+                border-bottom: 1px solid #eee;
+            }
+
+            .navbar .d-flex {
+                margin-top: 1rem;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 76px;
+            }
+
+            .footer {
+                padding: 2rem 0 1rem;
+                text-align: center;
+            }
+            
+            .footer .col-md-4 {
+                margin-bottom: 2rem;
+            }
+
+            .order-details-container {
+                margin: 1rem;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="/image/Screenshot 2025-01-02 185508.png" alt="Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/shop">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                    <li class="nav-item">   
+                        <a class="nav-link" href="/user/profile">Profile</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center gap-4">
+                    <a href="#" class="text-decoration-none"><i class="fas fa-search"></i></a>
+                    <a href="#" class="text-decoration-none"><i class="fas fa-shopping-cart"></i></a>
+                    <a href="#" class="text-decoration-none"><i class="fas fa-heart"></i></a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="order-details-container">
+        <h2 class="page-title">My Orders</h2>
+        
+        <% if (!orders || orders.length === 0) { %>
+            <div class="empty-orders">
+                <img src="/api/placeholder/200/200" alt="No Orders">
+                <h3>No Orders Yet</h3>
+                <p>Looks like you haven't made your first order yet.</p>
+                <a href="/" class="btn btn-primary">Start Shopping</a>
+            </div>
+        <% } else { %>
+            <table class="order-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Product Name</th>
+                        <th>Delivery Date</th>
+                        <th>Total Price</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% orders.forEach(order => { %>
+                        <tr class="clickable-row" data-href="/user/order-view/<%= order._id %>">
+                            <td>
+                                <% if (order.items.length > 0 && order.items[0].productId && order.items[0].productId.images.length > 0) { %>
+                                    <img src="<%= order.items[0].productId.images[0] %>" alt="Product Image" class="product-image">
+                                <% } else { %>
+                                    <img src="/api/placeholder/60/60" alt="No Image" class="product-image">
+                                <% } %>
+                            </td>
+    
+                            <td>
+                                <% order.items.forEach(item => { %>
+                                    <p><%= item.productId ? item.productId.name : "Product Not Available" %></p>
+                                <% }); %>
+                            </td>
+    
+                            <td>
+                                <p>
+                                    <strong>Expected:</strong><br>
+                                    <%= order.deliveryDate ? new Date(order.deliveryDate).toDateString() : "Updating..." %>
+                                </p>
+                            </td>
+    
+                            <td>
+                                <% order.items.forEach(item => { %>
+                                    <p>₹<%= item.price.toFixed(2) %></p>
+                                <% }); %>
+                            </td>
+                            
+                            <td>
+                                <% if (order.status === "Delivered") { %>
+                                    <span class="status delivered">Delivered</span>
+                                <% } else if (order.status === "Canceled") { %>
+                                    <span class="status canceled">Canceled</span>
+                                <% } else { %>
+                                    <span class="status pending"><%= order.status %></span>
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+    
+            <div class="pagination">
+                <% if (currentPage > 1) { %>
+                    <a href="/user/order-details?page=<%= currentPage - 1 %>&limit=5">Previous</a>
+                <% } %>
+    
+                <span>Page <%= currentPage %> of <%= totalPages %></span>
+    
+                <% if (currentPage < totalPages) { %>
+                    <a href="/user/order-details?page=<%= currentPage + 1 %>&limit=5">Next</a>
+                <% } %>
+            </div>
+        <% } %>
+    </div>
+    <div>
+        
+    </div>
+       
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h4>About Us</h4>
+                    <p>We are committed to providing the best products and services to our customers.</p>
+                </div>
+                <div class="col-md-4">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Shop</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4>Contact Us</h4>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-phone"></i> +1 234 567 890</li>
+                        <li><i class="fas fa-envelope"></i> info@example.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Street, City, Country</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <p>&copy; 2025 Your Company. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const rows = document.querySelectorAll(".clickable-row");
+            rows.forEach(row => {
+                row.addEventListener("click", function () {
+                    const href = this.getAttribute("data-href");
+                    if (href) {
+                        window.location.href = href;
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 import express from 'express';
 
-import {  isCheckAuth, isAuth, print} from '../middlewares/authMiddleware.js';
+import {  isCheckAuth, isAuth, print ,checkBlockedUser} from '../middlewares/authMiddleware.js';
 import passport from 'passport';
 
 
@@ -28,12 +28,14 @@ import {
     getaddress,
     postaddress,geteditaddress
     ,posteditaddress,
-    deleteaddress
+    deleteaddress,
+    searchproduct,
+
     
 } from '../controllers/userController.js';
 
 import {getcart,addToCart,updateCartQuantity,removeFromCart} from '../controllers/CartController.js'
-import {singlecheckout,cartproduct,placeorder,buyNowCartView,addaddress,editaddress,getcheckout,singleCheckoutView,updateCheckoutQuantity} from '../controllers/checkoutController.js'
+import {singlecheckout,cartproduct,placeorder,buyNowCartView,addaddress,editaddress,getcheckout,singleCheckoutView,updateCheckoutQuantity,getorder,ordersucccess,orderdetails,orderview,ordercancel,ratingadd} from '../controllers/checkoutController.js'
 import { profileUpload } from '../middlewares/multerConfig.js';
 
 const router = express.Router();
@@ -63,51 +65,61 @@ router.post('/reset-password',changePassword)
 router.post('/forgotverify-otp',otpVerification)
 
 router.post('/resend-otp',resendOtp)
+//user block check router 
 
 
 
-router.get('/home',isAuth,homepage)
-router.get('/shop',shoppage)
-router.get('/productview/:id',productview)
+router.get('/home',checkBlockedUser,isAuth,homepage)
+router.get('/shop', checkBlockedUser,shoppage)
+router.get('/productview/:id',checkBlockedUser,productview)
 
 //google
 router.get('/auth/google', print, passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 
-router.get('/profile',isAuth,getprofile);
-router.post('/profile/edit',isAuth,profileUpload,postprofile)
-router.post('/profile/validate-password', isAuth, validatepass);
+router.get('/profile',isAuth,checkBlockedUser,getprofile);
+router.post('/profile/edit',isAuth,checkBlockedUser,profileUpload,postprofile)
+router.post('/profile/validate-password',checkBlockedUser, isAuth, validatepass);
 
 
 
-router.get('/address',isAuth,getaddress);
-router.post('/add-address',isAuth,postaddress)
-router.get('/edit-address/:id',isAuth,geteditaddress)
-router.post('/edit-address/:id',isAuth,posteditaddress)
+router.get('/address',checkBlockedUser,isAuth,getaddress);
+router.post('/add-address',checkBlockedUser,isAuth,postaddress)
+router.get('/edit-address/:id',checkBlockedUser,isAuth,geteditaddress)
+router.post('/edit-address/:id',checkBlockedUser,isAuth,posteditaddress)
 
-router.post('/delete-address/:id',deleteaddress)
-
-
-
-router.get("/cart",isAuth, getcart);
-router.post("/add-to-cart",isAuth ,addToCart);
-router.post("/update-cart-quantity",isAuth, updateCartQuantity);
-router.post("/remove-from-cart/:itemId",isAuth ,removeFromCart);
-
-router.get("/checkout",isAuth,getcheckout);
-router.post("/checkout/buy-now",isAuth,singlecheckout)
-router.get("/checkout/single", isAuth, singleCheckoutView);
-router.post("/checkout/buy-now-cart",isAuth,cartproduct)
-router.get("/checkout/buy-now-cart", isAuth, buyNowCartView);
-router.post("/address/add",isAuth,addaddress)
-router.post("/address/edit/:id",isAuth,editaddress)
-router.post("/checkout/update-quantity", isAuth,updateCheckoutQuantity);
-
-
-router.post("/checkout/placeorder",isAuth,placeorder)
+router.post('/delete-address/:id',checkBlockedUser,deleteaddress)
 
 
 
+router.get("/cart",isAuth,checkBlockedUser, getcart);
+router.post("/add-to-cart",isAuth ,checkBlockedUser,addToCart);
+router.post("/update-cart-quantity",isAuth,checkBlockedUser, updateCartQuantity);
+router.post("/remove-from-cart/:itemId",isAuth ,checkBlockedUser,removeFromCart);
+
+router.get("/checkout",isAuth,checkBlockedUser,getcheckout);
+router.post("/checkout/buy-now",isAuth,checkBlockedUser,singlecheckout)
+router.get("/checkout/single", isAuth,checkBlockedUser, singleCheckoutView);
+router.post("/checkout/buy-now-cart",isAuth,checkBlockedUser,cartproduct)
+router.get("/checkout/buy-now-cart", isAuth,checkBlockedUser, buyNowCartView);
+router.post("/address/add",isAuth,checkBlockedUser,addaddress)
+router.post("/address/edit/:id",isAuth,checkBlockedUser,editaddress)
+router.post("/checkout/update-quantity", isAuth,checkBlockedUser,updateCheckoutQuantity);
+
+
+router.post("/checkout/placeorder",isAuth,checkBlockedUser,placeorder)
+router.get("/orders",isAuth,checkBlockedUser,getorder)
+router.get('/order-success',isAuth,checkBlockedUser,ordersucccess)
+
+router.get('/order-details/',isAuth,checkBlockedUser,orderdetails)
+router.get('/order-view/:orderId',isAuth,checkBlockedUser,orderview)
+
+router.post("/order/cancel/:orderId", isAuth,checkBlockedUser, ordercancel);
+router.post("/order/rate-product", isAuth,checkBlockedUser, ratingadd);
+
+
+
+router.get('/search',isAuth,checkBlockedUser,searchproduct)
 
 
 export default router;

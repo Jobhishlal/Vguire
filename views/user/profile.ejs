@@ -165,7 +165,7 @@
             <!-- Sidebar -->
             <div class="col-md-3 profile-sidebar">
                 <div class="text-center mb-4">
-                    <img src="<%= user.profileImage ? user.profileImage : '/uploads/default-profile.png' %>" 
+                    <img src="<%= user.profileImage ? user.profileImage : 'https://via.placeholder.com/150' %>" 
                          alt="Profile Image" class="profile-image mb-3">
                     <h4 class="text-white"><%= user.fname %> <%= user.lname %></h4>
                     <p class="text-white-50"><%= user.email %></p>
@@ -180,7 +180,7 @@
                         <a href="/user/address" class="nav-link">
                             <i class="bi bi-geo-alt me-2"></i>Address
                         </a>
-                        <a href="#orders" class="nav-link">
+                        <a href="/user/order-details" class="nav-link">
                             <i class="bi bi-bag me-2"></i>Order Info
                         </a>
                     </div>
@@ -237,7 +237,7 @@
                                 <label for="currentPassword" class="form-label" style="color: black;">Current Password</label>
                                 <div class="input-group">
                                     <input type="password" class="form-control" id="currentPassword" 
-                                           name="currentPassword" required>
+                                           name="currentPassword" >
                                     <button class="btn btn-primary" type="button" style="background-color: rgb(29, 32, 228);"
                                             onclick="validateCurrentPassword()">
                                         Verify
@@ -351,6 +351,29 @@
                 });
             });
         }
+
+        const successMessage = "<%= success %>";
+        const errorMessage = "<%= error %>";
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+        if (successMessage) {
+            Swal.fire({
+                icon: "success",
+                title: "Success",
+                text: successMessage,
+                confirmButtonColor: "#3085d6",
+            });
+        }
+        if (errorMessage) {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: errorMessage,
+                confirmButtonColor: "#d33",
+            });
+        }
+    });
     </script>
 </body>
 </html>

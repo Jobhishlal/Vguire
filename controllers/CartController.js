@@ -48,7 +48,6 @@ export const getcart = async (req, res) => {
 
 
 // Add to Cart
-
 export const addToCart = async (req, res) => {
     try {
         const { productId, size, quantity } = req.body;
@@ -61,41 +60,50 @@ export const addToCart = async (req, res) => {
             return res.json({ success: false, message: "⚠️ Product not found. Please try again!" });
         }
 
-        const sizeKey = `size${size}`;
+        const sizeKey = `size${size}`; // e.g., "sizeS", "sizeM", etc.
         if (!["sizeS", "sizeM", "sizeL", "sizeXL", "sizeXXL"].includes(sizeKey)) {
             return res.json({ success: false, message: "Invalid size selected. Choose a valid size!" });
         }
 
         if (product[sizeKey] < quantity) {
-            return res.json({ success: false, message: ` Only ${product[sizeKey]} items left in stock!` });
+            return res.json({ success: false, message: `Only ${product[sizeKey]} items left in stock!` });
         }
 
+        // Find or create a cart for the user
         let cart = await Cart.findOne({ userId });
         if (!cart) {
             cart = new Cart({ userId, items: [] });
         }
 
-        // ✅ Store each size separately
+        // Check if the item already exists in the cart (same product and size)
         const existingItem = cart.items.find(item => 
             item.productId.equals(productId) && item.size === sizeKey
         );
 
         if (existingItem) {
+            // Ensure the total quantity does not exceed the available stock
             if (existingItem.quantity + parseInt(quantity) > product[sizeKey]) {
                 return res.json({ success: false, message: `⚠️ Only ${product[sizeKey]} items available in stock!` });
             }
             existingItem.quantity += parseInt(quantity);
+            existingItem.totalPrice = existingItem.quantity * product.price; 
         } else {
-            cart.items.push({ productId, size: sizeKey, quantity });
+            cart.items.push({ 
+                productId, 
+                size: sizeKey, 
+                quantity: parseInt(quantity),
+                price: product.price,              
+                totalPrice: product.price * quantity 
+            });
         }
 
         cart.markModified("items");
         await cart.save();
-      return res.redirect("/user/cart")
+        return res.redirect("/user/cart");
 
     } catch (error) {
         console.error("Error adding to cart:", error);
-        return res.status(500).json({ success: false, message: " Error adding item to cart. Please try again!" });
+        return res.status(500).json({ success: false, message: "Error adding item to cart. Please try again!" });
     }
 };
 
@@ -108,32 +116,28 @@ export const updateCartQuantity = async (req, res) => {
         const userId = req.user._id;
 
         let cart = await Cart.findOne({ userId });
-        if (!cart) {
-            return res.redirect("/user/cart")
-        }
+        if (!cart) return res.status(400).json({ error: "Cart not found" });
 
         const item = cart.items.find(item => item._id.equals(itemId));
-        if (!item) {
-            return res.redirect("/user/cart")
-        }
+        if (!item) return res.status(400).json({ error: "Item not found" });
 
         const product = await Product.findById(item.productId);
         if (!product || product[item.size] < quantity) { 
-            return res.redirect("/user/cart")
+            return res.status(400).json({ error: "Stock unavailable" });
         }
-        if(item.quantity>5){
-            return res.redirect("/user/cart")
-        }
+
+        if (quantity > 5) return res.status(400).json({ error: "Max 5 items allowed" });
 
         item.quantity = parseInt(quantity);
         await cart.save();
-        return res.redirect("/user/cart");
 
+        return res.status(200).json({ message: "Cart updated successfully" });
     } catch (error) {
         console.error("Error updating cart quantity:", error);
-       return res.status(500).send("cart update is not work")
+        return res.status(500).json({ error: "Server error" });
     }
 };
+
 
 export const removeFromCart = async (req, res) => {
     try {

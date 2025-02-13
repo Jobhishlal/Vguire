@@ -5,9 +5,11 @@ const orderSchema = new mongoose.Schema({
     items: [
         {
             productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
+            size: { type: String, required: true },
             quantity: { type: Number, required: true },
             price: { type: Number, required: true } ,
             totalprice:{type:Number,required:true},
+            rating: { type: Number, min: 1, max: 5, default: null } 
         }
     ],
     addressId: { type: mongoose.Schema.Types.ObjectId, ref: "Address", required: true },
@@ -17,7 +19,8 @@ const orderSchema = new mongoose.Schema({
     estimatedDelivery: { type: Date },
     trackingNumber: { type: String, default: null },
     createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
+    updatedAt: { type: Date, default: Date.now },
+    deliveryDate: { type: Date },
 }, { timestamps: true });
 
 const order= mongoose.model("Order",orderSchema);

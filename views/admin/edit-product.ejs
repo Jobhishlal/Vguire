@@ -17,33 +17,37 @@
         </div>
 
         <!-- Form for editing product -->
-        <form id="productForm" action="/admin/edit-product/<%= product._id %>" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+        <form id="productForm" action="/admin/edit-product/<%= product._id %>" method="POST" enctype="multipart/form-data">
             
             <!-- Product Name -->
             <div class="mb-3">
                 <label for="productName" class="form-label">Product Name</label>
-                <input type="text" class="form-control" id="productName" name="name" value="<%= product.name %>" placeholder="Enter product name" required>
+                <input type="text" class="form-control" id="productName" name="name" value="<%= product.name %>" placeholder="Enter product name" >
             </div>
         
             <!-- Product Description -->
             <div class="mb-3">
                 <label for="productDescription" class="form-label">Product Description</label>
-                <textarea class="form-control" id="productDescription" name="description" placeholder="Describe the product" rows="4" required><%= product.description %></textarea>
+                <textarea class="form-control" id="productDescription" name="description" placeholder="Describe the product" rows="4" ><%= product.description %></textarea>
             </div>
         
             <!-- Product Price -->
             <div class="mb-3">
                 <label for="productPrice" class="form-label">Product Price</label>
-                <input type="number" class="form-control" id="productPrice" name="price" value="<%= product.price %>" placeholder="Enter price" required>
+                <input type="number" class="form-control" id="productPrice" name="price" value="<%= product.price %>" placeholder="Enter price" >
             </div>
         
             <!-- Category Selection -->
             <div class="mb-3">
                 <label for="productCategory" class="form-label">Category</label>
-                <select class="form-control" id="productCategory" name="category" required>
+                <select class="form-control" id="productCategory" name="category" >
                     <option value="">Select Category</option>
                     <% categories.forEach(category => { %>
-                        <option value="<%= category._id %>" <%= product.category._id === category._id ? 'selected' : '' %>><%= category.name %></option>
+                        <option value="<%= category._id %>" 
+                            <%= String(product.category) === String(category._id) ? 'selected' : '' %>>
+                            <%= category.name %>
+                        </option>
+                        
                     <% }); %>
                 </select>
             </div>
@@ -115,6 +119,29 @@
         <div id="loadingIndicator" style="display: none;">Cropping image...</div>
         
         <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<% if (messages && messages.success && messages.success.length > 0) { %>
+    <script>
+        Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "<%= messages.success[0] %>",
+            confirmButtonColor: "#28a745"
+        });
+    </script>
+<% } %>
+
+<% if (messages && messages.error && messages.error.length > 0) { %>
+    <script>
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "<%= messages.error[0] %>",
+            confirmButtonColor: "#d33"
+        });
+    </script>
+<% } %>
         
         <script>
             let cropper;
@@ -127,7 +154,7 @@
                 const newInput = document.createElement('input');
                 newInput.type = 'file';
                 newInput.className = 'form-control';
-                newInput.name = 'image[]';
+                newInput.name = 'images';
                 newInput.accept = 'image/*';
                 newInput.addEventListener('change', function() {
                     previewAndCropImage(this);
@@ -224,43 +251,47 @@
                     document.getElementById('cropperSection').style.display = 'none';
                 }
             }
+            async function validateForm(event) {
+        event.preventDefault();
+        const form = document.getElementById("productForm");
+        const formData = new FormData(form);
 
-            async function validateForm() {
-    const formData = new FormData(document.getElementById('productForm'));
-    const base64Image = document.getElementById('base64Image').value;
+        try {
+            const response = await fetch(form.action, {
+                method: "POST",
+                body: formData
+            });
 
-    // Add cropped image if exists
-    if (base64Image) {
-        formData.append('croppedImage', base64Image);
+            const result = await response.json(); // Expect JSON response from backend
+
+            if (response.ok) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: result.message || "Product updated successfully!",
+                    confirmButtonColor: "#28a745"
+                }).then(() => {
+                    window.location.href = "/admin/product";
+                });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: result.message || "Failed to update product.",
+                    confirmButtonColor: "#d33"
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Something went wrong!",
+                confirmButtonColor: "#d33"
+            });
+        }
     }
 
-    // Add new image files
-    const imageInputs = document.querySelectorAll('input[name="image[]"]');
-    imageInputs.forEach(input => {
-        if (input.files.length > 0) {
-            formData.append('image[]', input.files[0]);
-        }
-    });
-
-    try {
-        const response = await fetch('/admin/edit-product/<%= product._id %>', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (response.ok) {
-            alert('Product updated successfully!');
-            window.location.href = '/admin/product';
-        } else {
-            alert('Product updated successfully!');
-            window.location.href = '/admin/product';
-        }
-    } catch (error) {
-        alert('An product add successfully.');
-    }
-
-    return false;  
-}
+    document.getElementById("productForm").addEventListener("submit", validateForm);
 
 
 

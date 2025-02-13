@@ -8,50 +8,193 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
     <link rel="stylesheet" href="/style.css">
+    <style>
+           :root {
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 70px;
+            --header-height: 60px;
+            --primary-color: #cbcfda;
+            --secondary-color: #858796;
+            --dark-bg: #1a1a1a;
+            --card-bg: #242424;
+            --text-color: #e4e4e4;
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #010612 0%, #224abe 100%);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            padding-top: var(--header-height);
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: var(--header-height);
+            background: rgba(1, 6, 18, 0.9);
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .logo-full {
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo-mini {
+            display: none;
+            color: white;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .sidebar.collapsed .logo-full {
+            display: none;
+        }
+
+        .sidebar.collapsed .logo-mini {
+            display: block;
+        }
+
+        .nav-item {
+            position: relative;
+            margin: 0.25rem 1rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+            margin-right: 1rem;
+        }
+
+        .sidebar.collapsed .nav-link span {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-item {
+            margin: 0.25rem 0.5rem;
+        }
+
+        .sidebar.collapsed .nav-link i {
+            margin-right: 0;
+        }
+        
+
+    </style>
 </head>
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="logo">
-                <h2 style="color: white;">VGURIE</h2>
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo-full">
+                    <i class="fas fa-shopping-bag me-2"></i>
+                    VGURIE
+                </a>
+                <a href="#" class="logo-mini">
+                    <i class="fas fa-shopping-bag"></i>
+                </a>
             </div>
-            
-            <nav class="sidebar-nav">
-                <ul>
-                    <li class="active">
-                        <a href="#"><i class="fas fa-th-large"></i> Dashboard</a>
-                    </li>
-                    <li>
-                        <a href="/admin/product"><i class="fas fa-box"></i> Product</a>
-                    </li>
-                    <li>
-                        <a href="#"><i class="fas fa-shopping-cart"></i> Orders</a>
-                    </li>
-                    <li>
-                        <a href="/admin/usersmanagement"><i class="fas fa-users"></i> Users</a>
-                    </li>
-                    <li>
-                        <a href="/admin/categories"><i class="fas fa-tags"></i> Categories</a>
-                    </li>
-                    <li>
-                        <a href="#"><i class="fas fa-gift"></i> Offers</a>
-                    </li>
-                    <li>
-                        <a href="#"><i class="fas fa-ticket-alt"></i> Coupon</a>
-                    </li>
-                    <li>
-                        <a href="#"><i class="fas fa-image"></i> Banner</a>
-                    </li>
-                    <li>
-                        <a href="#"><i class="fas fa-cog"></i> Settings</a>
-                    </li>
-                    <li>
-                        <a href="#" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
+            <div class="nav flex-column">
+                <div class="nav-item">
+                    <a href="/admin/dashboard" class="nav-link">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/product" class="nav-link">
+                        <i class="fas fa-box"></i>
+                        <span>Products</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/ordermanagement" class="nav-link">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Orders</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/usersmanagement" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        <span>Users</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/categories" class="nav-link">
+                        <i class="fas fa-tags"></i>
+                        <span>Categories</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-gift"></i>
+                        <span>Offers</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-ticket-alt"></i>
+                        <span>Coupons</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-image"></i>
+                        <span>Banners</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </div>
+                <div class="nav-item mt-auto">
+                    <a href="#" class="nav-link text-danger">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
 
         <!-- Main Content -->
         <main class="main-content">

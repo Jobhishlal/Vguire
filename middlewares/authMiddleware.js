@@ -23,23 +23,20 @@ export const ensureGuest = (req, res, next) => {
 };
 
 
-
-export const isAuthenticatedAdmin = async (req, res, next) => {
-  const token = req.cookies.admin_token;
-
-  if (!token) {
-    return res.redirect('/admin/login'); 
+export const isAuthenticatedAdmin = (req, res, next) => {
+  if (req.session?.admin) {
+      return next(); 
   }
-
-  try {
-    const decoded = jwt.verify(token, 'jobhisecret');  
-    req.admin = decoded.id;  
-    next();  
-  } catch (err) {
-    console.error(err);
-    return res.redirect('/admin/login');  
-  }
+  res.redirect('/admin/login');
 };
+
+export const preventLoggedInAdmin = (req, res, next) => {
+  if (req.session?.admin) {
+      return res.redirect('/admin/dashboard');
+  }
+  next();
+};
+
 
 
 export const redirectIfAuthenticated = (req, res, next) => {
@@ -52,46 +49,6 @@ export const redirectIfAuthenticated = (req, res, next) => {
 };
 
 
-
-// export const isAuth = async (req, res, next) => {
-//   if (req.user&&!req.session.user) {
-//       return res.redirect("/user/login"); 
-//   }
-
-//   try {
-//       const user = await User.findById(req.session.user);
-//       if (!user) {
-//           return res.redirect("/user/login");
-//       }
-
-//       req.user = user;  
-//       next();
-//   } catch (error) {
-//       console.error("Error in authentication:", error);
-//       res.redirect("/user/login");
-//   }
-// };
-
-
-
-// export const isAuth = async (req, res, next) => {
-//   if (!req.session.user) {
-//       return res.redirect("/user/login"); 
-//   }
-
-//   try {
-//       const user = await User.findById(req.session.user);  // Correctly cast ObjectId here
-//       if (!user) {
-//           return res.redirect("/user/login");
-//       }
-
-//       req.user = user;  // Ensure req.user is the actual user object
-//       next();
-//   } catch (error) {
-//       console.error("Error in authentication:", error);
-//       return res.redirect("/user/login");
-//   }
-// };
 
 
 export const isAuth = async (req, res, next) => {
@@ -130,6 +87,34 @@ export const print= (req,res,next)=>{
 }
 
 
+export const adminAuth = (req, res, next) => {
+  if (req.session.admin) {
+      return next(); 
+  }
+  res.redirect('/admin/login');
+};
+
+
+
+
+export const checkBlockedUser = async (req, res, next) => {
+  if (req.session?.user) {
+    try {
+      
+      const user = await User.findById(req.session.user);
+
+     
+      if (user?.blocked) {
+        return res.render('user/blocked', { message: 'Your account has been blocked. Please contact support.' });
+      }
+    } catch (error) {
+      console.error("Error checking if user is blocked:", error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+
+  next();
+};
 
 
 

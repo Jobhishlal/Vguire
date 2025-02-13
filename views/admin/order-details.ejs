@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #4CAF50;
+            --bg-color: #f8f9fa;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 30px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100px;
+            height: 3px;
+            background: var(--primary-color);
+        }
+
+        .order-info-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .order-status {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: white;
+            background: var(--success-color);
+        }
+
+        .order-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+        }
+
+        .order-table thead {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .order-table th {
+            padding: 15px;
+            font-weight: 600;
+        }
+
+        .order-table td {
+            padding: 15px;
+            vertical-align: middle;
+        }
+
+        .order-table img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .customer-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .customer-avatar {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 15px;
+        }
+
+        .address-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .address-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .btn-back {
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        .btn-back:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .price-column {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .order-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="page-title">Order Details</h2>
+
+        <div class="order-info-card">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="customer-info">
+                        <div class="customer-avatar">
+                            <%= (order.userId && order.userId.name) ? order.userId.name.charAt(0).toUpperCase() : "U" %>
+                        </div>
+                        
+                        <div>
+                            <h4 class="mb-0">
+                                <%= order.userId ? order.userId.name : "Unknown User" %>
+                            </h4>
+                            
+                            <small class="text-muted">
+                                <%= order.userId ? order.userId.email : "N/A" %>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="mb-2">
+                        <span class="info-label">Order ID:</span>
+                        <span class="info-value">#<%= order._id %></span>
+                    </div>
+                    <span class="order-status"><%= order.status %></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="order-table">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Image</th>
+                        <th>Size</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% order.items.forEach(item => { %>
+                        <tr>
+                            <td><%= item.productId ? item.productId.name : "Product Not Available" %></td>
+                            <td>
+                                <% if (item.productId && item.productId.images && item.productId.images.length > 0) { %>
+                                    <img src="<%= item.productId.images[0] %>" alt="Product Image" />
+                                <% } else { %>
+                                    <span class="text-muted">No Image</span>
+                                <% } %>
+                            </td>
+                            <td><%= item.size %></td>
+                            <td><%= item.quantity %></td>
+                            <td class="price-column">₹<%= item.price.toFixed(2) %></td>
+                            <td class="price-column">₹<%= item.totalprice.toFixed(2) %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="address-card">
+            <h3><i class="fas fa-shipping-fast me-2"></i>Delivery Address</h3>
+            <% if (order.addressId) { %>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="info-label">Full Name</div>
+                            <div class="info-value"><%= order.addressId.fullName %></div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="info-label">Address</div>
+                            <div class="info-value">
+                                <%= order.addressId.streetAddress %>,<br>
+                                <%= order.addressId.city %>, <%= order.addressId.state %> - <%= order.addressId.pincode %>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="info-label">Phone Number</div>
+                            <div class="info-value"><%= order.addressId.phone %></div>
+                        </div>
+                    </div>
+                </div>
+            <% } else { %>
+                <p class="text-muted">Address not available.</p>
+            <% } %>
+        </div>
+
+        
+
+        <a href="/admin/ordermanagement" class="btn-back">
+            <i class="fas fa-arrow-left me-2"></i>Back to Orders
+        </a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
