@@ -360,29 +360,33 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <h4 class="mb-0"><%= category.name %></h4>
                             <div class="category-actions">
-                                <!-- <a href="/view-category/<%= category.id %>" class="btn btn-info text-white">
-                                    <i class="fas fa-eye"></i>
-                                </a> -->
-                                <a href="/admin/edit-category/<%= category.id %>" class="btn btn-warning text-white">
+                                <!-- Edit Category -->
+                                <a href="/admin/edit-category/<%= category._id %>" class="btn btn-warning text-white">
                                     <i class="fas fa-pencil-alt"></i>
                                 </a>
-                                <!-- <a href="/admin/delete-category/<%= category.id %>" class="btn btn-danger text-white">
-                                    <i class="fas fa-trash-alt"></i>
-                                </a> -->
+            
+                                <!-- Add Offer -->
+                                <a href="/admin/category/<%= category._id %>/offer" class="btn btn-success text-white">
+                                    <i class="fas fa-tag"></i> 
+                                </a>
+            
+                                <form action="/admin/category/<%= category._id %>/remove-offer?_method=DELETE" method="POST">
+                                    <button type="submit" class="btn btn-danger">Remove Category Offer</button>
+                                </form>
+                                
+                                
                             </div>
                         </div>
-        
+            
                         <div class="category-image">
                             <img src="/uploads/categories/<%= category.image %>" alt="<%= category.name %>" class="img-fluid">
                         </div>
-        
+            
                         <div class="category-details">
                             <p><i class="fas fa-info-circle"></i> <strong>Description:</strong> <%= category.description %></p>
-                            <!-- <p><i class="fas fa-cube"></i> <strong>Total Products:</strong> <%= category.productCount %></p>
-                            <p><i class="fas fa-calendar-alt"></i> <strong>Created:</strong> <%= category.createdAt %></p> -->
                         </div>
-        
-                        <form action="/admin/listcategory/<%= category.id %>" method="POST">
+            
+                        <form action="/admin/listcategory/<%= category._id %>" method="POST">
                             <% if (category.isListed) { %>
                                 <button type="submit" class="status-btn btn-unlist">
                                     <i class="fas fa-ban"></i>
@@ -399,43 +403,35 @@
                 </div>
                 <% }) %>
             </div>
+            
+            
         </main>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <% if(messages.success.length>0){%>
+    <% if (messages.success && messages.success.length > 0) { %>
         <script>
             Swal.fire({
-                icon:"success",
-                title:"!Success",
-                text:"<%=messages.success[0]%>",
+                icon: "success",
+                title: "Success",
+                text: "<%= messages.success[0] %>",
                 confirmButtonColor: "#28a745"
-
-            })
-
-
+            });
         </script>
-        
-        
-        <%}%>
-
-        <%if(messages.error.length>0){%>
-            <script>
-
-         Swal.fire({
-                icon:"error",
-                title:"error",
-                text:"<%=messages.error[0]%>",
+    <% } %>
+    
+    <% if (messages.error && messages.error.length > 0) { %>
+        <script>
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "<%= messages.error[0] %>",
                 confirmButtonColor: "#d33"
-                
-
-
-         })
-
-            </script>
-            
-            <%}%>
-
+            });
+        </script>
+    <% } %>
+    
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -394,9 +394,20 @@
                     <p>Size: <%= item.size %> | Quantity: <%= item.quantity %></p>
                     <p>Price: ₹<%= item.price %></p>
                 </div>
+                
+                <% if (order.status !== "Delivered" || order.status !== "Cancelled") { %>
+                    <form class="cancelOrderForm" action="/user/order/cancel/<%= order._id %>/<%= item.productId._id %>" method="POST">
+                        <button type="submit" class="btn btn-danger cancel-btn">
+                            <i class="fas fa-times"></i> Cancel Product
+                        </button>
+                    </form>
+                <% } else { %>
+                    <p class="text-muted">This order has been delivered and cannot be canceled.</p>
+                <% } %>
             </div>
+            <hr>
         <% }); %>
-
+        
         <div class="delivery-info">
             <h4>Delivery Details</h4>
             <% if (order.deliveryDate) { %>
@@ -405,7 +416,7 @@
                 <p class="text-muted">Delivery date will be updated soon</p>
             <% } %>
         </div>
-
+        
         <% if (order.addressId) { %>
             <div class="address-section">
                 <h4>Delivery Address</h4>
@@ -415,7 +426,7 @@
                 <p><strong>Phone:</strong> <%= order.addressId.phone %></p>
             </div>
         <% } %>
-
+        
         <div class="payment-info">
             <h4>Payment Method</h4>
             <p><%= order.paymentMethod %></p>
@@ -423,26 +434,13 @@
                 <p>Total Price (₹): <%= item.totalprice ? item.totalprice.toFixed(2) : "0.00" %></p>
             <% }); %>
         </div>
-
+        
         <h3>Order Status: <span class="<%= order.status === 'Delivered' ? 'text-success' : 'text-warning' %>">
             <%= order.status %>
         </span></h3>
         
-        <% if (order.status !== "Delivered") { %>
-            <form class="cancelOrderForm" action="/user/order/cancel/<%= order._id %>" method="POST">
-                <button type="submit" class="btn btn-danger cancel-btn">
-                    <i class="fas fa-times"></i> Cancel Order
-                </button>
-            </form>
-        <% } else { %>
-            <p class="text-muted">This order has been delivered and cannot be canceled.</p>
-        <% } %>
-
-        
-
         <% if (order) { %>
             <div class="card order-card shadow-sm p-4 mb-4">
-               
                 <p class="status-text">
                     Status: <strong class="<%= order.status === 'Delivered' ? 'text-success' : 'text-warning' %>">
                         <%= order.status %>
@@ -476,7 +474,6 @@
         <% } else { %>
             <div class="alert alert-warning text-center">No order found.</div>
         <% } %>
-        
         
         
 
@@ -545,14 +542,14 @@ document.querySelectorAll(".rating-form").forEach(form => {
     form.addEventListener("submit", async function (e) {
         e.preventDefault();
 
-        const orderId = this.getAttribute("data-order");  // ✅ Ensure this is correctly set
-        const productId = this.getAttribute("data-product");  // ✅ Ensure productId is captured
+        const orderId = this.getAttribute("data-order");  
+        const productId = this.getAttribute("data-product"); 
         const rating = this.querySelector("select[name='rating']").value;
 
-        console.log("🔍 Debugging values:", { orderId, productId, rating });  // ✅ Log values
+        console.log("🔍 Debugging values:", { orderId, productId, rating }); 
 
         if (!orderId || !productId) {
-            console.error("❌ Order ID or Product ID is missing!");
+            console.error(" Order ID or Product ID is missing!");
             return;
         }
 
@@ -581,7 +578,7 @@ document.querySelectorAll(".rating-form").forEach(form => {
 });
 
 
-fetch("user/order/rate-product", {  // ✅ Update the API route
+fetch("user/order/rate-product", {  
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ orderId, productId, rating })

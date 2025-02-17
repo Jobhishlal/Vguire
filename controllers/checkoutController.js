@@ -7,29 +7,40 @@ import Order from '../models/order.js';
 import mongoose from 'mongoose';
 
 
+
 export const singlecheckout = async (req, res) => {
     try {
         const { productId, quantity, size } = req.body;
-        const userId = req.user._id;
+        const userId = req.user?._id;
+
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+            return res.status(400).json({ success: false, message: "Invalid product ID" });
+        }
+        if (!userId) {
+            return res.status(401).json({ success: false, message: "Unauthorized: Please log in" });
+        }
+        if (!quantity || isNaN(quantity) || quantity <= 0) {
+            return res.status(400).json({ success: false, message: "Invalid quantity" });
+        }
 
         const product = await Product.findById(productId);
-        if (!product) return res.status(404).send("Product not found");
+        if (!product) return res.status(404).json({ success: false, message: "Product not found" });
 
         const addresses = await Address.find({ userId });
 
-        res.render("user/checkout", {
+        res.json({
+            success: true,
+            checkoutType: "single",
             items: [{ product, quantity, price: product.price, size }],
             addresses,
             totalAmount: product.price * parseInt(quantity),
-            currentCheckoutUrl: `/user/checkout/single?productId=${productId}&quantity=${quantity}&size=${size}`,
-            checkoutType: 'single',
-            flashMessage: req.session.flashMessage || null
+            redirectUrl: "/user/checkout"
         });
-        delete req.session.flashMessage;
+        
 
     } catch (error) {
         console.error("Checkout Error:", error);
-        res.status(500).send("Server Error");
+        res.status(500).json({ success: false, message: "Server Error" });
     }
 };
 
@@ -238,45 +249,73 @@ export const placeorder = async (req, res) => {
 
 export const addaddress = async (req, res) => {
     try {
-        const addressData = req.body;
-        addressData.userId = req.user._id;
-        const newAddress = new Address(addressData);
+        const { fullName, phone, streetAddress, city, state, pincode, addressType, redirectUrl } = req.body;
+
+       
+        const errors = [];
+
+        if (!fullName || fullName.trim().length < 3) errors.push("Full name must be at least 3 characters long.");
+        if (!phone || !/^[1-9][0-9]{9}$/.test(phone)) errors.push("Enter a valid 10-digit phone number.");
+        if (!streetAddress || streetAddress.trim().length < 5) errors.push("Street Address must be at least 5 characters.");
+        if (!city || city.trim().length < 3) errors.push("City must be at least 3 characters.");
+        if (!state || state.trim().length < 3) errors.push("State must be at least 3 characters.");
+        if (!pincode || !/^[1-9][0-9]{5}$/.test(pincode)) errors.push("Enter a valid 6-digit Pincode.");
+        if (!addressType || !["Home", "Work", "Other"].includes(addressType)) errors.push("Invalid address type selected.");
+
+        if (errors.length > 0) {
+            return res.status(400).json({ success: false, errors });
+        }
+
+       
+        const newAddress = new Address({ fullName, phone, streetAddress, city, state, pincode, addressType, userId: req.user._id });
         await newAddress.save();
 
-        const redirectUrl = req.body.redirectUrl || "/user/checkout";
-        return res.redirect(redirectUrl);
+        return res.json({ success: true, redirectUrl: redirectUrl || "/user/checkout" });
+
     } catch (error) {
         console.error("Address Addition Error:", error);
-        return res.status(500).send("Error adding address");
+        return res.status(500).json({ success: false, errors: ["Server error, please try again later."] });
     }
 };
 
 export const editaddress = async (req, res) => {
     try {
         const addressId = req.params.id;
-        const { productId, quantity, size, redirectUrl } = req.body;
+        const { fullName, phone, streetAddress, city, state, pincode, addressType, productId, quantity, size, redirectUrl } = req.body;
+
+        
+        const errors = [];
+
+        if (!fullName || fullName.trim().length < 3) errors.push("Full name must be at least 3 characters long.");
+        if (!phone || !/^[1-9][0-9]{9}$/.test(phone)) errors.push("Enter a valid 10-digit phone number.");
+        if (!streetAddress || streetAddress.trim().length < 5) errors.push("Street Address must be at least 5 characters.");
+        if (!city || city.trim().length < 3) errors.push("City must be at least 3 characters.");
+        if (!state || state.trim().length < 3) errors.push("State must be at least 3 characters.");
+        if (!pincode || !/^[1-9][0-9]{5}$/.test(pincode)) errors.push("Enter a valid 6-digit Pincode.");
+        if (!addressType || !["Home", "Work", "Other"].includes(addressType)) errors.push("Invalid address type selected.");
+
+        if (errors.length > 0) {
+            return res.status(400).json({ success: false, errors });
+        }
 
     
-
-        const updatedData = req.body;
-        const updatedAddress = await Address.findByIdAndUpdate(addressId, updatedData, { new: true });
+        const updatedAddress = await Address.findByIdAndUpdate(addressId, req.body, { new: true });
 
         if (!updatedAddress) {
-            return res.status(404).json({ success: false, error: "Address not found" });
+            return res.status(404).json({ success: false, errors: ["Address not found"] });
         }
 
-       
+      
         if (productId && quantity && size) {
-            return res.redirect(`/user/checkout/single?productId=${productId}&quantity=${quantity}&size=${size}`);
+            return res.json({ success: true, redirectUrl: `/user/checkout/single?productId=${productId}&quantity=${quantity}&size=${size}` });
         } else {
-            return res.redirect(redirectUrl || "/user/checkout");
+            return res.json({ success: true, redirectUrl: redirectUrl || "/user/checkout" });
         }
     } catch (error) {
-        console.error(" Edit Address Error:", error);
-        return res.status(500).send("Error editing address");
+        console.error("Edit Address Error:", error);
+        return res.status(500).json({ success: false, errors: ["Server error, please try again later."] });
     }
 };
-
 
 
 export const singleCheckoutView = async (req, res) => {
@@ -407,7 +446,6 @@ export const updateCheckoutQuantity = async (req, res) => {
 
 
 
-
 export const getorder = async (req, res) => {
     try {
         const userId = req.user._id;
@@ -478,7 +516,7 @@ export const orderdetails = async (req, res) => {
     }
 };
 
-export const orderview = async (req, res) => {
+export const orderview = async (req, res) => { 
     try {
         console.log(" Received params:", req.params);  
 
@@ -510,50 +548,130 @@ export const orderview = async (req, res) => {
     }
 };
 
-
-
+ 
 export const ordercancel = async (req, res) => {
     try {
         const userId = req.user._id;
-        const { orderId } = req.params;
+        const { orderId, productId } = req.params;
 
         const order = await Order.findOne({ _id: orderId, userId });
-
         if (!order) {
             req.flash("error", "Order not found.");
             return res.redirect(`/user/order-view/${orderId}`);
         }
+
+        const itemIndex = order.items.findIndex(item => item.productId.toString() === productId);
+        if (itemIndex === -1) {
+            req.flash("error", "Product not found in order.");
+            return res.redirect(`/user/order-view/${orderId}`);
+        }
+
+        const item = order.items[itemIndex];
 
         if (order.status === "Delivered") {
             req.flash("error", "Delivered products can't be canceled.");
             return res.redirect(`/user/order-view/${orderId}`);
         }
 
-        for (let item of order.items) {
-            const sizeKey = `size${item.size}`;
-            const product = await Product.findById(item.productId);
-            if (!product) continue;
-
-            if (product[sizeKey] !== undefined) {
-                product[sizeKey] += item.quantity;
-            }
-
-            product.totalStock += item.quantity;
-            await product.save();
+        const product = await Product.findById(productId);
+        if (!product) {
+            req.flash("error", "Product not found.");
+            return res.redirect(`/user/order-view/${orderId}`);
         }
 
-        order.status = "Cancelled";
+    
+        if (item.size) {
+            const sizeKey = `size${item.size.trim()}`;
+            if (product[sizeKey] !== undefined) {
+                product[sizeKey] += item.quantity;
+            } else {
+                console.warn(`Size ${sizeKey} not found in product ${productId}`);
+            }
+        }
+
+
+        product.totalStock += item.quantity;
+        await product.save();
+
+      
+        order.items.splice(itemIndex, 1);
+
+        
+        if (order.items.length === 0) {
+            order.status = "Cancelled";
+        }
+
         await order.save();
 
-        req.flash("success", "Order canceled successfully.");
+        req.flash("success", "Product canceled successfully.");
         return res.redirect(`/user/order-view/${orderId}`);
     } catch (error) {
-        console.error("Order Cancellation Error:", error);
-        return res.status(500).send("Order cancellation failed.");
+        console.error(" Product Cancellation Error:", error);
+        return res.status(500).send("Product cancellation failed.");
     }
 };
 
 
+// export const ordercancel = async (req, res) => {
+//     try {
+//         const userId = req.user._id;
+//         const { orderId, productId } = req.params;
+
+//         const order = await Order.findOne({ _id: orderId, userId });
+//         if (!order) {
+//             req.flash("error", "Order not found.");
+//             return res.redirect(`/user/order-view/${orderId}`);
+//         }
+
+//         const itemIndex = order.items.findIndex(item => item.productId.toString() === productId);
+//         if (itemIndex === -1) {
+//             req.flash("error", "Product not found in order.");
+//             return res.redirect(`/user/order-view/${orderId}`);
+//         }
+
+//         const item = order.items[itemIndex];
+
+//         if (order.status === "Delivered") {
+//             req.flash("error", "Delivered products can't be canceled.");
+//             return res.redirect(`/user/order-view/${orderId}`);
+//         }
+
+//         const product = await Product.findById(productId);
+//         if (!product) {
+//             req.flash("error", "Product not found.");
+//             return res.redirect(`/user/order-view/${orderId}`);
+//         }
+
+      
+//         if (item.size) {
+//             const sizeKey = `size${item.size.trim()}`;
+//             if (product[sizeKey] !== undefined) {
+//                 product[sizeKey] += item.quantity;
+//             } else {
+//                 console.warn(`Size ${sizeKey} not found in product ${productId}`);
+//             }
+//         }
+
+//         product.totalStock += item.quantity;
+//         await product.save();
+
+    
+//         order.items[itemIndex].status = "Cancelled";
+
+   
+//         if (order.items.every(item => item.status === "Cancelled")) {
+//             order.status = "Cancelled";
+//         }
+
+//         await order.save();
+
+//         req.flash("success", "Product canceled successfully.");
+//         return res.redirect(`/user/order-view/${orderId}`);
+//     } catch (error) {
+//         console.error(" Product Cancellation Error:", error);
+//         return res.status(500).send("Product cancellation failed.");
+//     }
+// };
 
 
 export const ratingadd = async (req, res) => {

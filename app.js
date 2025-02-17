@@ -97,11 +97,11 @@ app.get('/logout', (req, res) => {
     });
 });
 
-// Routes
+
 app.use('/user', userRoutes);
 app.use('/admin', adminRoutes);
 
-// Connect to MongoDB and start the server
+
 const PORT = process.env.PORT || 8010;
 
 connectDB()

@@ -107,6 +107,7 @@ router.post("/address/edit/:id",isAuth,checkBlockedUser,editaddress)
 router.post("/checkout/update-quantity", isAuth,checkBlockedUser,updateCheckoutQuantity);
 
 
+
 router.post("/checkout/placeorder",isAuth,checkBlockedUser,placeorder)
 router.get("/orders",isAuth,checkBlockedUser,getorder)
 router.get('/order-success',isAuth,checkBlockedUser,ordersucccess)
@@ -114,7 +115,7 @@ router.get('/order-success',isAuth,checkBlockedUser,ordersucccess)
 router.get('/order-details/',isAuth,checkBlockedUser,orderdetails)
 router.get('/order-view/:orderId',isAuth,checkBlockedUser,orderview)
 
-router.post("/order/cancel/:orderId", isAuth,checkBlockedUser, ordercancel);
+router.post("/order/cancel/:orderId/:productId", isAuth,checkBlockedUser, ordercancel);
 router.post("/order/rate-product", isAuth,checkBlockedUser, ratingadd);
 
 

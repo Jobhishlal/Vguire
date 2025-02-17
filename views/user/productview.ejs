@@ -547,11 +547,11 @@
         transition: 0.3s;
     }
 
-    .size-btn.selected {
-        background-color: #007bff; /* Change to your preferred color */
-        color: white;
-        border-color: #007bff;
-    }
+    .selected-size {
+    background-color: #ff5733;
+    color: white;
+    border: 2px solid #ff5733;
+}
     </style>
 </head>
 <body>
@@ -654,47 +654,53 @@
                     </div>
                     
     
-                    <form action="/user/add-to-cart" method="POST" class="mt-4">
-                        <input type="hidden" name="productId" value="<%= product._id %>">
                     
-                        <!-- Size Selection -->
+
+                    <form id="add-to-cart-form" action="/user/add-to-cart" method="POST">
+
+                        <input type="hidden" name="productId" value="<%= product._id %>">
+                        
+                        
                         <div class="mb-4">
                             <h5 class="fw-bold">Select Size</h5>
                             <div class="size-buttons d-flex gap-2">
                                 <% if (product.sizeS > 0) { %>
-                                    <input type="radio" name="size" value="S" id="sizeS" class="d-none" onchange="selectSize('sizeS',event)">
+                                    <input type="radio" name="size" value="S" id="sizeS" class="d-none">
                                     <label for="sizeS" class="size-btn">S</label>
                                 <% } %>
                                 <% if (product.sizeM > 0) { %>
-                                    <input type="radio" name="size" value="M" id="sizeM" class="d-none" onchange="selectSize('sizeM',event)">
+                                    <input type="radio" name="size" value="M" id="sizeM" class="d-none">
                                     <label for="sizeM" class="size-btn">M</label>
                                 <% } %>
                                 <% if (product.sizeL > 0) { %>
-                                    <input type="radio" name="size" value="L" id="sizeL" class="d-none" onchange="selectSize('sizeL',event)">
+                                    <input type="radio" name="size" value="L" id="sizeL" class="d-none">
                                     <label for="sizeL" class="size-btn">L</label>
                                 <% } %>
                                 <% if (product.sizeXL > 0) { %>
-                                    <input type="radio" name="size" value="XL" id="sizeXL" class="d-none" onchange="selectSize('sizeXL',event)">
+                                    <input type="radio" name="size" value="XL" id="sizeXL" class="d-none">
                                     <label for="sizeXL" class="size-btn">XL</label>
                                 <% } %>
                                 <% if (product.sizeXXL > 0) { %>
-                                    <input type="radio" name="size" value="XXL" id="sizeXXL" class="d-none" onchange="selectSize('sizeXXL',event)">
+                                    <input type="radio" name="size" value="XXL" id="sizeXXL" class="d-none">
                                     <label for="sizeXXL" class="size-btn">XXL</label>
                                 <% } %>
                             </div>
+                            
+                        </div>
+                    
+                        
+                        <div class="mb-3" style="display: none;">
+                            <label for="quantity" class="fw-bold">Quantity</label>
+                            <input type="number" name="quantity" id="quantity" class="form-control" value="1" min="1">
                         </div>
                         
                     
-                       
-                        
-                    
-                        <!-- Action Buttons -->
-                        <div class="d-flex gap-3">
-                            <button type="submit" class="btn btn-custom btn-add-cart">
-                                <i class="fas fa-plus me-2"></i>Add to Cart
-                            </button>
-                        </div>
+                      
+                        <button type="submit" class="btn btn-custom btn-add-cart">
+                            <i class="fas fa-plus me-2"></i> Add to Cart
+                        </button>
                     </form>
+                    
                     
 
                     <form onsubmit="a(event)">
@@ -762,127 +768,330 @@
             </div>
         </div>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
    
 
     <script>
      
-        let selectedSize=''
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", function() {
+   
+    const sizeLabels = document.querySelectorAll(".size-btn");
+    const addToCartForm = document.getElementById("addToCartForm");
+    const buyNowForm = document.querySelector('form[onsubmit="a(event)"]');
+    const zoomImages = document.querySelectorAll(".zoom-image");
+
+   
+    initializeSizeSelection();
+    
+
+    initializeAddToCart();
+    initializeBuyNow();
+    
+
+    initializeImageZoom();
+
+
+    function initializeSizeSelection() {
+        sizeLabels.forEach(label => {
+            label.addEventListener("click", function() {
+             
+                sizeLabels.forEach(l => l.classList.remove("selected-size"));
             
-        document.querySelectorAll(".zoom-image").forEach(image => {
-       image.addEventListener("mousemove", function (e) {
-           let rect = this.getBoundingClientRect();
-           let x = ((e.clientX - rect.left) / rect.width) * 100;
-           let y = ((e.clientY - rect.top) / rect.height) * 100;
-           this.style.transformOrigin = `${x}% ${y}%`;
-           this.style.transform = "scale(2)"; 
-       });
-   
-       image.addEventListener("mouseleave", function () {
-           this.style.transform = "scale(1)";
-       });
-   });
-   
-   document.getElementById("productForm").addEventListener("submit", function (e) {
-           const selectedSize = document.querySelector('input[name="size"]:checked');
-           if (!selectedSize) {
-               e.preventDefault();
-               Swal.fire({
-                   icon: "error",
-                   title: "Size Required!",
-                   text: "Please select a size before adding to cart.",
-                   showConfirmButton: true
-               });
-           }
-       });
-         
-   
-     
-   
+                this.classList.add("selected-size");
+                
+             
+                const radioId = this.getAttribute("for");
+                document.getElementById(radioId).checked = true;
+            });
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+    initializeAddToCart();
+});
+
+
+
+function initializeAddToCart() {
+    const addToCartForm = document.getElementById("add-to-cart-form");
+
+    if (!addToCartForm) {
+        console.error(" Error: #addToCartForm not found in the DOM.");
+        return;
+    }
+
+    addToCartForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        if (!validateSizeSelection()) return;
+
+        const formData = new FormData(this);
+        const jsonData = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch("/user/add-to-cart", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(jsonData),
+            });
+
+            const result = await response.json();
+            console.log(" Server Response:", result); 
+
+            if (response.ok && result.success) {
+                console.log("Product added to cart successfully! Redirecting...");
+            
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Added to Cart!',
+                    text: 'Product successfully added to your cart.',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    window.location.href = result.redirectUrl; 
+                });
+
+            } else {
+                showErrorAlert("Failed to Add", result.message || "Failed to add product to cart.");
+            }
+
+        } catch (error) {
+            console.error(" Error:", error);
+            showErrorAlert("Error", "An unexpected error occurred. Please try again.");
+        }
+    });
+}
+
+
+
+
+
+function validateSizeSelection() {
+    const size = document.querySelector('input[name="size"]:checked');
+    if (!size) {
+        showErrorAlert('Size Required', 'Please select a size before adding to cart.');
+        return false;
+    }
+    return true;
+}
+
+function showSuccessAlert(title, message) {
+    return Swal.fire({
+        icon: 'success',
+        title: title,
+        text: message,
+        confirmButtonText: 'OK'
+    });
+}
+
+function showErrorAlert(title, message) {
+    return Swal.fire({
+        icon: 'error',
+        title: title,
+        text: message,
+        confirmButtonText: 'OK'
+    });
+}
+
+
+ 
+    function initializeBuyNow() {
+    if (!buyNowForm) {
+        console.error("Error: buyNowForm not found!");
+        return;
+    }
+
+    buyNowForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        if (!validateSizeSelection()) return;
+
+        const selectedSize = document.querySelector('input[name="size"]:checked');
+        if (!selectedSize) {
+            showErrorAlert('Size Required!', 'Please select a size before proceeding.');
+            return;
+        }
+
+        document.getElementById("hh").value = selectedSize.value;
+
+        const formData = {
+            productId: this.querySelector('input[name="productId"]')?.value || null,
+            quantity: 1,
+            size: selectedSize.value,
+            price: this.querySelector('input[name="price"]')?.value || null
+        };
+
+        console.log("Form Data Sent:", formData);
+
+        if (!formData.productId || !formData.price) {
+            console.error("Error: Missing productId or price in form.");
+            showErrorAlert('Error', 'Invalid product details. Please try again.');
+            return;
+        }
+
+        try {
+            const response = await fetch("/user/checkout/buy-now", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const text = await response.text();
+            console.log("Raw Response:", text);
+
+            let result;
+            try {
+                result = JSON.parse(text);
+            } catch (error) {
+                console.error("Response is not valid JSON:", error);
+                showErrorAlert('Error', 'Invalid server response. Please try again.');
+                return;
+            }
+
+            console.log("Parsed JSON Response:", result);
+
+            if (response.ok && result.success) {
+                window.location.href = `/user/checkout/single?productId=${formData.productId}&quantity=${formData.quantity}&size=${formData.size}`;
+            } else {
+                showErrorAlert('Checkout Failed', result.message || "Failed to proceed to checkout.");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            showErrorAlert('Error', 'An unexpected error occurred. Please try again.');
+        }
+    });
+}
+
+
+
+
+    // Image Zoom System
+    function initializeImageZoom() {
+        zoomImages.forEach(image => {
+            let isZoomed = false;
+            let zoomLevel = 2;
+
+            image.addEventListener("mousemove", function(e) {
+                if (!isZoomed) return;
+                
+                const rect = this.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                
+                this.style.transformOrigin = `${x}% ${y}%`;
+                this.style.transform = `scale(${zoomLevel})`;
+            });
+
+            image.addEventListener("mouseenter", function() {
+                isZoomed = true;
+                this.style.transform = `scale(${zoomLevel})`;
+            });
+
+            image.addEventListener("mouseleave", function() {
+                isZoomed = false;
+                this.style.transform = "scale(1)";
+            });
+
+            // Optional: Add zoom level control with mouse wheel
+            image.addEventListener("wheel", function(e) {
+                e.preventDefault();
+                if (isZoomed) {
+                    if (e.deltaY < 0 && zoomLevel < 4) {
+                        zoomLevel += 0.5;
+                    } else if (e.deltaY > 0 && zoomLevel > 1.5) {
+                        zoomLevel -= 0.5;
+                    }
+                    this.style.transform = `scale(${zoomLevel})`;
+                }
+            });
+        });
+    }
+
+    // Alert Helpers
+    function showSuccessAlert(title, text) {
+        return Swal.fire({
+            icon: "success",
+            title: title,
+            text: text,
+            timer: 2000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+            position: 'top-end',
+            toast: true,
+            showClass: {
+                popup: 'animate__animated animate__fadeInRight'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutRight'
+            }
+        });
+    }
+
+    function showErrorAlert(title, text) {
+        return Swal.fire({
+            icon: "error",
+            title: title,
+            text: text,
+            confirmButtonColor: "#ff5733",
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            }
+        });
+    }
+
+    // Optional: Add quantity control system
+    function initializeQuantityControl() {
+        const quantityInput = document.querySelector('input[name="quantity"]');
+        if (quantityInput) {
+            const minusBtn = document.createElement('button');
+            const plusBtn = document.createElement('button');
+            
+            minusBtn.type = 'button';
+            plusBtn.type = 'button';
+            minusBtn.className = 'btn btn-outline-secondary';
+            plusBtn.className = 'btn btn-outline-secondary';
+            minusBtn.textContent = '-';
+            plusBtn.textContent = '+';
+
+            minusBtn.onclick = () => {
+                const currentValue = parseInt(quantityInput.value);
+                if (currentValue > 1) {
+                    quantityInput.value = currentValue - 1;
+                }
+            };
+
+            plusBtn.onclick = () => {
+                const currentValue = parseInt(quantityInput.value);
+                const maxStock = parseInt(quantityInput.dataset.maxStock || '99');
+                if (currentValue < maxStock) {
+                    quantityInput.value = currentValue + 1;
+                }
+            };
+
+            const container = document.createElement('div');
+            container.className = 'input-group';
+            container.appendChild(minusBtn);
+            container.appendChild(quantityInput);
+            container.appendChild(plusBtn);
+
+            quantityInput.parentNode.replaceChild(container, quantityInput);
+        }
+    }
+
     
-   
-    
-       document.querySelectorAll(".add-to-cart-form").forEach(form => {
-           form.addEventListener("submit", async function(event) {
-               event.preventDefault(); // Prevent default form submission
-   
-               const formData = new FormData(this);
-               const response = await fetch("/user/add-to-cart", {
-                   method: "POST",
-                   body: formData
-               });
-   
-               const result = await response.json();
-   
-               if (result.success) {
-                   Swal.fire({
-                       icon: "success",
-                       title: "Added to Cart!",
-                       text: result.message,
-                       timer: 2000,
-                       showConfirmButton: false
-                   }).then(() => {
-                       window.location.href = "/user/cart"; 
-                   });
-               } else {
-                   Swal.fire({
-                       icon: "error",
-                       title: "Oops!",
-                       text: result.message
-                   });
-               }
-           });
-       });
-   
-   
-       function selectSize(selectedId) {
-           
-           document.querySelectorAll(".size-btn").forEach(btn => {
-               btn.classList.remove("selected");
-           });
-           selectedSize=event.target.value
-          
-           
-           
-           document.querySelector(`label[for='${selectedId}']`).classList.add("selected");
-       }
-   
-   
-       async function a(event) {
-       event.preventDefault(); 
-   
-       const selectedSize = document.querySelector('input[name="size"]:checked')?.value;
-       if (!selectedSize) {
-           alert("Please select a size before buying.");
-           return;
-       }
-   
-       const formData = {
-           productId: "<%= product._id %>",
-           quantity: 1,
-           size: selectedSize,
-           price: "<%= product.price %>"
-       };
-   
-       try {
-           const response = await fetch("/user/checkout/buy-now", {
-               method: "POST",
-               headers: { "Content-Type": "application/json" },
-               body: JSON.stringify(formData)
-           });
-   
-           if (!response.ok) throw new Error("Failed to load content");
-   
-           const html = await response.text(); 
-           document.body.innerHTML = html; 
-       } catch (error) {
-           console.error("Error:", error);
-           alert("An error occurred. Please try again.");
-       }
-   }
+});
    
        </script>
-          <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-   
+       
        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 
 

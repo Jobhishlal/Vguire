@@ -21,7 +21,12 @@ const productSchema = new mongoose.Schema({
   sizeXL: { type: Number, default: 0 },
   sizeXXL: { type: Number, default: 0 },
   totalStock: { type: Number, default: 0 },
-  isdelete:{type:Boolean,default:false} 
+  isdelete:{type:Boolean,default:false} ,
+  isOfferActive:{type:Boolean,default:false},
+  Offerprice:{type:Number},
+  discountPercentage:{type:Number},
+  offerType:{type:String,enum:["product","category"],default:null}
+
 },{ timestamps: true });  
 
 const Product = mongoose.model('Product', productSchema);

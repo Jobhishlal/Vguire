@@ -546,17 +546,13 @@ function cropImage() {
 }
 
 function validateForm() {
-    const base64Image = document.getElementById('base64Image').value;
+    const base64Image = document.getElementById('base64Image')?.value;  
     if (!base64Image) {
         Swal.fire({
             title: 'Error',
             text: 'Please crop and save the image before submitting.',
             icon: 'error',
-            confirmButtonText: 'OK',
-            customClass: {
-                confirmButton: 'swal2-confirm',
-                cancelButton: 'swal2-cancel'
-            }
+            confirmButtonText: 'OK'
         });
         return false;
     }
@@ -566,8 +562,8 @@ function validateForm() {
 function updateTotalStock() {
     let total = 0;
     ['sizeS', 'sizeM', 'sizeL', 'sizeXL', 'sizeXXL'].forEach(size => {
-        const value = document.getElementById(size).value;
-        total += parseInt(value) || 0;
+        const input = document.getElementById(size);
+        total += parseInt(input?.value) || 0;  
     });
     document.getElementById('totalStock').value = total;
 }
@@ -580,13 +576,10 @@ document.querySelectorAll('input[type="number"]').forEach(input => {
                 title: 'Warning',
                 text: 'Stock value cannot be negative.',
                 icon: 'warning',
-                confirmButtonText: 'OK',
-                customClass: {
-                    confirmButton: 'swal2-confirm',
-                    cancelButton: 'swal2-cancel'
-                }
+                confirmButtonText: 'OK'
             });
         }
+        updateTotalStock();  
     });
 });
 

@@ -292,7 +292,7 @@
                 <div class="d-flex align-items-center">
                     
                     <a href="#" class="me-3"><i class="fas fa-search"></i></a>
-                    <a href="#" class="me-3"><i class="fas fa-shopping-cart"></i></a>
+                    <a href="/user/cart" class="me-3"><i class="fas fa-shopping-cart"></i></a>
                     <a href="#"><i class="fas fa-heart"></i></a>
                 </div>
             </div>
@@ -439,63 +439,76 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script>
-        $(document).ready(function () {
-            // Toggle full address details
-            $(".address-box").click(function (e) {
-                if (!$(e.target).closest('.dropdown-toggle, .dropdown-menu').length) {
-                    const fullAddress = $(this).find('.full-address');
-                    fullAddress.slideToggle(300);
+  $(document).ready(function () {
+    $("#addAddressForm").submit(function (e) {
+        e.preventDefault();
+
+       
+        const formData = {
+            fullName: $("#fullName").val().trim(),
+            phone: $("#phone").val().trim(),
+            streetAddress: $("#streetAddress").val().trim(),
+            city: $("#city").val().trim(),
+            state: $("#state").val().trim(),
+            pincode: $("#pincode").val().trim(),
+            addressType: $("#addressType").val(),
+        };
+
+        
+        const phoneRegex = /^(?!0{10})[0-9]{10}$/; 
+        const pincodeRegex = /^[0-9]{6}$/;
+
+        if (!phoneRegex.test(formData.phone)) {
+            Swal.fire({ icon: 'error', title: 'Invalid Phone Number', text: 'Please enter a valid 10-digit phone number' });
+            return;
+        }
+
+        if (!pincodeRegex.test(formData.pincode)) {
+            Swal.fire({ icon: 'error', title: 'Invalid Pincode', text: 'Pincode must be a 6-digit number' });
+            return;
+        }
+
+   
+        $.ajax({
+            type: "POST",
+            url: "/user/add-address",
+            contentType: "application/json",
+            data: JSON.stringify(formData),
+            success: function (response) {
+                console.log('1', response);
+                
+                if (response.success) {
+                    console.log('here');
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Address Added!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        location.reload(); 
+                    });
+                } else {
+                    console.log('there');
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message || 'Something went wrong!',
+                    });
                 }
-            });
-    
-            $("#addAddressForm").submit(function (e) {
-    e.preventDefault();
-
-    const formData = {
-        fullName: $("#fullName").val(),
-        phone: $("#phone").val(),
-        streetAddress: $("#streetAddress").val(),
-        city: $("#city").val(),
-        state: $("#state").val(),
-        pincode: $("#pincode").val(),
-        addressType: $("#addressType").val(),
-    };
-
-    $.ajax({
-        type: "POST",
-        url: "/user/address/add",
-        contentType: "application/json", 
-        data: JSON.stringify(formData),  
-        success: function (response) {
-            if (response.success) {
+            },
+            error: function (xhr) {
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Address Added!',
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-                $("#addAddressForm")[0].reset();
-            } else {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Address-added',
-                    text: response.message,
+                    icon: 'error',
+                    title: 'Server Error',
+                    text: xhr.responseJSON?.message || 'Failed to add address, try again later.',
                 });
             }
-        },
-        error: function (xhr) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Server Error',
-                text: xhr.responseJSON?.message || 'Failed to add address, try again later.',
-            });
-        }
+        });
     });
 });
 
-
-        });
-    
        
         function editAddress(id) {
             Swal.fire({

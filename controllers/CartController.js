@@ -1,5 +1,6 @@
 import Cart from '../models/cart.js';
 import Product from '../models/products.js';
+import mongoose from "mongoose";
 
 // Get Cart Items
 export const getcart = async (req, res) => {
@@ -51,55 +52,81 @@ export const getcart = async (req, res) => {
 export const addToCart = async (req, res) => {
     try {
         const { productId, size, quantity } = req.body;
-        const userId = req.user._id;
+        console.log(req.body);
+        console.log("Received request body:", req.body);
+       
 
-        console.log("Received add-to-cart request:", { productId, size, quantity });
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: "Unauthorized. Please log in." });
+        }
+        console.log("Authenticated user:", req.user);
+        
+        const userId = req.user._id;
+        const MAX_QUANTITY_PER_ITEM = 5; 
+
+        const parsedQuantity = parseInt(quantity, 10);
+        if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
+            return res.status(400).json({ success: false, message: "Invalid quantity!" });
+        }
 
         const product = await Product.findById(productId);
         if (!product) {
-            return res.json({ success: false, message: "⚠️ Product not found. Please try again!" });
+            return res.status(404).json({ success: false, message: "Product not found. Please try again!" });
         }
 
-        const sizeKey = `size${size}`; // e.g., "sizeS", "sizeM", etc.
-        if (!["sizeS", "sizeM", "sizeL", "sizeXL", "sizeXXL"].includes(sizeKey)) {
-            return res.json({ success: false, message: "Invalid size selected. Choose a valid size!" });
+        const validSizes = new Set(["S", "M", "L", "XL", "XXL"]);
+        if (!validSizes.has(size)) {
+            return res.status(400).json({ success: false, message: "Invalid size selected. Choose a valid size!" });
         }
 
-        if (product[sizeKey] < quantity) {
-            return res.json({ success: false, message: `Only ${product[sizeKey]} items left in stock!` });
+        const sizeKey = `size${size}`;
+        if (product[sizeKey] < parsedQuantity) {
+            return res.status(400).json({ success: false, message: `Only ${product[sizeKey]} items left in stock!` });
         }
 
-        // Find or create a cart for the user
         let cart = await Cart.findOne({ userId });
         if (!cart) {
             cart = new Cart({ userId, items: [] });
         }
 
-        // Check if the item already exists in the cart (same product and size)
         const existingItem = cart.items.find(item => 
-            item.productId.equals(productId) && item.size === sizeKey
+            item.productId.equals(productId) && item.size === size
         );
 
         if (existingItem) {
-            // Ensure the total quantity does not exceed the available stock
-            if (existingItem.quantity + parseInt(quantity) > product[sizeKey]) {
-                return res.json({ success: false, message: `⚠️ Only ${product[sizeKey]} items available in stock!` });
+            const totalQuantity = existingItem.quantity + parsedQuantity;
+            if (totalQuantity > MAX_QUANTITY_PER_ITEM) {
+                return res.status(400).json({
+                    success: false,
+                    message: `You can only add up to ${MAX_QUANTITY_PER_ITEM} of this item!`
+                });
             }
-            existingItem.quantity += parseInt(quantity);
-            existingItem.totalPrice = existingItem.quantity * product.price; 
+            existingItem.quantity = totalQuantity;
+            existingItem.totalPrice = existingItem.quantity * product.price;
         } else {
-            cart.items.push({ 
-                productId, 
-                size: sizeKey, 
-                quantity: parseInt(quantity),
-                price: product.price,              
-                totalPrice: product.price * quantity 
+            if (parsedQuantity > MAX_QUANTITY_PER_ITEM) {
+                return res.status(400).json({
+                    success: false,
+                    message: ` Maximum ${MAX_QUANTITY_PER_ITEM} items per product allowed!`
+                });
+            }
+            cart.items.push({
+                productId,
+                size,
+                quantity: parsedQuantity,
+                price: product.price,
+                totalPrice: product.price * parsedQuantity
             });
         }
 
         cart.markModified("items");
         await cart.save();
-        return res.redirect("/user/cart");
+
+        return res.json({
+            success: true,
+            message: "Product added to cart successfully!",
+            redirectUrl: "/user/cart"
+        });
 
     } catch (error) {
         console.error("Error adding to cart:", error);
@@ -108,19 +135,22 @@ export const addToCart = async (req, res) => {
 };
 
 
-
-
 export const updateCartQuantity = async (req, res) => {
     try {
         const { itemId, quantity } = req.body;
         const userId = req.user._id;
+        console.log(itemId,quantity);
+        
 
         let cart = await Cart.findOne({ userId });
         if (!cart) return res.status(400).json({ error: "Cart not found" });
 
-        const item = cart.items.find(item => item._id.equals(itemId));
+        
+        const objectItemId = new mongoose.Types.ObjectId(itemId);
+        const item = cart.items.find(item => item._id.equals(objectItemId));
         if (!item) return res.status(400).json({ error: "Item not found" });
 
+    
         const product = await Product.findById(item.productId);
         if (!product || product[item.size] < quantity) { 
             return res.status(400).json({ error: "Stock unavailable" });
@@ -137,7 +167,6 @@ export const updateCartQuantity = async (req, res) => {
         return res.status(500).json({ error: "Server error" });
     }
 };
-
 
 export const removeFromCart = async (req, res) => {
     try {

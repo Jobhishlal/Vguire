@@ -80,16 +80,7 @@
 
          <% } %>
         
-         <form action="/user/search" method="GET" class="d-flex">
-            <input type="text" name="query" id="searchInput" class="form-control" 
-                style="width: 250px; height: 30px; font-size: 14px; margin-top: 10px; border-radius: 5px;" 
-                placeholder="Search products">
         
-            <button type="submit" class="btn btn-primary" 
-                style="padding: 5px; width: 36px; height: 36px; margin-left: 5px; margin-top: 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                <i class="fas fa-search" style="font-size: 16px;"></i>
-            </button>
-        </form>
         
              
         
@@ -207,25 +198,7 @@
          </div>
 
          
-         <div class="filters" style="margin-left: 50px; display: flex; align-items: center; gap: 12px;">
-            <label for="sortSelect" class="sort-label"
-                style="font-weight: bold; font-size: 16px; color: white; background: linear-gradient(45deg, #ff416c, #ff4b2b);
-                       padding: 8px 15px; border-radius: 20px; box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);">
-                <i class="fas fa-sort" style="margin-right: 8px; color: white;"></i> Sort By:
-            </label>
-        
-            <select id="sortSelect" class="filter-btn"
-                style="padding: 10px 15px; border-radius: 25px; border: none;
-                       background: linear-gradient(135deg, #007bff, #00c6ff); color: white;
-                       font-size: 14px; cursor: pointer; transition: all 0.3s ease-in-out;
-                       box-shadow: 3px 3px 10px rgba(0,0,0,0.2); outline: none;">
-                <option value="" style="color: black;">Select</option>
-                <option value="price-asc" style="color: black;">Price: Low to High</option>
-                <option value="price-desc" style="color: black;">Price: High to Low</option>
-                <option value="name-asc" style="color: black;">Name: A-Z</option>
-                <option value="name-desc" style="color: black;">Name: Z-A</option>
-            </select>
-        </div>
+       
         
 
 
@@ -320,102 +293,102 @@
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
 
     <script>
-        AOS.init();
-      </script>
-      <script>
-        history.pushState(null, "", location.href);
-        window.onpopstate = function () {
-            history.pushState(null, "", location.href);
-        };
+//         AOS.init();
+//       </script>
+//       <script>
+//         history.pushState(null, "", location.href);
+//         window.onpopstate = function () {
+//             history.pushState(null, "", location.href);
+//         };
 
 
-        document.addEventListener("DOMContentLoaded", function () {
-    const searchButton = document.getElementById("searchButton");
-    const searchInput = document.getElementById("searchInput");
+//         document.addEventListener("DOMContentLoaded", function () {
+//     const searchButton = document.getElementById("searchButton");
+//     const searchInput = document.getElementById("searchInput");
 
-    if (searchButton && searchInput) {
-        searchButton.addEventListener("click", function (e) {
-            e.preventDefault();
+//     if (searchButton && searchInput) {
+//         searchButton.addEventListener("click", function (e) {
+//             e.preventDefault();
 
          
-            if (searchInput.style.display === "none" || searchInput.style.display === "") {
-                searchInput.style.display = "block";
-                searchInput.focus();
-            } else {
-                searchInput.style.display = "none";
-            }
-        });
-    }
-});
+//             if (searchInput.style.display === "none" || searchInput.style.display === "") {
+//                 searchInput.style.display = "block";
+//                 searchInput.focus();
+//             } else {
+//                 searchInput.style.display = "none";
+//             }
+//         });
+//     }
+// });
 
 
   
-document.addEventListener("DOMContentLoaded", function () {
-    const searchInput = document.getElementById("searchInput");
+// document.addEventListener("DOMContentLoaded", function () {
+//     const searchInput = document.getElementById("searchInput");
 
-    if (searchInput) {
-        searchInput.addEventListener("keypress", function (e) {
-            if (e.key === "Enter") {
-                e.preventDefault();
-                const query = searchInput.value.trim();
-                if (query) {
-                    window.location.href = `/user/search?query=${encodeURIComponent(query)}`;
-                } else {
-                    alert("Please enter a product name to search.");
-                }
-            }
-        });
-    }
-});
+//     if (searchInput) {
+//         searchInput.addEventListener("keypress", function (e) {
+//             if (e.key === "Enter") {
+//                 e.preventDefault();
+//                 const query = searchInput.value.trim();
+//                 if (query) {
+//                     window.location.href = `/user/search?query=${encodeURIComponent(query)}`;
+//                 } else {
+//                     alert("Please enter a product name to search.");
+//                 }
+//             }
+//         });
+//     }
+// });
 
 
-document.addEventListener("DOMContentLoaded", function () {
-    const searchInput = document.getElementById("searchInput");
-    const resultsContainer = document.getElementById("searchResults");
+// document.addEventListener("DOMContentLoaded", function () {
+//     const searchInput = document.getElementById("searchInput");
+//     const resultsContainer = document.getElementById("searchResults");
 
-    if (searchInput) {
-        searchInput.addEventListener("input", async function () {
-            const query = searchInput.value.trim();
+//     if (searchInput) {
+//         searchInput.addEventListener("input", async function () {
+//             const query = searchInput.value.trim();
 
-            if (query.length > 2) { 
-                try {
-                    const response = await fetch(`/user/search?query=${encodeURIComponent(query)}`);
-                    const data = await response.json();
+//             if (query.length > 2) { 
+//                 try {
+//                     const response = await fetch(`/user/search?query=${encodeURIComponent(query)}`);
+//                     const data = await response.json();
                     
-                    resultsContainer.innerHTML = ""; 
+//                     resultsContainer.innerHTML = ""; 
 
-                    if (data.length > 0) {
-                        data.forEach(product => {
-                            const productItem = document.createElement("div");
-                            productItem.classList.add("search-result-item");
-                            productItem.innerHTML = `
-                                <a href="/user/productview/${product._id}">
-                                    <img src="${product.images[0]}" alt="${product.name}" class="search-image">
-                                    <span>${product.name}</span>
-                                </a>
-                            `;
-                            resultsContainer.appendChild(productItem);
-                        });
-                    } else {
-                        resultsContainer.innerHTML = "<p>No products found</p>";
-                    }
-                } catch (error) {
-                    console.error("Error fetching search results:", error);
-                }
-            } else {
-                resultsContainer.innerHTML = "";
-            }
-        });
-    }
-});
+//                     if (data.length > 0) {
+//                         data.forEach(product => {
+//                             const productItem = document.createElement("div");
+//                             productItem.classList.add("search-result-item");
+//                             productItem.innerHTML = `
+//                                 <a href="/user/productview/${product._id}">
+//                                     <img src="${product.images[0]}" alt="${product.name}" class="search-image">
+//                                     <span>${product.name}</span>
+//                                 </a>
+//                             `;
+//                             resultsContainer.appendChild(productItem);
+//                         });
+//                     } else {
+//                         resultsContainer.innerHTML = "<p>No products found</p>";
+//                     }
+//                 } catch (error) {
+//                     console.error("Error fetching search results:", error);
+//                 }
+//             } else {
+//                 resultsContainer.innerHTML = "";
+//             }
+//         });
+//     }
+// });
 
 
-document.getElementById("sortSelect").addEventListener("change",function(event){
-const sortValue=this.value;
-if(sortValue){
-    window.location.href=`/user/home?sort=${sortValue}`
-}
-})
+// document.getElementById("sortSelect").addEventListener("change",function(event){
+// const sortValue=this.value;
+// if(sortValue){
+//     window.location.href=`/user/home?sort=${sortValue}`
+// }
+// })
 
 
 

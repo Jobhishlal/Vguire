@@ -14,6 +14,7 @@ import flash from 'express-flash';
 import passport from 'passport';
 import path from 'path';
 import fs from 'fs'
+import mongoose from 'mongoose';
 
 
 
@@ -571,7 +572,6 @@ export const homepage = async (req, res) => {
         
         const ratingsMap = new Map(ratingsData.map(r => [r._id.toString(), r.avgRating.toFixed(1)]));
 
-        // Add average rating to each product
         const productsWithAvgRating = products.map(product => ({
             ...product.toObject(),
             avgRating: ratingsMap.get(product._id.toString()) || "No ratings yet"
@@ -603,63 +603,96 @@ export const homepage = async (req, res) => {
 
 export const shoppage = async (req, res) => {
     try {
-        const { category, sort } = req.query;
+        const { sort, query, category } = req.query;
+        let filter = { isdelete: false };
 
+        if (query) {
+            filter.name = { $regex: `^${query}`, $options: "i" };
+        }
+
+     
+        if (category) {
+            const decodedCategory = decodeURIComponent(category.trim());
+            const categoryDoc = await Category.findOne({
+                name: { $regex: `^${decodedCategory}$`, $options: "i" }
+            });
+
+            if (categoryDoc) {
+                filter.category = categoryDoc._id;
+            } else {
+                return res.render("user/shop", {
+                    user: req.user,
+                    categories: await Category.find({ isListed: false }),
+                    product: [],
+                    date: await Product.find().sort({ createdAt: -1 }).limit(1),
+                    cartItems: req.user ? (await Cart.findOne({ userId: req.user._id }))?.items || [] : [],
+                    session: req.session
+                });
+            }
+        }
+
+       
         let sortQuery = {};
         if (sort === "price-asc") sortQuery = { price: 1 };
         if (sort === "price-desc") sortQuery = { price: -1 };
+        if (sort === "name-asc") sortQuery = { name: 1 };  
+        if (sort === "name-desc") sortQuery = { name: -1 }; 
 
-        let allProducts = [];
+       
+        let products = await Product.find(filter)
+            .populate("category")
+            .sort(sortQuery)
+            .collation({ locale: "en", strength: 2 });  
 
-        if (category) {
-            allProducts = await Product.aggregate([
-                {
-                    $lookup: {
-                        from: "categories",
-                        localField: "category",
-                        foreignField: "_id",
-                        as: "resultCategory"
-                    }
-                },
-                {
-                    $match: {
-                        "resultCategory.name": { $regex: `^${category}`, $options: "i" }
-                    }
+       
+        const ratingsData = await Order.aggregate([
+            { $unwind: "$items" },
+            { $match: { "items.rating": { $ne: null } } },
+            {
+                $group: {
+                    _id: "$items.productId",
+                    avgRating: { $avg: "$items.rating" }
                 }
-            ]);
-        } else {
-            allProducts = await Product.find({ isdelete: false }).sort(sortQuery);
+            }
+        ]);
+
+        const ratingsMap = new Map(ratingsData.map(r => [r._id.toString(), parseFloat(r.avgRating.toFixed(1))]));
+
+        const productsWithAvgRating = products.map(product => ({
+            ...product.toObject(),
+            avgRating: ratingsMap.get(product._id.toString()) || 0 
+        }));
+        
+        
+        if (sort === "rating-desc") { 
+            
+            productsWithAvgRating.sort((a, b) => b.avgRating - a.avgRating);
+        } else if (sort === "rating-asc") { 
+          
+            productsWithAvgRating.sort((a, b) => a.avgRating - b.avgRating);
         }
+        
 
-        // Case-insensitive sorting for names
-        if (sort === "name-asc") {
-            allProducts = allProducts.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
-        } else if (sort === "name-desc") {
-            allProducts = allProducts.sort((a, b) => b.name.toLowerCase().localeCompare(a.name.toLowerCase()));
-        }
-
-        const categories = await Category.find({ isListed: false });
-        const latestProduct = await Product.find().sort({ createdAt: -1 }).limit(1);
-
-        let cartItems = [];
-        if (req.user) {
-            const cart = await Cart.findOne({ userId: req.user._id });
-            cartItems = cart ? cart.items : [];
+        
+        if (req.xhr) {
+            return res.json({ products: productsWithAvgRating });
         }
 
         res.render("user/shop", {
             user: req.user,
-            categories,
-            product: allProducts, 
-            date: latestProduct,
-            cartItems,
+            categories: await Category.find({ isListed: false }),
+            product: productsWithAvgRating,
+            date: await Product.find().sort({ createdAt: -1 }).limit(1),
+            cartItems: req.user ? (await Cart.findOne({ userId: req.user._id }))?.items || [] : [],
             session: req.session
         });
+
     } catch (error) {
-        console.error("Error: Shop page is not working", error);
-        return res.status(500).send("Shop page is not working");
+        console.error("Error fetching shop page data:", error);
+        res.status(500).send("Internal Server Error");
     }
 };
+
 
 
 export const productview = async (req, res) => {
@@ -672,10 +705,10 @@ export const productview = async (req, res) => {
             return res.status(404).send("Product not found");
         }
 
-        // Aggregate average rating from orders
+     
         const ratingData = await Order.aggregate([
-            { $unwind: "$items" }, // Break down order items
-            { $match: { "items.productId": product._id, "items.rating": { $ne: null } } }, // Exclude null ratings
+            { $unwind: "$items" }, 
+            { $match: { "items.productId": product._id, "items.rating": { $ne: null } } }, 
             {
                 $group: {
                     _id: "$items.productId",
@@ -684,10 +717,10 @@ export const productview = async (req, res) => {
             }
         ]);
 
-        // Set average rating (if no ratings, default to null)
+    
         const avgRating = ratingData.length > 0 ? ratingData[0].avgRating.toFixed(1) : null;
 
-        // Fetch similar products from the same category
+     
         const similarProducts = await Product.aggregate([
             {
                 $lookup: {
@@ -705,7 +738,6 @@ export const productview = async (req, res) => {
             }
         ]);
 
-        // Select 4 random similar products
         const randomNumbers = new Set();
         while (randomNumbers.size < 4) {
             const randomNum = Math.floor(Math.random() * similarProducts.length);
@@ -902,6 +934,7 @@ export const getaddress = async (req, res) => {
         res.status(500).send("Address not fetched");
     }
 };
+
 export const postaddress = async (req, res) => {
     try {
         if (!req.user || !req.user._id) {
@@ -910,10 +943,13 @@ export const postaddress = async (req, res) => {
 
         const { fullName, phone, streetAddress, city, state, pincode, addressType } = req.body;
 
+       
         if (!fullName || !phone || !streetAddress || !city || !state || !pincode || !addressType) {
             return res.status(400).json({ success: false, message: "All fields are required" });
         }
-
+        console.log("helloowww",req.body);
+        
+      
         const newAddress = new Address({
             userId: req.user._id,
             fullName,
@@ -926,14 +962,15 @@ export const postaddress = async (req, res) => {
         });
 
         await newAddress.save();
-        res.json({ success: true, message: "Address added successfully" });
+
+    
+        return res.status(201).json({ success: true, message: "Address added successfully" });
 
     } catch (error) {
         console.error("Error adding address:", error);
-        res.status(500).json({ success: false, message: "Failed to add address" });
+        return res.status(500).json({ success: false, message: "Failed to add address" });
     }
 };
-
 
 
 export const geteditaddress = async(req,res)=>{
@@ -990,37 +1027,62 @@ export const deleteaddress = async(req,res)=>{
         res.redirect("/user/address");
     }
 }
-export const searchproduct = async (req, res) => {
-    try {
-        const { query } = req.query;
-        if (!query) {
-            return res.render("user/home", { 
-                product: [], 
-                session: req.session, 
-                cartItems: [],
-                date: [],
-                categories: []
-            }); 
-        }
+// export const searchproduct = async (req, res) => {
+//     try {
+//         const { query } = req.query;
+//         if (!query) {
+//             return res.render("user/home", { 
+//                 product: [], 
+//                 session: req.session, 
+//                 cartItems: [],
+//                 date: [],
+//                 categories: []
+//             }); 
+//         }
 
-        const products = await Product.find({
-            name: { $regex: `^${query}`, $options: "i" } 
-        });
-        console.log(products);
-        console.log("search query:", query);
+//         const products = await Product.find({
+//             name: { $regex: `^${query}`, $options: "i" } 
+//         });
+//         console.log(products);
+//         console.log("search query:", query);
 
         
 
-        res.render("user/home", { 
-            product: products, 
-            session: req.session, 
-            cartItems: [], 
-            date: [],
-            categories: [] 
-        });
+//         res.render("user/home", { 
+//             product: products, 
+//             session: req.session, 
+//             cartItems: [], 
+//             date: [],
+//             categories: [] 
+//         });
+//     } catch (error) {
+//         console.error("Error searching products:", error);
+//         res.status(500).send("Internal Server Error");
+//     }
+// };
+
+
+export const searchproduct = async (req, res) => {
+    try {
+        // const query = req.query?.query?.trim();
+
+        // if (!query) {
+        //     return res.json({ products: [] }); 
+        // }
+
+        
+        // const products = await Product.find({
+        //     name: { $regex: `^${query}`, $options: "i" } 
+        // });
+
+        // console.log("Search query:", query);
+        // console.log("Found products:", products);
+
+        // res.json({ products }); 
+
     } catch (error) {
         console.error("Error searching products:", error);
-        res.status(500).send("Internal Server Error");
+        res.status(500).json({ error: "Internal Server Error" }); 
     }
 };
 

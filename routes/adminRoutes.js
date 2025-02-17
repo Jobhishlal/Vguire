@@ -7,7 +7,7 @@ import { productUpload, categoryUpload,processProductImages } from '../middlewar
 
 import * as productController from '../controllers/productController.js';
 import * as adminuserController from '../controllers/adminuserController.js';
-import { addCategory, showCategories, getEditCategory, updateCategory ,list} from '../controllers/categoryController.js';
+import { addCategory, showCategories, getEditCategory, updateCategory ,list,applyCategoryOffer,applyCategoryOfferPost,removeCategoryOffer} from '../controllers/categoryController.js';
 import * as adminorderController from '../controllers/adminordercontroller.js'
 import { isAuthenticatedAdmin, preventLoggedInAdmin } from '../middlewares/authMiddleware.js';
 import { error } from 'console';
@@ -51,7 +51,6 @@ router.get('/add-category', isAuthenticatedAdmin, (req, res) => {
 });
 
 router.post('/add-category', isAuthenticatedAdmin, categoryUpload, addCategory);
-
 router.get('/edit-category/:id', isAuthenticatedAdmin, getEditCategory);
 router.post('/edit-category/:id', isAuthenticatedAdmin, categoryUpload, updateCategory);
 
@@ -65,6 +64,15 @@ router.get('/ordermanagement',adminorderController.getorder)
 router.get("/ordermanagement/:orderId", adminorderController.getOrderDetails);
 
 router.post("/ordermanagement/:orderId/update-status", adminorderController.updateOrderStatus);
+
+// offer
+
+router.get("/product/:id/offer",productController.offerpage)
+router.post("/product/:id/offer",productController.offerpost)
+router.get("/product/:id/remove-offer",productController.removeoffer)
+router.get("/category/:id/offer", applyCategoryOffer);
+router.post("/category/:id/offer", applyCategoryOfferPost);
+router.delete('/category/:id/remove-offer', removeCategoryOffer);
    
 
 

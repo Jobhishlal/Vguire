@@ -143,15 +143,15 @@ import multer from 'multer';
 import path from 'path';
 import sharp from 'sharp';
 import fs from 'fs';
+import { log } from 'console';
 
-// 📌 Function to create directories if they don’t exist
+
 const createUploadDirIfNeeded = (dirPath) => {
     if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath, { recursive: true });
     }
 };
 
-// 📌 Category Image Storage
 const categoryStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         const uploadDir = 'public/uploads/categories';
@@ -172,7 +172,7 @@ const categoryUpload = multer({
     }
 }).single('categoryImage');
 
-// 📌 Profile Image Storage
+
 const profileStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         const uploadDir = 'public/uploads/profileImage';
@@ -188,10 +188,13 @@ const profileUpload = multer({
     storage: profileStorage,
     limits: { fileSize: 15 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
+        console.log("Uploaded File MIME Type:", file.mimetype);
         const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
         allowedTypes.includes(file.mimetype) ? cb(null, true) : cb(new Error('Invalid file type.'));
     }
 }).single('profileImage');
+
+
 
 
 const productStorage = multer.diskStorage({
@@ -241,7 +244,7 @@ const processProductImages = async (req, res, next) => {
             req.files.map(async (file) => {
                 const croppedImagePath = `public/uploads/products/cropped-${file.filename}`;
 
-                // Validate Image before processing
+       
                 const isValidImage = await validateImage(file.path);
                 if (!isValidImage) {
                     console.error(`🚨 Invalid image file detected: ${file.filename}`);
@@ -254,7 +257,7 @@ const processProductImages = async (req, res, next) => {
                         .jpeg({ quality: 80 })
                         .toFile(croppedImagePath);
                 } catch (sharpError) {
-                    console.error(`❌ Sharp processing failed for ${file.filename}:`, sharpError);
+                    console.error(` Sharp processing failed for ${file.filename}:`, sharpError);
                     return null;
                 }
 
@@ -262,7 +265,6 @@ const processProductImages = async (req, res, next) => {
             })
         );
 
-        // Remove null values from the list of processed images
         req.body.croppedImages = croppedImages.filter(Boolean);
         next();
     } catch (error) {

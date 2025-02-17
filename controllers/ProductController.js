@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
 import { error } from 'console';
+import flash from 'express-flash';
 
 
 export const showProducts = async (req, res) => {
@@ -495,6 +496,81 @@ export const list = async(req,res)=>{
     } catch (error) {
         console.error('its not working');
         return res.status(500).send("its not  working now")
+        
+    }
+}
+
+
+
+export const offerpage = async(req,res)=>{
+    try {
+        const product = await Product.findById(req.params.id);
+        if(!product){
+            req.flash("error", "Product not found");
+            return res.status(404).redirect("/admin/product");
+        }
+        res.render("admin/add-product-offer", {
+            product: product,
+            success: req.flash("success"), 
+            error: req.flash("error") 
+        });
+
+    } catch (error) {
+        req.flash("error", "An error occurred while fetching the product");
+        return res.status(500).redirect("/admin/product");
+        
+    }
+}
+export const offerpost = async (req, res) => {
+    try {
+        const { discountPercentage } = req.body;
+        const product = await Product.findById(req.params.id);
+
+        if (!product) {
+            req.flash("error", "Product not found");
+            return res.status(404).redirect("/admin/product");
+        }
+
+        
+        if (product.offerType === "category" && product.isOfferActive) {
+            req.flash("error", "Category offer is already active. You cannot apply a product offer.");
+            return res.redirect(`/admin/product/${product._id}/offer`);
+        }
+
+       
+        const discountAmount = (product.price * discountPercentage) / 100;
+        product.Offerprice = product.price - discountAmount; 
+        product.discountPercentage = discountPercentage;
+        product.isOfferActive = true;
+        product.offerType = "product"; 
+        
+        await product.save();
+        req.flash("success", "Product offer applied successfully!");
+        res.redirect("/admin/product");
+    } catch (error) {
+        req.flash("error", "Failed to apply product offer");
+        return res.status(500).redirect("/admin/product");
+    }
+};
+
+
+
+export const removeoffer = async(req,res)=>{
+    try {
+        const product = await Product.findById(req.params.id);
+        if(!product){
+            req.flash("error",'product find errror')
+            return res.redirect("/admin/product")
+        }
+        product.isOfferActive=false,
+        product.Offerprice=undefined,
+        product.discountPercentage=undefined;
+        await product.save();
+        req.flash("success","offer remove successfully");
+        res.redirect("/admin/product")
+    } catch (error) {
+        req.flash("error","offer remove error");
+        return res.redirect("/admin/product")
         
     }
 }

@@ -14,19 +14,21 @@
             border-radius: 1rem;
             overflow: hidden;
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+            margin-top: 1.5rem;
         }
 
         .table {
             margin-bottom: 0;
-            color: whitesmoke
+            color: whitesmoke;
+            vertical-align: middle;
         }
 
         .table > :not(caption) > * > * {
-            padding: 1rem 1.5rem;
+            padding: 1.25rem 1.5rem;
             background: none;
-            border-bottom-color: rgb(243, 240, 240);
+            border-bottom-color: rgba(243, 240, 240, 0.1);
             color: white;
-           
+            vertical-align: middle;
         }
 
         .table > thead {
@@ -44,13 +46,15 @@
         /* Product Image Styles */
         .product-image-container {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.75rem;
             align-items: center;
+            flex-wrap: nowrap;
+            padding: 0.5rem 0;
         }
 
         .product-image {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border-radius: 8px;
             object-fit: cover;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
@@ -98,6 +102,7 @@
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.1);
             border: none;
+            margin: 0;
         }
 
         .btn-action:hover {
@@ -170,15 +175,25 @@
         }
 
         /* Size and Stock Indicators */
+
+
+        .size-indicators {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: flex-start;
+            flex-wrap: nowrap;
+        }
         .size-indicator {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
+            width: 35px;
+            height: 35px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
             background: rgba(255, 255, 255, 0.1);
+            font-size: 0.875rem;
         }
 
         .stock-warning {
@@ -232,7 +247,7 @@
 
         body {
             background-color: var(--dark-bg);
-            color:white;
+            color: white;
             min-height: 100vh;
             overflow-x: hidden;
         }
@@ -397,6 +412,8 @@
         }
 
         /* Responsive */
+
+        
         @media (max-width: 992px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -459,6 +476,17 @@
                 font-size: 0.7rem;
             }
         }
+        @media (max-width: 1200px) {
+            .table > :not(caption) > * > * {
+                padding: 1rem;
+            }
+
+            .size-indicator {
+                width: 30px;
+                height: 30px;
+                font-size: 0.75rem;
+            }
+        }
 
         @media (max-width: 768px) {
             .table-responsive {
@@ -512,6 +540,48 @@
 
         .pagination .page-item .page-link:hover {
             background: rgba(255, 255, 255, 0.1);
+        }
+        .offer-status {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: flex-start;
+        }
+
+        .offer-price {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 992px) {
+            .table-responsive {
+                margin: 0 -1rem;
+            }
+
+            .product-image {
+                width: 40px;
+                height: 40px;
+            }
+
+            .size-indicators {
+                gap: 0.25rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .product-info {
+                max-width: 200px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .btn-action {
+                width: 32px;
+                height: 32px;
+            }
         }
 
     </style>
@@ -655,6 +725,7 @@
                                 <th>Sizes [S,M,L,XL,XXL]</th>
                                 <th>Status</th>
                                 <th>Actions</th>
+                                <th>Offer Status</th> <!-- New column for offer status -->
                             </tr>
                         </thead>
                         <tbody>
@@ -683,7 +754,7 @@
                                 </td>
                                 <td><%= product.category ? product.category.name : 'N/A' %></td>
                                 <td>
-                                    <div class="fw-bold">$<%= product.price %></div>
+                                    <div class="fw-bold">₹<%= product.price %></div>
                                 </td>
                                 <td>
                                     <div class="<%= product.totalStock < 5 ? 'stock-danger' : (product.totalStock < 10 ? 'stock-warning' : '') %>">
@@ -705,7 +776,7 @@
                                     <% } else if (product.totalStock > 0) { %>
                                         <span class="status-badge status-low-stock">Low</span>
                                     <% } else { %>
-                                        <span class="status-badge status-out-of-stock">Out of</span>
+                                        <span class="status-badge status-out-of-stock">Out</span>
                                     <% } %>
                                 </td>
                                 <td>
@@ -713,29 +784,49 @@
                                         <button class="btn btn-action btn-primary">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <a href="/admin/edit-product/<%=product._id%>">
+                                        <a href="/admin/edit-product/<%= product._id %>">
                                             <button class="btn btn-action btn-success">
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                         </a>
-                                        
-                                        <form action="/admin/listproduct/<%= product._id %>" method="POST">
-                                            <button type="submit" 
-                                                style="background-color: <%= product.isDelete === true ? 'red' : 'green' %>; 
-                                                       color: white; padding: 10px 15px; border: none; cursor: pointer; border-radius: 5px;">
-                                                <i class="<%= product.isDelete === true ? 'fas fa-ban' : 'fas fa-check-circle' %>"></i>
-                                                <span><%= product.isDelete === true ? 'Unlist product' : 'List product' %></span>
-                                            </button>
-                                        </form>
-                                        
+                                        <a href="/admin/product/<%= product._id %>/offer" class="btn btn-action btn-warning">
+                                            <i class="fas fa-tag"></i>
+                                        </a>
                                     </div>
+                                          <div>
+
+                                            <% if (product.isOfferActive) { %>
+                                                <a href="/admin/product/<%= product._id %>/remove-offer" class="btn btn-action btn-danger">
+                                                    <i class="fas fa-times-circle"></i> 
+                                                </a>
+                                            <% } %>
+                                          </div>
                                 </td>
+                    
+                                <td>
+                                    <% if (product.isOfferActive) { %>
+                                        <% if (product.offerType === "product") { %>
+                                            <span class="badge badge-success">Product Offer Active</span>
+                                            <div>₹<%= product.Offerprice %></div> 
+                                        <% } else if (product.offerType === "category") { %>
+                                            <span class="badge badge-info">Category Offer Active</span>
+                                            <div>₹<%= product.price - (product.price * product.discountPercentage / 100) %></div> 
+                                        <% } %>
+                                    <% } else { %>
+                                        <span class="badge badge-secondary">No Offer</span>
+                                        <div>₹<%= product.price %></div> 
+                                    <% } %>
+                                </td>
+                                
                             </tr>
                             <% }); %>
                         </tbody>
                     </table>
+                    
+              
                 </div>
             </div>
+            
         </div>
     </main>
 
