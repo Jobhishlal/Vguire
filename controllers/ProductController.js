@@ -539,7 +539,7 @@ export const offerpost = async (req, res) => {
 
        
         const discountAmount = (product.price * discountPercentage) / 100;
-        product.Offerprice = product.price - discountAmount; 
+        product.Offerprice = Math.floor(product.price - discountAmount); 
         product.discountPercentage = discountPercentage;
         product.isOfferActive = true;
         product.offerType = "product"; 

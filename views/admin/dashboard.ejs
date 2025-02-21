@@ -115,6 +115,50 @@
         .sidebar.collapsed .nav-link i {
             margin-right: 0;
         }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            background: #1a1d24;
+            min-height: 100vh;
+        }
+        .report-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .report-container h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+        .filter-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .filter-section select, .filter-section input {
+            padding: 0.5rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .filter-section button {
+            background: #007bff;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .filter-section button:hover {
+            background: #0056b3;
+        }
+
+
+        
         
 
     </style>
@@ -164,13 +208,13 @@
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="/admin/referraloffer" class="nav-link">
                         <i class="fas fa-gift"></i>
                         <span>Offers</span>
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="/admin/coupons" class="nav-link">
                         <i class="fas fa-ticket-alt"></i>
                         <span>Coupons</span>
                     </a>
@@ -198,140 +242,65 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <div class="header">
-                <h1>Dashboard</h1>
-                <div class="user-profile">
-                    <img src="/image/Screenshot 2025-01-02 185508.png" alt="Profile" class="profile-img">
+            <div class="filter-section">
+                <label for="filter">Select Report Type:</label>
+                <select id="filter">
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                    <option value="custom">Custom Date</option>
+                </select>
+                <div id="customDateRange" style="display: none;">
+                    <label for="startDate">Start Date:</label>
+                    <input type="date" id="startDate">
+                    <label for="endDate">End Date:</label>
+                    <input type="date" id="endDate">
                 </div>
+                <button onclick="fetchSalesReport()">Get Report</button>
             </div>
-
-            <!-- Stats Cards -->
-            <div class="stats-container">
-                <div class="stats-card purple">
-                    <div class="icon"><i class="fas fa-users"></i></div>
-                    <div class="stats-info">
-                        <span class="label">Total users</span>
-                        <h3>29</h3>
-                    </div>
-                </div>
-
-                <div class="stats-card dark-purple">
-                    <div class="icon"><i class="fas fa-shopping-bag"></i></div>
-                    <div class="stats-info">
-                        <span class="label">Items sold</span>
-                        <h3>34</h3>
-                    </div>
-                </div>
-
-                <div class="stats-card blue">
-                    <div class="icon"><i class="fas fa-rupee-sign"></i></div>
-                    <div class="stats-info">
-                        <span class="label">Total Sales</span>
-                        <h3>₹15889</h3>
-                    </div>
-                </div>
-
-                <div class="stats-card pink">
-                    <div class="icon"><i class="fas fa-clock"></i></div>
-                    <div class="stats-info">
-                        <span class="label">Pending Orders</span>
-                        <h3>12</h3>
-                    </div>
-                </div>
+            <div class="report-container">
+                <h3>Total Sales: ₹<span id="totalSales">0</span></h3>
+                <h3>Total Orders: <span id="totalOrders">0</span></h3>
+                <h3>Total Products Sold: <span id="totalProductsSold">0</span></h3>
             </div>
-
-            <!-- Date Filter -->
-            <div class="date-filter">
-                <span>Sorted To Date</span>
-                <div class="date-inputs">
-                    <label>From</label>
-                    <input type="date" class="date-input">
-                    <label>To</label>
-                    <input type="date" class="date-input">
-                </div>
-                <button class="download-btn">
-                    Download report
-                    <span class="pdf-tag">PDF <i class="fas fa-download"></i></span>
-                </button>
-            </div>
-
-            <!-- Products Table
-            <div class="products-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>PRODUCT IMAGE</th>
-                            <th>PRODUCT NAME</th>
-                            <th>CATEGORY</th>
-                            <th>AMOUNT</th>
-                            <th>REVENUE</th>
-                            <th>QTY SOLD</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>#11225</td>
-                            <td><img src="/api/placeholder/40/40" alt="Jersey"></td>
-                            <td>Jersey</td>
-                            <td>Women</td>
-                            <td>$120</td>
-                            <td>$178.45</td>
-                            <td>5</td>
-                        </tr>
-                        <tr>
-                            <td>#11226</td>
-                            <td><img src="/api/placeholder/40/40" alt="Jersey"></td>
-                            <td>Jersey</td>
-                            <td>Men</td>
-                            <td>$85.35</td>
-                            <td>$309.95</td>
-                            <td>5</td>
-                        </tr>
-                        <tr>
-                            <td>#11227</td>
-                            <td><img src="/api/placeholder/40/40" alt="Hand Gripper"></td>
-                            <td>Hand Gripper</td>
-                            <td>Accessories</td>
-                            <td>$25.25</td>
-                            <td>$863.45</td>
-                            <td>4</td>
-                        </tr>
-                        <tr>
-                            <td>#11228</td>
-                            <td><img src="/api/placeholder/40/40" alt="Boots"></td>
-                            <td>Boots</td>
-                            <td>Accessories</td>
-                            <td>$100</td>
-                            <td>$127.45</td>
-                            <td>2</td>
-                        </tr>
-                        <tr>
-                            <td>#11229</td>
-                            <td><img src="/api/placeholder/40/40" alt="Badminton"></td>
-                            <td>Badminton</td>
-                            <td>Accessories</td>
-                            <td>$80</td>
-                            <td>$86.00</td>
-                            <td>2</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="table-footer">
-                    <span>SHOWING 1 OF 10</span>
-                    <div class="pagination">
-                        <button><i class="fas fa-chevron-left"></i></button>
-                        <button class="active">1</button>
-                        <button>2</button>
-                        <button>3</button>
-                        <button>...</button>
-                        <button>8</button>
-                        <button>9</button>
-                        <button><i class="fas fa-chevron-right"></i></button>
-                    </div>
-                </div>
-            </div> -->
         </main>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <canvas id="salesChart"></canvas>
+<script>
+    document.getElementById("filter").addEventListener("change", function () {
+      document.getElementById("customDateRange").style.display =
+        this.value === "custom" ? "block" : "none";
+    });
+  
+    async function fetchSalesReport() {
+      const filter = document.getElementById("filter").value;
+      let url = `/admin/sales-report?filter=${filter}`;
+  
+      if (filter === "custom") {
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
+        if (!startDate || !endDate) {
+          alert("Please select start and end dates!");
+          return;
+        }
+        url += `&startDate=${startDate}&endDate=${endDate}`;
+      }
+  
+      const response = await fetch(url);
+      const data = await response.json();
+  
+      document.getElementById("totalSales").innerText = data.totalSales;
+      document.getElementById("totalOrders").innerText = data.totalOrders;
+      document.getElementById("totalProductsSold").innerText = data.totalProductsSold;
+
+
+     
+
+
+
+    }
+  </script>
 </body>
 </html>

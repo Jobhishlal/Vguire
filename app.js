@@ -52,6 +52,8 @@ app.use(
 );
 
 
+
+
 app.set('views', path.join(process.cwd(), 'views'));
 app.set('view engine', 'ejs');
 
@@ -113,3 +115,4 @@ connectDB()
     .catch((error) => {
         console.error('Database connection failed:', error);
     });
+

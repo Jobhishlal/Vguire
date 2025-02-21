@@ -89,7 +89,7 @@
                     <% order.items.forEach(item => { %> 
                         <div class="detail-row">
                             <span class="detail-label">Amount Paid</span>
-                            <span class="detail-value">₹<%= item.totalprice %></span>
+                            <span class="detail-value">₹<%= order.totalAmount %></span>
                         </div>
                     <% }); %>
                 

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Keep existing navbar styles */
+        :root {
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 70px;
+            --header-height: 60px;
+            --primary-color: #cbcfda;
+            --secondary-color: #858796;
+            --dark-bg: #1a1a1a;
+            --card-bg: #242424;
+            --text-color: #e4e4e4;
+        }
+        
+        /* Existing navbar styles here... */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #010612 0%, #224abe 100%);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            padding-top: var(--header-height);
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: var(--header-height);
+            background: rgba(1, 6, 18, 0.9);
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .logo-full {
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo-mini {
+            display: none;
+            color: white;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .sidebar.collapsed .logo-full {
+            display: none;
+        }
+
+        .sidebar.collapsed .logo-mini {
+            display: block;
+        }
+
+        .nav-item {
+            position: relative;
+            margin: 0.25rem 1rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+            margin-right: 1rem;
+        }
+
+        .sidebar.collapsed .nav-link span {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-item {
+            margin: 0.25rem 0.5rem;
+        }
+
+        .sidebar.collapsed .nav-link i {
+            margin-right: 0;
+        }
+        
+        /* New styles for content area */
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.3s ease;
+        }
+
+        .sidebar.collapsed + body {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        .content-wrapper {
+            padding: 2rem;
+            margin-top: var(--header-height);
+        }
+
+        .page-header {
+            background: linear-gradient(45deg, #1e3c72, #2a5298);
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .table {
+            color: var(--text-color);
+        }
+
+        .table-dark {
+            background-color: var(--card-bg);
+        }
+
+        .badge {
+            font-size: 0.85rem;
+            padding: 0.5em 0.8em;
+        }
+
+        .btn-add-coupon {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-weight: 500;
+            transition: transform 0.2s;
+        }
+
+        .btn-add-coupon:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-edit {
+            background: linear-gradient(45deg, #f1c40f, #f39c12);
+            border: none;
+        }
+
+        .btn-remove {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            border: none;
+        }
+
+        .table-responsive {
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+  
+      <nav class="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="logo-full">
+                <i class="fas fa-shopping-bag me-2"></i>
+                VGURIE
+            </a>
+            <a href="#" class="logo-mini">
+                <i class="fas fa-shopping-bag"></i>
+            </a>
+        </div>
+        <div class="nav flex-column">
+            <div class="nav-item">
+                <a href="/admin/dashboard" class="nav-link">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="/admin/product" class="nav-link">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="/admin/ordermanagement" class="nav-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="/admin/usersmanagement" class="nav-link">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="/admin/categories" class="nav-link">
+                    <i class="fas fa-tags"></i>
+                    <span>Categories</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-gift"></i>
+                    <span>Offers</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Coupons</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-image"></i>
+                    <span>Banners</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </div>
+            <div class="nav-item mt-auto">
+                <a href="#" class="nav-link text-danger">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+  
+    </nav>
+
+    <div class="content-wrapper">
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="mb-0">Coupon Management</h1>
+                    <p class="text-light mb-0">Manage your store's promotional offers</p>
+                </div>
+                <a href="/admin/coupons/add" class="btn btn-add-coupon">
+                    <i class="fas fa-plus-circle me-2"></i>Add New Coupon
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Discount Type</th>
+                                <th>Value</th>
+                                <th>Expiration</th>
+                                <th>Usage</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% coupons.forEach(function(coupon) { %>
+                            <tr>
+                                <td>
+                                    <span class="fw-bold"><%= coupon.code %></span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info"><%= coupon.discountType %></span>
+                                </td>
+                                <td>
+                                    <%= coupon.value %><%=coupon.discountType === 'percentage' ? '%' : '₹' %>
+                                </td>
+                                <td>
+                                    <span class="<%= new Date(coupon.expirationDate) < new Date() ? 'text-danger' : 'text-success' %>">
+                                        <%= new Date(coupon.expirationDate).toLocaleDateString() %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="progress bg-dark">
+                                        <div class="progress-bar bg-success" 
+                                             role="progressbar" 
+                                             style="width: <%= (coupon.usedCount/coupon.usageLimit)*100 %>%">
+                                            <%= coupon.usedCount %>/<%= coupon.usageLimit %>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <% if(new Date(coupon.expirationDate) < new Date()) { %>
+                                        <span class="badge bg-danger">Expired</span>
+                                    <% } else if(coupon.usedCount >= coupon.usageLimit) { %>
+                                        <span class="badge bg-warning">Limit Reached</span>
+                                    <% } else { %>
+                                        <span class="badge bg-success">Active</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="/admin/coupons/edit/<%= coupon._id %>" 
+                                           class="btn btn-edit btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button class="btn btn-remove btn-sm remove-btn" 
+                                                data-id="<%= coupon._id %>">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.all.min.js"></script>
+    <script>
+        document.querySelectorAll('.remove-btn').forEach(button => {
+            button.addEventListener('click', async function(event) {
+                const couponId = event.target.closest('.remove-btn').getAttribute('data-id');
+
+                const result = await Swal.fire({
+                    title: 'Are you sure?',
+                    text: "This coupon will be permanently deleted!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e74c3c',
+                    cancelButtonColor: '#95a5a6',
+                    confirmButtonText: 'Yes, delete it!'
+                });
+
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`/admin/coupons/remove/${couponId}`, {
+                            method: 'DELETE',
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            await Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: data.message,
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                            event.target.closest('tr').remove();
+                        } else {
+                            throw new Error(data.message || 'Failed to delete coupon');
+                        }
+                    } catch (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: error.message,
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="card p-3">
+        <h4>Your Referral Code</h4>
+        <div class="input-group">
+            <input type="text" class="form-control" id="referralCode" value="<%= referralCode %>" readonly>
+            <button class="btn btn-primary" onclick="copyReferral()">Copy</button>
+        </div>
+        <button class="btn btn-success mt-2" onclick="shareReferral()">Share</button>
+        
+        <script>
+        function copyReferral() {
+            const referralInput = document.getElementById("referralCode");
+            referralInput.select(); 
+            document.execCommand("copy");  
+            alert("Referral code copied to clipboard!");  
+        }
+        
+        function shareReferral() {
+            const referralCode = document.getElementById("referralCode").value;
+            const shareText = `Join now using my referral code: ${referralCode}`;
+        
+            if (navigator.share) {
+          
+                navigator.share({
+                    title: "Join and Earn Rewards!",
+                    text: shareText,
+                    url: window.location.origin + "/user/signup?ref=" + referralCode
+                }).catch(err => console.log("Error sharing:", err));
+            } else {
+                alert("Sharing not supported on this device. Copy the code instead.");
+            }
+        }
+        </script>
+        
+</body>
+</html>

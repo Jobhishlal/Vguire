@@ -2,7 +2,7 @@ import Cart from '../models/cart.js';
 import Product from '../models/products.js';
 import mongoose from "mongoose";
 
-// Get Cart Items
+
 export const getcart = async (req, res) => {
     try {
         const userId = req.user._id;
@@ -24,16 +24,22 @@ export const getcart = async (req, res) => {
                     size: "$items.size",
                     quantity: "$items.quantity",
                     product: "$productDetails",
-                    price: "$productDetails.price"
+                    price: {
+                        $cond: {
+                            if: "$productDetails.isOfferActive",
+                            then: "$productDetails.Offerprice",
+                            else: "$productDetails.price"
+                        }
+                    }
                 }
             }
         ]);
 
-        let totalPrice = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+        let totalPrice = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
         console.log("Cart Data:", cart);
-       res.render("user/cart", { 
-            cart: cart, 
+        res.render("user/cart", { 
+            cart, 
             user: req.user, 
             totalPrice,
             messages: {
@@ -48,19 +54,16 @@ export const getcart = async (req, res) => {
 };
 
 
+
 // Add to Cart
 export const addToCart = async (req, res) => {
     try {
         const { productId, size, quantity } = req.body;
-        console.log(req.body);
-        console.log("Received request body:", req.body);
-       
-
+        
         if (!req.user) {
             return res.status(401).json({ success: false, message: "Unauthorized. Please log in." });
         }
-        console.log("Authenticated user:", req.user);
-        
+
         const userId = req.user._id;
         const MAX_QUANTITY_PER_ITEM = 5; 
 
@@ -89,6 +92,9 @@ export const addToCart = async (req, res) => {
             cart = new Cart({ userId, items: [] });
         }
 
+       
+        const finalPrice = product.isOfferActive ? product.Offerprice : product.price;
+
         const existingItem = cart.items.find(item => 
             item.productId.equals(productId) && item.size === size
         );
@@ -102,7 +108,7 @@ export const addToCart = async (req, res) => {
                 });
             }
             existingItem.quantity = totalQuantity;
-            existingItem.totalPrice = existingItem.quantity * product.price;
+            existingItem.totalPrice = existingItem.quantity * finalPrice;
         } else {
             if (parsedQuantity > MAX_QUANTITY_PER_ITEM) {
                 return res.status(400).json({
@@ -114,8 +120,8 @@ export const addToCart = async (req, res) => {
                 productId,
                 size,
                 quantity: parsedQuantity,
-                price: product.price,
-                totalPrice: product.price * parsedQuantity
+                price: finalPrice,
+                totalPrice: finalPrice * parsedQuantity
             });
         }
 
@@ -133,6 +139,7 @@ export const addToCart = async (req, res) => {
         return res.status(500).json({ success: false, message: "Error adding item to cart. Please try again!" });
     }
 };
+
 
 
 export const updateCartQuantity = async (req, res) => {

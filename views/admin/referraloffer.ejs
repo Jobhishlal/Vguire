@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Orders and Referred Users</title>
+</head>
+<body>
+    <h2>Users Referred by You</h2>
+
+    <% if (message) { %>
+      <p><%= message %></p>
+    <% } %>
+    
+    <% if (referredUserDetails.length > 0) { %>
+      <form action="/admin/apply-offer" method="POST">
+        <table border="1">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Referral Code</th>
+              <th>Referred Count</th>
+              <th>Offer Percentage</th>
+              <th>Apply Offer</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% referredUserDetails.forEach(user => { %>
+              <% if (user.referredCount >= 1) { %>
+                <tr>
+                  <td><%= user.fname %></td>
+                  <td><%= user.email %></td>
+                  <td><%= user.referralCode %></td>
+                  <td><%= user.referredCount %></td>
+                  <td>
+                    <input type="number" name="offerPercentage" min="1" max="100" required placeholder="Enter Offer %" />
+                  </td>
+                  <td>
+                    <input type="hidden" name="userId" value="<%= user._id %>" />
+                    <button type="submit">Apply Offer</button>
+                  </td>
+                </tr>
+              <% } %>
+            <% }) %>
+          </tbody>
+        </table>
+      </form>
+    <% } else { %>
+      <p>No referred users available.</p>
+    <% } %>
+
+    <h2>Product List</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Original Price</th>
+                <th>Offer Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% products.forEach(product => { %>
+                <tr>
+                    <td><%= product.name %></td>
+                    <td>₹<%= product.price.toFixed(2) %></td>
+                    <td>
+                        <% if (product.Offerprice) { %>
+                            ₹<%= product.Offerprice %> 
+                            <span style="color: green;">(Discount Applied)</span>
+                        <% } else { %>
+                            ₹<%= product.price.toFixed(2) %> 
+                        <% } %>
+                    </td>
+                    
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+
+</body>
+</html>

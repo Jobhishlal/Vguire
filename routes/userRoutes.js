@@ -30,13 +30,16 @@ import {
     ,posteditaddress,
     deleteaddress,
     searchproduct,
+   referralCodeget
 
     
 } from '../controllers/userController.js';
 
 import {getcart,addToCart,updateCartQuantity,removeFromCart} from '../controllers/CartController.js'
-import {singlecheckout,cartproduct,placeorder,buyNowCartView,addaddress,editaddress,getcheckout,singleCheckoutView,updateCheckoutQuantity,getorder,ordersucccess,orderdetails,orderview,ordercancel,ratingadd} from '../controllers/checkoutController.js'
+import {singlecheckout,cartproduct,placeorder,buyNowCartView,addaddress,editaddress,getcheckout,singleCheckoutView,updateCheckoutQuantity,getorder,ordersucccess,orderdetails,orderview,ordercancel,ratingadd,createRazorpayOrder,verifyPayment,couponapplied} from '../controllers/checkoutController.js'
 import { profileUpload } from '../middlewares/multerConfig.js';
+import {getwishlist, postwishlist,togglewishlist,wishlistcount} from '../controllers/wishlistController.js';
+import {createorder} from '../controllers/peymentController.js'
 
 const router = express.Router();
 
@@ -108,6 +111,7 @@ router.post("/checkout/update-quantity", isAuth,checkBlockedUser,updateCheckoutQ
 
 
 
+
 router.post("/checkout/placeorder",isAuth,checkBlockedUser,placeorder)
 router.get("/orders",isAuth,checkBlockedUser,getorder)
 router.get('/order-success',isAuth,checkBlockedUser,ordersucccess)
@@ -121,6 +125,19 @@ router.post("/order/rate-product", isAuth,checkBlockedUser, ratingadd);
 
 
 router.get('/search',isAuth,checkBlockedUser,searchproduct)
+
+router.get("/referral",isAuth,checkBlockedUser,referralCodeget)
+
+
+router.get("/wishlist",isAuth,checkBlockedUser,getwishlist)
+router.post("/wishlist",isAuth,checkBlockedUser,postwishlist)
+router.post("/wishlist/toggle",isAuth,checkBlockedUser,togglewishlist)
+router.get("/wishlist/count",isAuth,checkBlockedUser,wishlistcount);
+router.post("/create-order",isAuth,checkBlockedUser,createorder)
+router.post("/checkout/razorpay-order",isAuth,checkBlockedUser, createRazorpayOrder);
+router.post("/checkout/verify-payment",isAuth,checkBlockedUser, verifyPayment);
+router.post("/checkout/apply-coupon",isAuth,checkBlockedUser,couponapplied)
+
 
 
 export default router;

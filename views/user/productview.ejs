@@ -626,10 +626,29 @@
                     </div>
                     
                     <div class="mb-4">
-                        <span class="product-price"><%= product.price %></span>
-                        <span class="original-price ms-2">₹3599</span>
-                        <span class="discount-badge">25% OFF</span>
+                        <span class="product-price">
+                            <% if (product.isOfferActive) { %>
+                                <% if (product.offerType === "product") { %>
+                                    ₹<%= product.Offerprice %> <!-- Product offer price -->
+                                <% } else if (product.offerType === "category") { %>
+                                    ₹<%= product.price - (product.price * product.discountPercentage / 100) %> <!-- Category offer price -->
+                                <% } %>
+                            <% } else { %>
+                                ₹<%= product.price %> <!-- Regular price if no offer -->
+                            <% } %>
+                        </span>
+                        
+                        <span class="original-price ms-2">
+                            ₹<%= product.price %> <!-- Original price -->
+                        </span>
+                        
+                        <% if (product.isOfferActive) { %>
+                            <span class="discount-badge">
+                                <%= product.discountPercentage %> % offer <!-- Display discount percentage -->
+                            </span>
+                        <% } %>
                     </div>
+                    
 
                     <% if (avgRating && avgRating !== "No ratings yet") { %>
                         <div class="product-rating d-flex align-items-center">

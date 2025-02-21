@@ -8,7 +8,10 @@ import { productUpload, categoryUpload,processProductImages } from '../middlewar
 import * as productController from '../controllers/productController.js';
 import * as adminuserController from '../controllers/adminuserController.js';
 import { addCategory, showCategories, getEditCategory, updateCategory ,list,applyCategoryOffer,applyCategoryOfferPost,removeCategoryOffer} from '../controllers/categoryController.js';
-import * as adminorderController from '../controllers/adminordercontroller.js'
+import * as adminorderController from '../controllers/adminordercontroller.js';
+import * as couponcontroller from '../controllers/couponcontroller.js';
+import * as dashboardController from '../controllers/dashboardController.js'
+
 import { isAuthenticatedAdmin, preventLoggedInAdmin } from '../middlewares/authMiddleware.js';
 import { error } from 'console';
 
@@ -73,7 +76,24 @@ router.get("/product/:id/remove-offer",productController.removeoffer)
 router.get("/category/:id/offer", applyCategoryOffer);
 router.post("/category/:id/offer", applyCategoryOfferPost);
 router.delete('/category/:id/remove-offer', removeCategoryOffer);
-   
 
+
+
+router.get("/referraloffer",isAuthenticatedAdmin,adminuserController.referorder)
+router.get("/referraldiscount",isAuthenticatedAdmin,adminuserController.referraldiscount)
+router.post('/apply-offer',isAuthenticatedAdmin,adminuserController.applyoffer)
+
+router.get('/coupons',isAuthenticatedAdmin,couponcontroller.getcoupon)
+router.get('/coupons/add', (req, res) => {
+    res.render('admin/coupon-add'); 
+  });
+router.post("/coupons",isAuthenticatedAdmin,couponcontroller.addcoupon);
+router.delete("/coupons/remove/:id",isAuthenticatedAdmin,couponcontroller.removecoupon)
+router.get("/coupons/edit/:id",isAuthenticatedAdmin, couponcontroller.editCouponForm);
+router.put("/coupons/edit/:id",isAuthenticatedAdmin,couponcontroller.editCoupon);
+
+
+
+router.get("/sales-report",isAuthenticatedAdmin,dashboardController.salesreportget)
 
 export default router;

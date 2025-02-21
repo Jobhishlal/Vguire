@@ -194,7 +194,6 @@ export const applyCategoryOfferPost = async (req, res) => {
         const categoryId = req.params.id;
         const { offerPercentage } = req.body;
 
-       
         if (!offerPercentage || offerPercentage <= 0 || offerPercentage > 100) {
             req.flash("error", "Invalid offer percentage. Please enter a value between 1 and 100.");
             return res.redirect(`/admin/category/${categoryId}/offer`);
@@ -206,7 +205,6 @@ export const applyCategoryOfferPost = async (req, res) => {
             return res.redirect("/admin/categories");
         }
 
-       
         const productWithOffer = await Product.findOne({
             category: categoryId,
             isOfferActive: true,
@@ -218,20 +216,22 @@ export const applyCategoryOfferPost = async (req, res) => {
             return res.redirect(`/admin/category/${categoryId}/offer`);
         }
 
+      
+        const products = await Product.find({ category: categoryId, isOfferActive: false });
+
         
-        await Product.updateMany(
-            {
-                category: categoryId,
-                isOfferActive: false 
-            },
-            { 
-                $set: { 
-                    isOfferActive: true,
-                    discountPercentage: offerPercentage,
-                    offerType: "category"  
-                }
-            }
-        );
+        for (const product of products) {
+            const discountAmount = (product.price * offerPercentage) / 100;
+            product.Offerprice = Math.floor(product.price - discountAmount); 
+            product.isOfferActive = true;
+            product.discountPercentage = offerPercentage;
+            product.offerType = "category";
+            await product.save();
+        }
+       console.log(products.Offerprice);
+       console.log("offer",products);
+       
+       
 
         req.flash("success", `Category offer of ${offerPercentage}% applied successfully!`);
         res.redirect("/admin/categories");
@@ -241,6 +241,7 @@ export const applyCategoryOfferPost = async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 };
+
 
 
 export const removeCategoryOffer = async (req, res) => {

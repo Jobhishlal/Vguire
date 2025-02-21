@@ -985,7 +985,7 @@ html {
     --accent-color: #6c63ff;
     --hover-color: #5046e5;
 }
-
+/* 
 .product-overview {
     padding: 50px 0;
 }
@@ -1011,7 +1011,7 @@ html {
 
 .product-overview h1:hover::after {
     width: 100%;
-}
+} */
 
 .category-nav {
     margin-bottom: 40px;

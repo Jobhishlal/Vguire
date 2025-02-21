@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { nanoid } from 'nanoid';
 import { type } from 'os';
 
 const userSchema = new mongoose.Schema({
@@ -42,6 +43,10 @@ const userSchema = new mongoose.Schema({
   },
   dob: { type: Date },
   gender:{type:String ,enum: ['male', 'female', 'other'] },
+
+  
+  referralCode: { type: String, unique: true, default: () => nanoid(8) },
+  referredBy: { type: String, ref: 'User', required: false },
 }, { timestamps: true });
 
 export default mongoose.model("User", userSchema);

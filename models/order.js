@@ -13,7 +13,10 @@ const orderSchema = new mongoose.Schema({
         }
     ],
     addressId: { type: mongoose.Schema.Types.ObjectId, ref: "Address", required: true },
+    totalAmount: { type: Number, required: true },
+    appliedCoupon: { type: mongoose.Schema.Types.ObjectId, ref: "Coupon" },
     paymentMethod: { type: String, enum: ["COD", "UPI", "Card", "Wallet"], required: true },
+    paymentStatus: { type: String, required: true, default: "Pending" },
     transactionId: { type: String, default: null },  
     status: { type: String, enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"], default: "Pending" },
     estimatedDelivery: { type: Date },

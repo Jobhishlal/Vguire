@@ -319,7 +319,15 @@
                             <div class="cart-item-details flex-grow-1 ps-3">
                                 <h5 class="mb-1"><%= item.product.name %></h5>
                                 <p class="mb-1 text-muted">Size: <%= item.size.replace('size', '') %></p>
-                                <p class="fw-bold">₹<%= item.product.price %></p>
+                                <p class="fw-bold">
+                                    <% if (item.product.Offerprice && item.product.Offerprice > 0) { %>
+                                        <span class="text-danger">₹<%= item.product.Offerprice %></span>
+                                        <span class="text-muted text-decoration-line-through">₹<%= item.product.price %></span>
+                                    <% } else { %>
+                                        ₹<%= item.product.price %>
+                                    <% } %>
+                                </p>
+                                
     
                                 <div class="d-flex align-items-center">
                                   
@@ -331,8 +339,10 @@
                                    <button type="button" class="btn btn-sm btn-outline-secondary"
                                        onclick="changeQuantity(this, -1, 5)">−</button>
                                
-                                   <input type="number" name="quantity" value="<%=item.quantity%>" min="1" max="5"
-                                       class="form-control form-control-sm quantity-input" data-price="<%= item.price %>" readonly>
+                                       <input type="number" name="quantity" value="<%= item.quantity %>" min="1" max="5"
+                                       class="form-control form-control-sm quantity-input" 
+                                       data-price="<%= item.product.Offerprice && item.product.Offerprice > 0 ? item.product.Offerprice : item.product.price %>" readonly>
+                                   
                                
                                    <button type="button" class="btn btn-sm btn-outline-secondary"
                                        onclick="changeQuantity(this, 1, 5)">+</button>
@@ -342,7 +352,10 @@
                                         
                                     
                                     
-                                    <span class="item-total ms-3 fw-bold">₹<%= item.quantity * item.product.price %></span>
+                               <span class="item-total ms-3 fw-bold">
+                                ₹<%= item.quantity * (item.product.Offerprice && item.product.Offerprice > 0 ? item.product.Offerprice : item.product.price) %>
+                            </span>
+                            
                                 </div>
                             </div>
     

@@ -15,6 +15,8 @@ import passport from 'passport';
 import path from 'path';
 import fs from 'fs'
 import mongoose from 'mongoose';
+import { nanoid } from 'nanoid';
+import Wishlist from '../models/wishlist.js';
 
 
 
@@ -128,20 +130,21 @@ const validatepassword = (password) => {
     return passwordRegex.test(password);
 };
 
-
 export const signup = async (req, res) => {
-    const { fname, lname, email, password, cpassword } = req.body;
-    
+    const { fname, lname, email, password, cpassword, referralCode } = req.body;
+
     const data = {
         fname,
         lname,
         email,
         password,
-        cpassword
+        cpassword,
+        referralCode
     };
 
-    req.session.details = data;
+    req.session.details = data; // Store the data in session for later use
     const errors = validationResult(req);
+
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
@@ -155,7 +158,6 @@ export const signup = async (req, res) => {
         req.flash('err', 'Passwords do not match');
         return res.redirect('/user/signup');
     }
-   
 
     try {
         const existingUser = await User.findOne({ email });
@@ -164,8 +166,23 @@ export const signup = async (req, res) => {
             return res.redirect('/user/signup');
         }
 
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        let referredUser = null;
+        let offerApplied = false;
+
+        if (referralCode) {
+            referredUser = await User.findOne({ referralCode });
+            if (referredUser) {
+                offerApplied = true;
+                req.flash('success', `Offer applied successfully! Referred by: ${referredUser.fname}`);
+                data.referredBy = referredUser.referralCode; // Store the referral info in session
+            } else {
+                req.flash('err', 'Invalid referral code.');
+                return res.redirect('/user/signup');
+            }
+        }
+
+        req.session.offerApplied = offerApplied;
+
         const otp = generateOtp();
         const emailSent = await sendVerificationEmail(email, otp);
 
@@ -174,31 +191,34 @@ export const signup = async (req, res) => {
             return res.redirect('/user/signup');
         }
 
-        req.session.otp = otp;
-        req.session.email = email;
+        req.session.otp = otp; 
+      console.log(req.session.otp);
+      
+        req.session.email = email; // Store the email for OTP verification
         req.flash('err', 'OTP sent to your email. Please verify.');
-        console.log(otp);
-        
         return res.redirect('/user/otp');
     } catch (err) {
         console.error('Error in signup:', err);
-        res.status(500).send('Server error');
+        req.flash('err', 'Server error. Please try again later.');
+        return res.redirect('/user/signup');
     }
 };
 
 
-// export const otprecieve = (req, res) => {
-//     const email = req.session.userEmail; 
-//     const msg= req.flash('msg','message')
-//     res.render('user/otp', { userEmail: email ,msg:msg.length?msg[0]:null});  
-// };
-
 export const otprecieve = (req, res) => {
     const email = req.session.userEmail;
-    const err = req.flash('err');  // Use 'err' instead of 'msg' for flash message
-    console.log('Flash message passed to OTP page:', err); // Log the flash message for debugging
-    res.render('user/otp', { userEmail: email, err: err.length > 0 ? err[0] : null }); // Pass 'err' to the OTP page
+    const err = req.flash('err');  
+    const offerApplied=req.session.offerApplied||false
+    console.log('Flash message passed to OTP page:', err);
+    res.render('user/otp', { userEmail: email, err: err.length > 0 ? err[0] : null }); 
 };
+
+
+
+const generateReferralCode = () => {
+    return Math.random().toString(36).substring(2, 8).toUpperCase();
+};
+
 
 export const verifyOtp = async (req, res) => {
     const { otp } = req.body;
@@ -206,53 +226,65 @@ export const verifyOtp = async (req, res) => {
     const email = data.email;
     const storedOtp = req.session.otp;
     const otpSentAt = req.session.otpSentAt;
+    console.log(storedOtp);
 
-    // If either email or OTP is missing, set a flash message and redirect
+    
+
     if (!email || !otp) {
-        req.flash('err', 'Please enter both OTP and Email');  // Use 'err' instead of 'msg'
+        req.flash('err', 'Please enter both OTP and Email');
         return res.redirect('/user/otp');
     }
-    console.log('Flash message set:', req.flash('err')); // Log the flash message
 
     try {
-        // OTP expiry check
-        const otpExpiryTime = 1 * 60 * 1000; // OTP expiry time of 1 minute
+        const otpExpiryTime = 1 * 60 * 1000; 
         if (Date.now() - otpSentAt > otpExpiryTime) {
-            req.flash('err', 'OTP has expired. Please request a new OTP.');  // Use 'err' instead of 'msg'
-            req.session.otp = null; // Clear OTP in session
+            req.flash('err', 'OTP has expired. Please request a new OTP.');
+            req.session.otp = null;
             return res.redirect('/user/otp');
         }
 
         if (parseInt(otp) !== storedOtp) {
-            req.flash('err', 'Invalid OTP');  // Use 'err' instead of 'msg'
+            req.flash('err', 'Invalid OTP');
             return res.redirect('/user/otp');
         }
 
+        
         const hashedPassword = await bcrypt.hash(data.password, 10);
 
+       
         const newUser = new User({
             fname: data.fname,
             lname: data.lname,
             email: data.email,
             password: hashedPassword,
-            otp: null,  // Reset OTP
-            verified: true,  // Set the user as verified
+            referralCode: generateReferralCode(),  
+            verified: true,
+            referredBy: data.referredBy || null, 
         });
 
         await newUser.save();
 
-        // Clear OTP and user details after saving
+        if (req.session.offerApplied) {
+            const referredUser = await User.findOne({ referralCode: data.referralCode });
+            if (referredUser) {
+                referredUser.rewardPoints += 10; 
+                await referredUser.save();
+            }
+        }
+
+       
         req.session.otp = null;
         req.session.details = null;
 
-        req.flash('err', 'User verified successfully.');  // Use 'err' instead of 'msg'
-        return res.redirect('/user/home'); // Redirect to user home page after successful registration
-
+        req.flash('err', 'User verified successfully.');
+        return res.redirect('/user/home');
     } catch (error) {
         console.error('Error verifying OTP:', error);
-        res.status(500).send('Server error');
+        req.flash('err', 'Server error. Please try again later.');
+        return res.redirect('/user/signup');
     }
 };
+
 
 
 export const getLoginPage = (req, res) => {
@@ -626,7 +658,8 @@ export const shoppage = async (req, res) => {
                     product: [],
                     date: await Product.find().sort({ createdAt: -1 }).limit(1),
                     cartItems: req.user ? (await Cart.findOne({ userId: req.user._id }))?.items || [] : [],
-                    session: req.session
+                    session: req.session,
+                    wishlistProducts: []
                 });
             }
         }
@@ -643,6 +676,14 @@ export const shoppage = async (req, res) => {
             .populate("category")
             .sort(sortQuery)
             .collation({ locale: "en", strength: 2 });  
+
+            let wishlistProducts = [];
+            if (req.user) {
+                const wishlist = await Wishlist.findOne({ userId: req.user._id });
+                if (wishlist) {
+                    wishlistProducts = wishlist.products.map(p => p.toString());
+                }
+            }
 
        
         const ratingsData = await Order.aggregate([
@@ -684,7 +725,8 @@ export const shoppage = async (req, res) => {
             product: productsWithAvgRating,
             date: await Product.find().sort({ createdAt: -1 }).limit(1),
             cartItems: req.user ? (await Cart.findOne({ userId: req.user._id }))?.items || [] : [],
-            session: req.session
+            session: req.session,
+            wishlistProducts
         });
 
     } catch (error) {
@@ -840,6 +882,8 @@ export const getprofile = async (req, res) => {
         res.render("user/profile", {
             user,
             order, 
+            referralCode:user.referralCode,
+            referralRewards:user.referralRewards,
             success: req.flash('success'),
             error: req.flash('error')
         });
@@ -1114,5 +1158,36 @@ export const checkSession = async (req, res) => {
     } catch (error) {
         console.error("Error checking session:", error);
         res.status(500).json({ sessionActive: false, message: "Server error" });
+    }
+};
+
+
+export const referralCodeget = async (req, res) => {
+    try {
+        if (!req.user || !req.user._id) {
+            console.log("User not authenticated, redirecting to login.");
+            return res.redirect('/user/login'); 
+        }
+
+        let user = await User.findById(req.user._id);
+        if (!user) {
+            console.log("User not found in database.");
+            return res.redirect('/user/login'); 
+        }
+
+      
+
+        
+        if (!user.referralCode) {
+            user.referralCode = nanoid(8); 
+            await user.save();
+            console.log("New referral code generated:", user.referralCode);
+        }
+
+        res.render('user/referral', { referralCode: user.referralCode });
+
+    } catch (error) {
+        console.error('Error fetching referral code:', error);
+        return res.status(500).send("Error fetching referral code");
     }
 };

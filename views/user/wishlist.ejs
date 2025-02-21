@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wishlist</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+   
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        
+      
+        .navbar {
+    padding: 1rem;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.navbar-brand img {
+    width: 60px;
+    margin-right: 50px;
+}
+
+@media (max-width: 992px) {
+    .navbar-brand img {
+        margin-right: 0;
+    }
+    
+    .nav-link {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .navbar .d-flex {
+        margin-top: 1rem;
+        justify-content: center;
+    }
+}
+
+.nav-link {
+    color: var(--primary-color);
+    margin: 0 1rem;
+    position: relative;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color:rgb(238, 45, 45);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.login-btn {
+    background: var(--secondary-color);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.login-btn:hover {
+    background: #ff2e43;
+    color: white;
+    transform: translateY(-2px);
+}
+
+       
+
+        .wishlist-title {
+            font-size: 1.5rem;
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .wishlist-count {
+            color: #6c757d;
+            font-weight: normal;
+        }
+
+        .wishlist-item {
+            display: flex;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #eee;
+            background: white;
+            transition: all 0.2s ease;
+            margin-top: 100px;
+        }
+
+        .wishlist-item:last-child {
+            border-bottom: none;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .wishlist-item:hover {
+            background: #f8f9fa;
+        }
+
+        .product-image {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            margin-right: 2rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+
+        .product-info {
+            flex: 1;
+            min-width: 0;
+            position: relative;
+            padding-right: 3rem;
+        }
+
+        .product-title {
+            color: #2c3e50;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .product-title:hover {
+            color: #0056b3;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0.75rem 0;
+        }
+
+        .tag {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .price-info {
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .current-price {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .original-price {
+            font-size: 1rem;
+            color: #6c757d;
+            text-decoration: line-through;
+        }
+
+        .discount {
+            color: #28a745;
+            font-weight: 500;
+        }
+
+        .assured-badge {
+            display: inline-flex;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            border: 1px solid #e9ecef;
+        }
+
+        .assured-badge i {
+            color: #ffc107;
+            margin-right: 0.5rem;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: none;
+            border: none;
+            color: blue;
+            padding: 0.5rem;
+            opacity: 0.7;
+            transition: all 0.2s ease;
+        }
+
+        .remove-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .empty-state {
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h2 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .browse-btn {
+            background: #007bff;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .browse-btn:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .wishlist-item {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .product-image {
+                width: 100%;
+                height: 200px;
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+
+            .product-info {
+                padding-right: 0;
+            }
+
+            .remove-btn {
+                top: -190px;
+                right: 10px;
+                background: rgba(255,255,255,0.9);
+                border-radius: 50%;
+                padding: 0.5rem;
+            }
+        }
+        .wishlist-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 100px;
+    width: 100%;
+}
+
+.wishlist-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    position: relative;
+    padding-bottom: 10px;
+    text-align: center;
+}
+
+.wishlist-title::after {
+    content: "";
+    width: 60px;
+    height: 4px;
+    background-color: #ff6600; 
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+.wishlist-count {
+    font-weight: normal;
+    color: #ff6600; 
+}
+.footer {
+    background: black;
+    color: white;
+    padding: 4rem 0 2rem;
+}
+
+@media (max-width: 768px) {
+    .footer {
+        padding: 2rem 0 1rem;
+        text-align: center;
+    }
+    
+    .footer .col-md-4 {
+        margin-bottom: 2rem;
+    }
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 1rem;
+}
+
+.footer-links a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: var(--secondary-color);
+}
+
+
+
+
+    </style>
+</head>
+<body>
+
+    
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="/image/Screenshot 2025-01-02 185508.png" alt="Logo" width="60">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="/user/home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/user/shop">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/user/profile">Profile</a></li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <a href="#" class="me-3"><i class="fas fa-search"></i></a>
+                    <a href="/user/cart" class="me-3"><i class="fas fa-shopping-cart"></i></a>
+                    <a href="#"><i class="fas fa-heart"></i></a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="wishlist-container">
+        <h1 class="wishlist-title">My Wishlist <span class="wishlist-count">(<%= wishlist.length %>)</span></h1>
+    </div>
+    
+
+        <% if (wishlist.length > 0) { %>
+            <% wishlist.forEach(product => { %>
+                
+                <div class="wishlist-item" id="wishlist-item-<%= product._id %>">
+
+                    
+              
+                    <img src="<%= product.images[0] %>" alt="<%= product.name %>" class="product-image">
+                    <div class="product-info">
+                        <a href="/product/<%= product._id %>" class="product-title"><%= product.name %></a>
+                        
+                        <div class="assured-badge">
+                            <i class="fas fa-shield-alt"></i>
+                            <%= product.description%>
+                        </div>
+                        <div class="price-info">
+                            <span class="current-price">
+                                ₹<% if (product.isOfferActive) { %>
+                                    <% if (product.offerType === "product") { %>
+                                        <%= product.Offerprice %>
+                                    <% } else if (product.offerType === "category") { %>
+                                        <%= (product.price - (product.price * product.discountPercentage / 100)).toFixed(2) %> 
+                                    <% } %>
+                                <% } else { %>
+                                    <%= product.price %> 
+                                <% } %>
+                            </span>
+                            
+                           
+                            <span class="discount"><%= product.discountPercentage %>% off</span>
+                        </div>
+                        <button 
+                            class="remove-btn"
+                            onclick="confirmRemove('<%= product._id %>', '<%= product.name %>')"
+                        >
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <div class="empty-state">
+                <i class="fas fa-heart"></i>
+                <h2>Your wishlist is empty</h2>
+                <p class="text-muted">Browse our products and add your favorites to the wishlist!</p>
+                <a href="/products" class="btn browse-btn">
+                    <i class="fas fa-shopping-bag me-2"></i>Browse Products
+                </a>
+            </div>
+        <% } %>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h4>About Us</h4>
+                    <p>We are committed to providing the best products and services to our customers.</p>
+                </div>
+                <div class="col-md-4">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="/user/home">Home</a></li>
+                        <li><a href="/user/shop">Shop</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4>Contact Us</h4>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-phone me-2"></i> +1 234 567 890</li>
+                        <li><i class="fas fa-envelope me-2"></i> info@example.com</li>
+                        <li><i class="fas fa-map-marker-alt me-2"></i> 123 Street, City, Country</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <p>&copy; 2025 Your Company. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.all.min.js"></script>
+    <script>
+        function confirmRemove(productId, productName) {
+            Swal.fire({
+                title: 'Remove Item?',
+                text: `Are you sure you want to remove "${productName}" from your wishlist?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Remove',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    toggleWishlist(productId);
+                }
+            });
+        }
+
+        function toggleWishlist(productId) {
+    fetch("/user/wishlist/toggle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const item = document.getElementById(`wishlist-item-${productId}`);
+            
+            if (!item) {
+                console.error(`Element #wishlist-item-${productId} not found`);
+                return;
+            }
+
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(-20px)';
+            setTimeout(() => {
+                item.remove();
+                updateWishlistCount();
+                checkEmptyState();
+            }, 300);
+
+            Swal.fire({
+                title: 'Removed',
+                text: 'Item removed from your wishlist',
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        } else {
+            Swal.fire({
+                title: 'Error',
+                text: data.message || 'Could not remove item',
+                icon: 'error'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            title: 'Error',
+            text: 'Something went wrong',
+            icon: 'error'
+        });
+    });
+}
+
+        function updateWishlistCount() {
+            const count = document.querySelectorAll('.wishlist-item').length;
+            document.querySelector('.wishlist-count').textContent = `(${count})`;
+        }
+
+        function checkEmptyState() {
+            const items = document.querySelectorAll('.wishlist-item');
+            if (items.length === 0) {
+                document.querySelector('.container').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-heart"></i>
+                        <h2>Your wishlist is empty</h2>
+                        <p class="text-muted">Browse our products and add your favorites to the wishlist!</p>
+                        <a href="/products" class="btn browse-btn">
+                            <i class="fas fa-shopping-bag me-2"></i>Browse Products
+                        </a>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

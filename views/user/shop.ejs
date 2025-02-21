@@ -8,6 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="/style.css">
+   
 </head>
 <style>
     body{
@@ -36,6 +37,33 @@
     #sortSelect:focus {
         box-shadow: 0px 0px 8px rgba(255, 75, 43, 0.7);
     }
+
+
+    .product-price {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.offer-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ff6600; /* Highlight offer price */
+}
+
+.original-price {
+    font-size: 1rem;
+    text-decoration: line-through;
+    color: #888; /* Faded color for original price */
+    margin-left: 8px;
+}
+
+.regular-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333; /* Regular price if no discount */
+}
 
 
 
@@ -97,7 +125,7 @@
         </a>
                     
 
-                    <a href="#"><i class="fas fa-heart"></i></a>
+                    <a href="/user/wishlist"><i class="fas fa-heart"></i></a>
                 </div>
             </div>
         </div>
@@ -229,6 +257,8 @@
 
         <h1 class="product-overview text-center my-4">PRODUCT OVERVIEW</h1>
 
+        
+        <% let wishlistProductIds = wishlistProducts.map(id => id.toString()); %>
         <section class="product-overview">
             <div class="container">
                 <div class="row" id="productContainer">
@@ -240,11 +270,14 @@
                                         <div class="product-image-wrapper">
                                             <img src="<%= product.images[0] %>" alt="<%= product.name %>" class="product-image">
                                             <div class="product-overlay"></div>
-                                            <button class="wishlist-btn">
-                                                <i class="far fa-heart"></i>
-                                            </button>
                                         </div>
                                     </a>
+        
+                                    <!-- Wishlist Button -->
+                                    <button class="wishlist-btn" onclick="toggleWishlist(event, '<%= product._id %>')" id="wishlist-<%= product._id %>">
+                                        <i class="fa-heart <%= wishlistProducts.includes(product._id.toString()) ? 'fas text-primary' : 'far text-black' %>"></i>
+                                    </button>
+        
                                     <div class="product-info d-flex justify-content-between align-items-center">
                                         <h3 class="product-title"><%= product.name %></h3>
         
@@ -261,6 +294,84 @@
                                             </div>
                                         <% } %>
                                     </div>
+        
+                                    <!-- Product Price with Discount Styling -->
+                                    <div class="product-price">
+                                        <% if (product.isOfferActive) { %>
+                                            <% if (product.offerType === "product") { %>
+                                                <span class="offer-price">₹<%= product.Offerprice %></span>
+                                            <% } else if (product.offerType === "category") { %>
+                                                <span class="offer-price">₹<%=Math.floor(product.price - (product.price * product.discountPercentage / 100)) %></span>
+                                            <% } %>
+                                            <span class="original-price">₹<%= product.price %></span>
+                                        <% } else { %>
+                                            <span class="regular-price">₹<%= product.price %></span>
+                                        <% } %>
+                                    </div>
+        
+                                    <a href="/user/productview/<%= product._id %>">
+                                        <button class="quick-view-btn">Quick View</button>
+                                    </a>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p class="text-center">No products found matching your search.</p>
+                    <% } %>
+                </div>
+            </div>
+            <span id="wishlist-count" hidden>(0)</span>
+        </section>
+        
+
+        <!-- <section class="product-overview">
+            <div class="container">
+                <div class="row" id="productContainer">
+                    <% if (product && product.length > 0) { %>
+                        <% product.forEach(product => { %>
+                            <div class="col-md-4 product-item">
+                                <div class="product-card">
+                                    <a href="/user/productview/<%= product._id %>">
+                                        <div class="product-image-wrapper">
+                                            <img src="<%= product.images[0] %>" alt="<%= product.name %>" class="product-image">
+                                            <div class="product-overlay"></div>
+                                        </div>
+                                    </a>
+                                    
+                                    
+                                    <button class="wishlist-btn" onclick="toggleWishlist(event, '<%= product._id %>')" id="wishlist-<%= product._id %>">
+                                        <i class="fa-heart <%= wishlistProducts.includes(product._id.toString()) ? 'fas text-primary' : 'far text-black' %>"></i>
+                                    </button>
+                                    
+                                    
+        
+                                    <div class="product-info d-flex justify-content-between align-items-center">
+                                        <h3 class="product-title"><%= product.name %></h3>
+        
+                                        <% if (product.avgRating && product.avgRating !== "No ratings yet") { %>
+                                            <div class="product-stars">
+                                                <% let rating = Math.round(product.avgRating); %>
+                                                <% for (let i = 1; i <= 5; i++) { %>
+                                                    <% if (i <= rating) { %>
+                                                        <i class="fas fa-star text-warning"></i> 
+                                                    <% } else { %>
+                                                        <i class="far fa-star text-warning"></i> 
+                                                    <% } %>
+                                                <% } %>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                    <span class="product-price">
+                                        ₹<% if (product.isOfferActive) { %>
+                                            <% if (product.offerType === "product") { %>
+                                                <%= product.Offerprice %>
+                                            <% } else if (product.offerType === "category") { %>
+                                                <%= (product.price - (product.price * product.discountPercentage / 100)).toFixed(2) %> 
+                                            <% } %>
+                                        <% } else { %>
+                                            <%= product.price %> 
+                                        <% } %>
+                                    </span>
                                     <p class="product-price">₹<%= product.price %></p>
                                     <a href="/user/productview/<%= product._id %>">
                                         <button class="quick-view-btn">Quick View</button>
@@ -273,7 +384,9 @@
                     <% } %>
                 </div>
             </div>
-        </section>
+            <span id="wishlist-count" hidden>(0)</span>
+
+        </section> -->
         
         
         
@@ -316,6 +429,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
     <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -410,8 +525,91 @@
         return ratingHTML + '</div>';
     }
 });
+function toggleWishlist(event, productId) {
+    event.stopPropagation();
+    event.preventDefault();
 
-  
+    let wishlistBtn = document.getElementById(`wishlist-${productId}`);
+    let icon = wishlistBtn.querySelector("i");
+    let isAdded = icon.classList.contains("fas"); // Check if already in wishlist
+
+    // Fetch the current wishlist count
+    fetch("/user/wishlist/count")
+        .then(response => response.json())
+        .then(data => {
+            const wishlistCount = data.count || 0;
+
+            // Check if adding a new item exceeds the limit
+            if (!isAdded && wishlistCount >= 5) {
+                Swal.fire("Limit Reached!", "You can only have 5 items in your wishlist.", "warning");
+                return;
+            }
+
+            // Show confirmation alert
+            Swal.fire({
+                title: isAdded ? "Remove from Wishlist?" : "Add to Wishlist?",
+                text: isAdded ? "Are you sure you want to remove this item from your wishlist?" : "Do you want to add this item to your wishlist?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: isAdded ? "Yes, Remove" : "Yes, Add"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Proceed with adding/removing the wishlist item
+                    fetch("/user/wishlist/toggle", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ productId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (data.added) {
+                                icon.classList.remove("far", "text-black");
+                                icon.classList.add("fas", "text-primary");
+                                Swal.fire("Added!", "Product added to wishlist.", "success");
+                            } else {
+                                icon.classList.remove("fas", "text-primary");
+                                icon.classList.add("far", "text-black");
+                                Swal.fire("Removed!", "Product removed from wishlist.", "success");
+                            }
+                        } else {
+                            Swal.fire("Error!", data.message || "Something went wrong!", "error");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        Swal.fire("Error!", "Failed to update wishlist.", "error");
+                    });
+                }
+            });
+        })
+        .catch(error => {
+            console.log(error);
+            
+            console.error("Error fetching wishlist count:", error);
+            Swal.fire("Error!", "Could not check wishlist count.", "error");
+        });
+}
+
+fetch("/user/wishlist/count")
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Wishlist Count:", data.count);
+        document.getElementById("wishlist-count").innerText = `(${data.count})`;
+    })
+    .catch(error => {
+        console.error("Error fetching wishlist count:", error);
+    });
+
+
+
     </script>
     
 </body>

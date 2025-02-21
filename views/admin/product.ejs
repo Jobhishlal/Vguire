@@ -781,9 +781,7 @@
                                 </td>
                                 <td>
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-action btn-primary">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
+                                      
                                         <a href="/admin/edit-product/<%= product._id %>">
                                             <button class="btn btn-action btn-success">
                                                 <i class="fas fa-edit"></i>
@@ -792,25 +790,27 @@
                                         <a href="/admin/product/<%= product._id %>/offer" class="btn btn-action btn-warning">
                                             <i class="fas fa-tag"></i>
                                         </a>
-                                    </div>
-                                          <div>
+                                        
 
                                             <% if (product.isOfferActive) { %>
                                                 <a href="/admin/product/<%= product._id %>/remove-offer" class="btn btn-action btn-danger">
                                                     <i class="fas fa-times-circle"></i> 
                                                 </a>
                                             <% } %>
-                                          </div>
+                                          
+                                    </div>
+                                          
                                 </td>
                     
                                 <td>
                                     <% if (product.isOfferActive) { %>
                                         <% if (product.offerType === "product") { %>
                                             <span class="badge badge-success">Product Offer Active</span>
-                                            <div>₹<%= product.Offerprice %></div> 
+                                            <div>₹<%=product.Offerprice%></div> 
                                         <% } else if (product.offerType === "category") { %>
                                             <span class="badge badge-info">Category Offer Active</span>
-                                            <div>₹<%= product.price - (product.price * product.discountPercentage / 100) %></div> 
+                                            <div>₹<%= Math.floor(product.price - (product.price * product.discountPercentage / 100)) %></div>
+
                                         <% } %>
                                     <% } else { %>
                                         <span class="badge badge-secondary">No Offer</span>
