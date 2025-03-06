@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 70px;
+            --header-height: 60px;
+            --primary-color: #cbcfda;
+            --secondary-color: #858796;
+            --dark-bg: #1a1a1a;
+            --card-bg: #242424;
+            --text-color: #e4e4e4;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #010612 0%, #224abe 100%);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            padding-top: var(--header-height);
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: var(--header-height);
+            background: rgba(1, 6, 18, 0.9);
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .logo-full {
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo-mini {
+            display: none;
+            color: white;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .sidebar.collapsed .logo-full {
+            display: none;
+        }
+
+        .sidebar.collapsed .logo-mini {
+            display: block;
+        }
+
+        .nav-item {
+            position: relative;
+            margin: 0.25rem 1rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+            margin-right: 1rem;
+        }
+
+        .sidebar.collapsed .nav-link span {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-item {
+            margin: 0.25rem 0.5rem;
+        }
+
+        .sidebar.collapsed .nav-link i {
+            margin-right: 0;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 1rem;
+            transition: margin-left 0.3s ease;
+        }
+
+        .sidebar.collapsed + .main-content {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #224abe;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .approve-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .approve-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="logo-full">
+                <i class="fas fa-shopping-bag me-2"></i>
+                VGURIE
+            </a>
+            <a href="#" class="logo-mini">
+                <i class="fas fa-shopping-bag"></i>
+            </a>
+        </div>
+        <div class="nav flex-column">
+            <div class="nav-item">
+                <a href="/admin/dashboard" class="nav-link">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="/admin/product" class="nav-link">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="/admin/ordermanagement" class="nav-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="/admin/usersmanagement" class="nav-link">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="/admin/categories" class="nav-link">
+                    <i class="fas fa-tags"></i>
+                    <span>Categories</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="/admin/returnRequests" class="nav-link">
+                    <i class="fas fa-undo-alt"></i> 
+                    <span>Returns & Refunds</span>  
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Coupons</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-image"></i>
+                    <span>Banners</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </div>
+            <div class="nav-item mt-auto">
+                <a href="#" class="nav-link text-danger">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container mt-4">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>User</th>
+                        <th>Product</th>
+                        <th>Reason</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% returnOrders.forEach(order => { %>
+                        <% order.items.forEach(item => { %>
+                            <% if (item.returnRequested && !item.returnApproved) { %>
+                                <tr>
+                                    <td><%= order._id %></td>
+                                    <td><%= order.userId.name %> (<%= order.userId.email %>)</td>
+                                    <td><%= item.productId.name %></td>
+                                    <td><%= item.returnReason %></td>
+                                    <td>
+                                        <% if (item.returnStatus === "Requested") { %>
+                                            <button class="approve-btn" 
+                                                data-order-id="<%= order._id %>" 
+                                                data-product-id="<%= item.productId._id %>">
+                                                Approve
+                                            </button>
+                                    
+                                            <button class="reject-btn btn btn-danger" 
+                                                data-order-id="<%= order._id %>" 
+                                                data-product-id="<%= item.productId._id %>">
+                                                Reject
+                                            </button>
+                                        <% } else { %>
+                                            <span><%= item.returnStatus %></span>
+                                        <% } %>
+                                    </td>
+                                    
+                                </tr>
+                            <% } %>
+                        <% }); %>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.querySelectorAll(".approve-btn").forEach(button => {
+    button.addEventListener("click", async () => {
+        handleReturnAction(button, "Approved");
+    });
+});
+
+document.querySelectorAll(".reject-btn").forEach(button => {
+    button.addEventListener("click", async () => {
+        handleReturnAction(button, "Rejected");
+    });
+});
+
+async function handleReturnAction(button, action) {
+    const orderId = button.dataset.orderId;
+    
+    const productId = button.dataset.productId;
+   
+console.log("Product ID:", productId);
+console.log("Order ID:", orderId);
+
+
+  
+
+    if (!orderId || !productId) {
+        return Swal.fire("Error!", "Missing orderId or productId", "error");
+    }
+
+    const result = await Swal.fire({
+        title: "Are you sure?",
+        text: `Do you want to ${action} this return request?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: `Yes, ${action} it`,
+        cancelButtonText: "No, cancel!"
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const response = await fetch("/admin/return-controller", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ orderId, productId, action }) 
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                Swal.fire("Success!", `Return ${action}d successfully!`, "success")
+                    .then(() => location.reload());
+            } else {
+                Swal.fire("Error!", data.message || "Something went wrong!", "error");
+            }
+        } catch (error) {
+            Swal.fire("Error!", "Server error occurred!", "error");
+            console.error("Fetch Error:", error);
+        }
+    }
+}
+
+    </script>
+</body>
+</html>

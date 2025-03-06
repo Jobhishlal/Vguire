@@ -6,10 +6,8 @@
     <title>VGURIE Dashboard</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-    <link href="styles.css" rel="stylesheet">
-    <link rel="stylesheet" href="/style.css">
     <style>
-           :root {
+        :root {
             --sidebar-width: 250px;
             --sidebar-collapsed-width: 70px;
             --header-height: 60px;
@@ -18,6 +16,13 @@
             --dark-bg: #1a1a1a;
             --card-bg: #242424;
             --text-color: #e4e4e4;
+            --fluorescent-green: #08ee22;
+            --gradient-green: linear-gradient(135deg, #08ee22, #2ecc71);
+        }
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .sidebar {
             position: fixed;
@@ -29,12 +34,11 @@
             transition: all 0.3s ease;
             z-index: 1000;
             padding-top: var(--header-height);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
         }
-
         .sidebar.collapsed {
             width: var(--sidebar-collapsed-width);
         }
-
         .sidebar-header {
             position: fixed;
             top: 0;
@@ -48,11 +52,9 @@
             transition: all 0.3s ease;
             z-index: 1001;
         }
-
         .sidebar.collapsed .sidebar-header {
             width: var(--sidebar-collapsed-width);
         }
-
         .logo-full {
             display: flex;
             align-items: center;
@@ -61,7 +63,6 @@
             font-size: 1.5rem;
             font-weight: bold;
         }
-
         .logo-mini {
             display: none;
             color: white;
@@ -69,20 +70,12 @@
             font-size: 1.5rem;
             font-weight: bold;
         }
-
         .sidebar.collapsed .logo-full {
             display: none;
         }
-
         .sidebar.collapsed .logo-mini {
             display: block;
         }
-
-        .nav-item {
-            position: relative;
-            margin: 0.25rem 1rem;
-        }
-
         .nav-link {
             display: flex;
             align-items: center;
@@ -92,75 +85,149 @@
             border-radius: 0.5rem;
             transition: all 0.3s ease;
         }
-
         .nav-link:hover {
             color: white;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--gradient-green);
         }
-
         .nav-link i {
             width: 20px;
             text-align: center;
             margin-right: 1rem;
         }
-
         .sidebar.collapsed .nav-link span {
             display: none;
         }
-
-        .sidebar.collapsed .nav-item {
-            margin: 0.25rem 0.5rem;
-        }
-
         .sidebar.collapsed .nav-link i {
             margin-right: 0;
         }
-
         .main-content {
             margin-left: var(--sidebar-width);
             padding: 2rem;
-            background: #1a1d24;
             min-height: 100vh;
         }
-        .report-container {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        .report-container h3 {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #333;
-        }
         .filter-section {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
             display: flex;
             align-items: center;
             gap: 1rem;
-            margin-bottom: 1.5rem;
         }
         .filter-section select, .filter-section input {
+            background: #333;
+            border: 1px solid var(--fluorescent-green);
+            color: var(--text-color);
+            border-radius: 8px;
             padding: 0.5rem;
-            border-radius: 5px;
-            border: 1px solid #ccc;
+            transition: all 0.3s ease;
+        }
+        .filter-section select:focus, .filter-section input:focus {
+            box-shadow: 0 0 5px var(--fluorescent-green);
+            outline: none;
         }
         .filter-section button {
-            background: #007bff;
-            color: white;
-            padding: 0.5rem 1rem;
+            background: var(--gradient-green);
+            color: #121212;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
             border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: 0.3s;
+            font-weight: bold;
+            transition: all 0.3s ease;
         }
         .filter-section button:hover {
-            background: #0056b3;
+            background: linear-gradient(135deg, #2ecc71, #08ee22);
+            box-shadow: 0 0 10px var(--fluorescent-green);
         }
-
-
-        
-        
-
+        .summary-box {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            text-align: center;
+            border: 1px solid var(--fluorescent-green);
+            transition: transform 0.3s ease;
+        }
+        .summary-box:hover {
+            transform: translateY(-5px);
+        }
+        .summary-box h4 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+        .summary-box p {
+            font-size: 1.5rem;
+            color: var(--fluorescent-green);
+            font-weight: bold;
+        }
+        .report-container {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            margin-top: 2rem;
+        }
+        .report-container h3 {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--fluorescent-green);
+            text-shadow: 0 0 5px rgba(8, 238, 34, 0.5);
+        }
+        .chart-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+            background: linear-gradient(135deg, #333, #242424);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7), inset 0 0 10px rgba(8, 238, 34, 0.2);
+            border: 1px solid var(--fluorescent-green);
+            min-height: 400px; /* Ensure enough height for charts */
+        }
+        .table th {
+            background: #222;
+            color: white;
+            border-color: #444;
+            font-weight: bold;
+        }
+        .table td {
+            background: var(--card-bg);
+            color: var(--text-color);
+            border-color: #444;
+        }
+        .download-buttons button {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: none;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        .download-buttons .btn-success {
+            background: linear-gradient(135deg, #28a745, #34c759);
+            color: white;
+        }
+        .download-buttons .btn-success:hover {
+            background: linear-gradient(135deg, #218838, #2ecc71);
+            box-shadow: 0 0 10px #28a745;
+        }
+        .download-buttons .btn-danger {
+            background: linear-gradient(135deg, #dc3545, #ff5767);
+            color: white;
+        }
+        .download-buttons .btn-danger:hover {
+            background: linear-gradient(135deg, #c82333, #e84351);
+            box-shadow: 0 0 10px #dc3545;
+        }
+        .download-buttons .btn-info {
+            background: var(--gradient-green);
+            color: #121212;
+        }
+        .download-buttons .btn-info:hover {
+            background: linear-gradient(135deg, #2ecc71, #08ee22);
+            box-shadow: 0 0 10px var(--fluorescent-green);
+        }
     </style>
 </head>
 <body>
@@ -176,131 +243,456 @@
                     <i class="fas fa-shopping-bag"></i>
                 </a>
             </div>
-            <div class="nav flex-column">
-                <div class="nav-item">
-                    <a href="/admin/dashboard" class="nav-link">
-                        <i class="fas fa-th-large"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="/admin/product" class="nav-link">
-                        <i class="fas fa-box"></i>
-                        <span>Products</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="/admin/ordermanagement" class="nav-link">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Orders</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="/admin/usersmanagement" class="nav-link">
-                        <i class="fas fa-users"></i>
-                        <span>Users</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="/admin/categories" class="nav-link">
-                        <i class="fas fa-tags"></i>
-                        <span>Categories</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="/admin/referraloffer" class="nav-link">
-                        <i class="fas fa-gift"></i>
-                        <span>Offers</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="/admin/coupons" class="nav-link">
-                        <i class="fas fa-ticket-alt"></i>
-                        <span>Coupons</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-image"></i>
-                        <span>Banners</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-cog"></i>
-                        <span>Settings</span>
-                    </a>
-                </div>
-                <div class="nav-item mt-auto">
-                    <a href="#" class="nav-link text-danger">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
-                    </a>
-                </div>
+            <div class="nav flex-column p-3">
+                <a href="/admin/dashboard" class="nav-link mb-2"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
+                <a href="/admin/product" class="nav-link mb-2"><i class="fas fa-box"></i><span>Products</span></a>
+                <a href="/admin/ordermanagement" class="nav-link mb-2"><i class="fas fa-shopping-cart"></i><span>Orders</span></a>
+                <a href="/admin/usersmanagement" class="nav-link mb-2"><i class="fas fa-users"></i><span>Users</span></a>
+                <a href="/admin/categories" class="nav-link mb-2"><i class="fas fa-tags"></i><span>Categories</span></a>
+                <a href="/admin/returnRequests" class="nav-link mb-2"><i class="fas fa-undo-alt"></i><span>Returns & Refunds</span></a>
+                <a href="/admin/coupons" class="nav-link mb-2"><i class="fas fa-ticket-alt"></i><span>Coupons</span></a>
+                <a href="#" class="nav-link mb-2"><i class="fas fa-image"></i><span>Banners</span></a>
+                <a href="#" class="nav-link mb-2"><i class="fas fa-cog"></i><span>Settings</span></a>
+                <a href="#" class="nav-link text-danger mt-auto"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
             </div>
         </nav>
 
-        <!-- Main Content -->
         <main class="main-content">
             <div class="filter-section">
-                <label for="filter">Select Report Type:</label>
-                <select id="filter">
+                <label for="filter" class="fw-bold">Report Type:</label>
+                <select id="filter" class="form-select w-auto">
                     <option value="daily">Daily</option>
                     <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
+                    <option value="monthly" selected>Monthly</option>
                     <option value="yearly">Yearly</option>
                     <option value="custom">Custom Date</option>
                 </select>
-                <div id="customDateRange" style="display: none;">
-                    <label for="startDate">Start Date:</label>
-                    <input type="date" id="startDate">
-                    <label for="endDate">End Date:</label>
-                    <input type="date" id="endDate">
+                
+
+                <!-- Month/Year Selection for Monthly -->
+                <div id="monthYearSelection" class="d-flex align-items-center gap-2">
+                    <label for="month">Month:</label>
+                    <select id="month" class="form-select w-auto">
+                        <option value="1" <%= (new Date().getMonth() + 1) === 1 ? 'selected' : '' %>>January</option>
+                        <option value="2" <%= (new Date().getMonth() + 1) === 2 ? 'selected' : '' %>>February</option>
+                        <option value="3" <%= (new Date().getMonth() + 1) === 3 ? 'selected' : '' %>>March</option>
+                        <option value="4" <%= (new Date().getMonth() + 1) === 4 ? 'selected' : '' %>>April</option>
+                        <option value="5" <%= (new Date().getMonth() + 1) === 5 ? 'selected' : '' %>>May</option>
+                        <option value="6" <%= (new Date().getMonth() + 1) === 6 ? 'selected' : '' %>>June</option>
+                        <option value="7" <%= (new Date().getMonth() + 1) === 7 ? 'selected' : '' %>>July</option>
+                        <option value="8" <%= (new Date().getMonth() + 1) === 8 ? 'selected' : '' %>>August</option>
+                        <option value="9" <%= (new Date().getMonth() + 1) === 9 ? 'selected' : '' %>>September</option>
+                        <option value="10" <%= (new Date().getMonth() + 1) === 10 ? 'selected' : '' %>>October</option>
+                        <option value="11" <%= (new Date().getMonth() + 1) === 11 ? 'selected' : '' %>>November</option>
+                        <option value="12" <%= (new Date().getMonth() + 1) === 12 ? 'selected' : '' %>>December</option>
+                    </select>
+                    <label for="year">Year:</label>
+                    <select id="year" class="form-select w-auto">
+                        <% for(let y = new Date().getFullYear(); y >= new Date().getFullYear() - 10; y--) { %>
+                            <option value="<%= y %>" <%= y === new Date().getFullYear() ? 'selected' : '' %>><%= y %></option>
+                        <% } %>
+                    </select>
+                    <div id="customDateRange" class="d-flex align-items-center gap-2" style="display: none;">
+                        <label for="startDate">Start:</label>
+                        <input type="date" id="startDate" class="form-control w-auto">
+                        <label for="endDate">End:</label>
+                        <input type="date" id="endDate" class="form-control w-auto">
+                    </div>
                 </div>
-                <button onclick="fetchSalesReport()">Get Report</button>
+
+                <!-- Custom Date Range -->
+                <div id="customDateRange" class="d-none d-flex align-items-center gap-2">
+                    <label for="startDate">Start:</label>
+                    <input type="date" id="startDate" class="form-control w-auto">
+                    <label for="endDate">End:</label>
+                    <input type="date" id="endDate" class="form-control w-auto">
+                </div>
+
+                <button class="btn" onclick="fetchSalesReport()">
+                    <i class="fas fa-chart-line me-2"></i>Get Report
+                </button>
             </div>
+
+            <div class="summary-boxes mt-4 d-flex flex-wrap gap-3">
+                <div class="summary-box flex-fill">
+                    <h4>Users</h4>
+                    <p><%= totalUsersCount || 0 %></p>
+                </div>
+                <div class="summary-box flex-fill">
+                    <h4>Total Sales</h4>
+                    <p id="totalSalesSummary">₹<%= totalSales || 0 %></p>
+                </div>
+                <div class="summary-box flex-fill">
+                    <h4>Pending Orders</h4>
+                    <p><%= pendingOrdersCount || 0 %></p>
+                </div>
+                <div class="summary-box flex-fill">
+                    <h4>Total Coupon Discount</h4>
+                    <p id="totalCouponDiscountSummary">₹<%= totalCouponDiscount || 0 %></p>
+                </div>
+            </div>
+
+            <!-- Chart Section -->
             <div class="report-container">
-                <h3>Total Sales: ₹<span id="totalSales">0</span></h3>
-                <h3>Total Orders: <span id="totalOrders">0</span></h3>
-                <h3>Total Products Sold: <span id="totalProductsSold">0</span></h3>
+                <h3 class="text-center mb-4">Sales Analytics</h3>
+                <div class="d-flex flex-wrap justify-content-center gap-4">
+                    <div class="chart-container">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                    <div class="chart-container mx-auto mt-4">
+                        <canvas id="lineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="report-container text-center">
+                <div class="report-summary">
+                    <h3>Total Sales: ₹<span id="totalSales"><%= totalSales || 0 %></span></h3>
+                    <h3>Total Orders: <span id="totalOrders"><%= totalOrders || 0 %></span></h3>
+                    <h3>Total Products Sold: <span id="totalProductsSold"><%= totalProductsSold || 0 %></span></h3>
+                    <h3>Total Coupon Discount: ₹<span id="totalCouponDiscount"><%= totalCouponDiscount || 0 %></span></h3>
+                </div>
+                <div class="mt-4">
+                    <h4 class="fw-bold">Order Details</h4>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Total Items</th>
+                                    <th>Total Amount</th>
+                                    <th>Offer Discount</th>
+                                    <th>Coupon Discount</th>
+                                    <th>Final Amount</th>
+                                    <th>Payment Method</th>
+                                    <th>Order Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTableBody">
+                                <% if (orders && orders.length > 0) { %>
+                                    <% orders.forEach(order => { %>
+                                        <tr>
+                                            <td><%= order["Order ID"] %></td>
+                                            <td><%= order["Total Items"] %></td>
+                                            <td><%= order["Total Amount"] %></td>
+                                            <td><%= order["Discount Applied"] %></td>
+                                            <td><%= order["Coupon Discount"] %></td>
+                                            <td><%= order["Final Amount"] %></td>
+                                            <td><%= order["Payment Method"] %></td>
+                                            <td><%= order["Order Status"] %></td>
+                                        </tr>
+                                    <% }) %>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="download-buttons mt-4 d-flex justify-content-center gap-3">
+                <button class="btn btn-success" onclick="fetchSalesReport('excel')">
+                    <i class="fas fa-file-excel me-2"></i>Excel
+                </button>
+                <button class="btn btn-danger" onclick="fetchSalesReport('pdf')">
+                    <i class="fas fa-file-pdf me-2"></i>PDF
+                </button>
+                <button class="btn btn-info" onclick="fetchSalesReport('json')">
+                    <i class="fas fa-eye me-2"></i>View Report
+                </button>
             </div>
         </main>
     </div>
+
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <canvas id="salesChart"></canvas>
 <script>
-    document.getElementById("filter").addEventListener("change", function () {
-      document.getElementById("customDateRange").style.display =
-        this.value === "custom" ? "block" : "none";
+    let barChartInstance = null;
+    let pieChartInstance = null;
+    let lineChartInstance = null; // New instance for line chart
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const filterSelect = document.getElementById("filter");
+        const monthYearSelection = document.getElementById("monthYearSelection");
+        const customDateRange = document.getElementById("customDateRange");
+
+        // Show month/year selection by default since "Monthly" is the default filter
+        monthYearSelection.style.display = "flex";
+        customDateRange.style.display = "none";
+
+        filterSelect.addEventListener("change", function () {
+            monthYearSelection.style.display = this.value === "monthly" ? "flex" : "none";
+            customDateRange.style.display = this.value === "custom" ? "flex" : "none";
+        });
+
+        fetchSalesReport();
+        fetchChartData();
     });
-  
-    async function fetchSalesReport() {
-      const filter = document.getElementById("filter").value;
-      let url = `/admin/sales-report?filter=${filter}`;
-  
-      if (filter === "custom") {
-        const startDate = document.getElementById("startDate").value;
-        const endDate = document.getElementById("endDate").value;
-        if (!startDate || !endDate) {
-          alert("Please select start and end dates!");
-          return;
+
+    async function fetchSalesReport(format = "json") {
+        const filter = document.getElementById("filter").value;
+        let url = `/admin/sales-report?filter=${filter}&format=${format}`;
+
+        if (filter === "monthly") {
+            const month = document.getElementById("month").value;
+            const year = document.getElementById("year").value;
+            if (!month || !year) {
+                alert("Please select month and year!");
+                return;
+            }
+            url += `&month=${month}&year=${year}`;
+        } else if (filter === "custom") {
+            const startDate = document.getElementById("startDate").value;
+            const endDate = document.getElementById("endDate").value;
+            if (!startDate || !endDate) {
+                alert("Please select start and end dates!");
+                return;
+            }
+            url += `&startDate=${startDate}&endDate=${endDate}`;
         }
-        url += `&startDate=${startDate}&endDate=${endDate}`;
-      }
-  
-      const response = await fetch(url);
-      const data = await response.json();
-  
-      document.getElementById("totalSales").innerText = data.totalSales;
-      document.getElementById("totalOrders").innerText = data.totalOrders;
-      document.getElementById("totalProductsSold").innerText = data.totalProductsSold;
 
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Failed to fetch sales report");
+            }
 
-     
-
-
-
+            if (format === "json") {
+                const data = await response.json();
+                renderSalesReport(data);
+                fetchChartData(); // Update charts with new filter
+            } else {
+                const blob = await response.blob();
+                const fileURL = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                const fileName = format === "pdf" ? "Sales_Report.pdf" : "Sales_Report.xlsx";
+                a.href = fileURL;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+        } catch (error) {
+            console.error("Error fetching sales report:", error);
+            alert("Failed to fetch sales report. Please try again later.");
+        }
     }
-  </script>
+
+    function renderSalesReport(data) {
+        const ordersTableBody = document.getElementById("ordersTableBody");
+
+        document.getElementById("totalSales").textContent = data.totalSales || 0;
+        document.getElementById("totalOrders").textContent = data.totalOrders || 0;
+        document.getElementById("totalProductsSold").textContent = data.totalProductsSold || 0;
+        const totalCouponDiscount = Math.floor(data.totalCouponDiscount || 0);
+        document.getElementById("totalCouponDiscount").textContent = totalCouponDiscount;
+
+        document.getElementById("totalSalesSummary").textContent = `₹${data.totalSales || 0}`;
+        document.getElementById("totalCouponDiscountSummary").textContent = `₹${totalCouponDiscount}`;
+
+        ordersTableBody.innerHTML = data.orders.map(order => `
+            <tr>
+                <td>${order["Order ID"]}</td>
+                <td>${order["Total Items"]}</td>
+                <td>${order["Total Amount"]}</td>
+                <td>${order["Discount Applied"]}</td>
+                <td>${order["Coupon Discount"]}</td>
+                <td>${order["Final Amount"]}</td>
+                <td>${order["Payment Method"]}</td>
+                <td>${order["Order Status"]}</td>
+            </tr>
+        `).join("");
+    }
+
+    async function fetchChartData() {
+        const filter = document.getElementById("filter").value;
+        let url = `/admin/chart-data?filter=${filter}`;
+
+        if (filter === "monthly") {
+            const month = document.getElementById("month").value;
+            const year = document.getElementById("year").value;
+            if (!month || !year) {
+                alert("Please select month and year!");
+                return;
+            }
+            url += `&month=${month}&year=${year}`;
+        } else if (filter === "custom") {
+            const startDate = document.getElementById("startDate").value;
+            const endDate = document.getElementById("endDate").value;
+            if (!startDate || !endDate) {
+                alert("Please select start and end dates!");
+                return;
+            }
+            url += `&startDate=${startDate}&endDate=${endDate}`;
+        }
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch chart data: ${response.statusText}`);
+            }
+            const data = await response.json();
+            if (!data.barChart || !data.pieChart || !data.lineChart) {
+                console.error("Invalid chart data:", data);
+                alert("No chart data available for the selected period.");
+                return;
+            }
+            renderCharts(data);
+        } catch (error) {
+            console.error("Error fetching chart data:", error);
+            alert("Failed to load charts. Please try again later.");
+        }
+    }
+
+    function renderCharts(data) {
+        if (barChartInstance) barChartInstance.destroy();
+        if (pieChartInstance) pieChartInstance.destroy();
+        if (lineChartInstance) lineChartInstance.destroy(); // Destroy previous line chart instance
+
+        // Bar Chart
+        const barCtx = document.getElementById("barChart").getContext("2d");
+        const barGradient = barCtx.createLinearGradient(0, 0, 0, 400);
+        barGradient.addColorStop(0, "rgba(8, 238, 34, 0.8)");
+        barGradient.addColorStop(1, "rgba(46, 204, 113, 0.6)");
+
+        barChartInstance = new Chart(barCtx, {
+            type: "bar",
+            data: {
+                labels: data.barChart.labels,
+                datasets: [{
+                    label: "Total Sales",
+                    data: data.barChart.sales,
+                    backgroundColor: barGradient,
+                    borderColor: "rgba(8, 238, 34, 1)",
+                    borderWidth: 2,
+                    borderRadius: 5,
+                    barThickness: 30,
+                }],
+            },
+            options: {
+                animation: {
+                    duration: 1500,
+                    easing: "easeInOutQuart",
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: "Sales (₹)", color: "#e4e4e4", font: { size: 14 } },
+                        ticks: { color: "#e4e4e4", font: { size: 12 } },
+                        grid: { color: "rgba(255, 255, 255, 0.1)" },
+                    },
+                    x: {
+                        title: { display: true, text: "Period", color: "#e4e4e4", font: { size: 14 } },
+                        ticks: { color: "#e4e4e4", font: { size: 12 } },
+                        grid: { display: false },
+                    },
+                },
+                plugins: {
+                    title: { display: true, text: "Sales Trend", color: "#e4e4e4", font: { size: 16, weight: "bold" } },
+                    legend: { labels: { color: "#e4e4e4", font: { size: 12 } } },
+                    tooltip: { backgroundColor: "#333", titleColor: "#e4e4e4", bodyColor: "#e4e4e4" },
+                },
+            },
+        });
+
+        // Pie Chart
+        const pieCtx = document.getElementById("pieChart").getContext("2d");
+        pieChartInstance = new Chart(pieCtx, {
+            type: "pie",
+            data: {
+                labels: data.pieChart.labels,
+                datasets: [{
+                    label: "Sales by Payment Method",
+                    data: data.pieChart.sales,
+                    backgroundColor: [
+                        "rgba(255, 99, 132, 0.8)",
+                        "rgba(54, 162, 235, 0.8)",
+                        "rgba(255, 206, 86, 0.8)",
+                        "rgba(75, 192, 192, 0.8)",
+                        "rgba(153, 102, 255, 0.8)",
+                    ],
+                    borderColor: [
+                        "rgba(255, 99, 132, 1)",
+                        "rgba(54, 162, 235, 1)",
+                        "rgba(255, 206, 86, 1)",
+                        "rgba(75, 192, 192, 1)",
+                        "rgba(153, 102, 255, 1)",
+                    ],
+                    borderWidth: 2,
+                }],
+            },
+            options: {
+                animation: {
+                    duration: 1500,
+                    easing: "easeInOutQuart",
+                },
+                plugins: {
+                    title: { display: true, text: "Sales by Payment Method", color: "#e4e4e4", font: { size: 16, weight: "bold" } },
+                    legend: {
+                        position: "right",
+                        labels: { color: "#e4e4e4", font: { size: 12 }, boxWidth: 20 },
+                    },
+                    tooltip: { backgroundColor: "#333", titleColor: "#e4e4e4", bodyColor: "#e4e4e4" },
+                },
+            },
+        });
+
+        // Line Chart (New)
+        const lineCtx = document.getElementById("lineChart").getContext("2d");
+        lineChartInstance = new Chart(lineCtx, {
+            type: "line",
+            data: {
+                labels: data.lineChart.labels,
+                datasets: [
+                    {
+                        label: "Current Week",
+                        data: data.lineChart.currentWeekSales,
+                        borderColor: "rgba(54, 162, 235, 1)", // Blue line (similar to the image)
+                        backgroundColor: "rgba(54, 162, 235, 0.2)",
+                        fill: false,
+                        tension: 0.4, // Smooth curve
+                        borderWidth: 2,
+                    },
+                    {
+                        label: "Previous Week",
+                        data: data.lineChart.previousWeekSales,
+                        borderColor: "rgba(46, 204, 113, 1)", // Green line (similar to the image)
+                        backgroundColor: "rgba(46, 204, 113, 0.2)",
+                        fill: false,
+                        tension: 0.4, // Smooth curve
+                        borderWidth: 2,
+                    },
+                ],
+            },
+            options: {
+                animation: {
+                    duration: 1500,
+                    easing: "easeInOutQuart",
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: "Sales (₹)", color: "#e4e4e4", font: { size: 14 } },
+                        ticks: { color: "#e4e4e4", font: { size: 12 } },
+                        grid: { color: "rgba(255, 255, 255, 0.1)" },
+                    },
+                    x: {
+                        title: { display: true, text: "Day of Week", color: "#e4e4e4", font: { size: 14 } },
+                        ticks: { color: "#e4e4e4", font: { size: 12 } },
+                        grid: { display: false },
+                    },
+                },
+                plugins: {
+                    title: { display: true, text: "Weekly Sales Comparison", color: "#e4e4e4", font: { size: 16, weight: "bold" } },
+                    legend: { labels: { color: "#e4e4e4", font: { size: 12 } } },
+                    tooltip: { backgroundColor: "#333", titleColor: "#e4e4e4", bodyColor: "#e4e4e4" },
+                },
+            },
+        });
+    }
+</script>
 </body>
 </html>

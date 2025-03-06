@@ -17,6 +17,8 @@ import fs from 'fs'
 import mongoose from 'mongoose';
 import { nanoid } from 'nanoid';
 import Wishlist from '../models/wishlist.js';
+import { generateBrudcrumbs } from '../middlewares/brudcrumbs.js';
+import WalletTransaction from '../models/wallet.js';
 
 
 
@@ -218,17 +220,12 @@ export const otprecieve = (req, res) => {
 const generateReferralCode = () => {
     return Math.random().toString(36).substring(2, 8).toUpperCase();
 };
-
-
 export const verifyOtp = async (req, res) => {
     const { otp } = req.body;
     const data = req.session.details;
     const email = data.email;
     const storedOtp = req.session.otp;
     const otpSentAt = req.session.otpSentAt;
-    console.log(storedOtp);
-
-    
 
     if (!email || !otp) {
         req.flash('err', 'Please enter both OTP and Email');
@@ -236,7 +233,7 @@ export const verifyOtp = async (req, res) => {
     }
 
     try {
-        const otpExpiryTime = 1 * 60 * 1000; 
+        const otpExpiryTime = 1 * 60 * 1000;
         if (Date.now() - otpSentAt > otpExpiryTime) {
             req.flash('err', 'OTP has expired. Please request a new OTP.');
             req.session.otp = null;
@@ -248,31 +245,52 @@ export const verifyOtp = async (req, res) => {
             return res.redirect('/user/otp');
         }
 
-        
         const hashedPassword = await bcrypt.hash(data.password, 10);
 
-       
         const newUser = new User({
             fname: data.fname,
             lname: data.lname,
             email: data.email,
             password: hashedPassword,
-            referralCode: generateReferralCode(),  
+            referralCode: generateReferralCode(),
             verified: true,
-            referredBy: data.referredBy || null, 
+            referredBy: data.referredBy || null,
+           
         });
 
         await newUser.save();
 
-        if (req.session.offerApplied) {
-            const referredUser = await User.findOne({ referralCode: data.referralCode });
-            if (referredUser) {
-                referredUser.rewardPoints += 10; 
-                await referredUser.save();
+        if (data.referredBy) {
+            const referral = await User.findOne({ referralCode: data.referredBy });
+            if (referral) {
+                // Add referral reward to the referrer's wallet
+                referral.walletBalance += 100;
+                await referral.save();
+
+                // Create a wallet transaction for the referrer
+                await WalletTransaction.create({
+                    userId: referral._id,
+                    amount: 100,
+                    type: "Credit",
+                    description: `Referral reward for referring ${data.email}`
+                });
+
+        
+                newUser.walletBalance += 50;
+                await newUser.save();
+
+                await WalletTransaction.create({
+                    userId: newUser._id,
+                    amount: 50,
+                    type: "Credit",
+                    description: `Referral reward for signing up via referral code`
+                });
             }
         }
 
-       
+        console.log("Referral transactions recorded.");
+
+        // Clear session data
         req.session.otp = null;
         req.session.details = null;
 
@@ -284,7 +302,6 @@ export const verifyOtp = async (req, res) => {
         return res.redirect('/user/signup');
     }
 };
-
 
 
 export const getLoginPage = (req, res) => {
@@ -612,11 +629,22 @@ export const homepage = async (req, res) => {
         const categories = await Category.find({ isListed: false });
         const latestProduct = await Product.find().sort({ createdAt: -1 }).limit(1);
 
+        let wishlistProducts = [];
+        if (req.user) {
+            const wishlist = await Wishlist.findOne({ userId: req.user._id });
+            if (wishlist) {
+                wishlistProducts = wishlist.products.map(p => p.toString());
+            }
+        }
+        
+
         let cartItems = [];
         if (req.user) {
             const cart = await Cart.findOne({ userId: req.user._id });
             cartItems = cart ? cart.items : [];
         }
+        console.log("cart home",cartItems);
+        
 
         res.render("user/home", {
             user: req.user,
@@ -624,7 +652,8 @@ export const homepage = async (req, res) => {
             product: productsWithAvgRating, 
             date: latestProduct,
             cartItems,
-            session: req.session
+            session: req.session,
+            wishlistProducts
         });
     } catch (error) {
         console.error("Error fetching homepage data:", error);
@@ -633,22 +662,190 @@ export const homepage = async (req, res) => {
 };
 
 
+// export const shoppage = async (req, res) => {
+//     try {
+//         const { sort, query, category, minPrice, maxPrice,page,limit } = req.query;
+//         let filter = { isdelete: false };
+          
+//         console.log("Received request with params:", req.query);
+//           let currentpage=parseInt(page)||1;
+          
+//           let perpage = parseInt(limit) || 10;
+ 
+
+//         if (query) {
+//             filter.name = { $regex: `^${query}`, $options: "i" };
+//         }
+
+    
+//         if (category && typeof category === "string") {
+         
+//             const decodedCategory = decodeURIComponent(category.trim().toLowerCase());
+//             console.log("Decoded Category:", decodedCategory);
+
+            
+//             const categoryDoc = await Category.findOne({ name: decodedCategory });
+
+          
+//             if (!categoryDoc) {
+//                 console.log("Category not found:", decodedCategory);
+//                 return res.render("user/shop", {
+//                     user: req.user,
+//                     categories: await Category.find({ isListed: false }),
+//                     product: [],
+//                     message: "No products found for this category."
+//                 });
+//             }
+
+//             console.log("Category found:", categoryDoc.name, "with ID:", categoryDoc._id);
+
+//             filter.category = categoryDoc._id;
+//         }
+
+//         if (minPrice || maxPrice) {
+//             filter.price = {};
+//             if (minPrice) filter.price.$gte = parseInt(minPrice);
+//             if (maxPrice) filter.price.$lte = parseInt(maxPrice);
+//         }
+
+      
+//         console.log("Final filter:", JSON.stringify(filter));
+
+  
+//         let sortQuery = {};
+//         switch (sort) {
+//             case "price-asc":
+//                 sortQuery.price = 1;
+//                 break;
+//             case "price-desc":
+//                 sortQuery.price = -1;
+//                 break;
+//             case "name-asc":
+//                 sortQuery.name = 1;
+//                 break;
+//             case "name-desc":
+//                 sortQuery.name = -1;
+//                 break;
+//             case "rating-asc":
+//             case "rating-desc":
+//                 break;
+//         }
+
+ 
+//         let products = await Product.find(filter)
+//             .populate("category")
+//             .sort(sortQuery)
+//             .collation({ locale: "en", strength: 2 })
+//             .skip((currentpage - 1) * perpage) 
+//             .limit(perpage)
+            
+
+//         console.log(`Found ${products.length} products matching the criteria`);
+
+//         let wishlistProducts = []; 
+
+//         if (req.user) {
+//             try {
+//                 const wishlist = await Wishlist.findOne({ userId: req.user._id }) || { products: [] };
+//                 wishlistProducts = wishlist.products.map(p => p.toString());
+//             } catch (error) {
+//                 console.error("Error fetching wishlist:", error);
+//             }
+//         }
+       
+//         let cartItems = [];
+//         if (req.user) {
+//             const cart = await Cart.findOne({ userId: req.user._id });
+//             console.log("Cart data:", cart);  
+//             cartItems = cart && cart.items ? cart.items : [];
+//         }
+
+//         console.log("Cart items:", cartItems);
+
+    
+//         const ratingsData = await Order.aggregate([
+//             { $unwind: "$items" },
+//             { $match: { "items.rating": { $ne: null } } },
+//             {
+//                 $group: {
+//                     _id: "$items.productId",
+//                     avgRating: { $avg: "$items.rating" }
+//                 }
+//             }
+//         ]);
+
+       
+//         console.log("Ratings Data:", ratingsData);
+
+//         const ratingsMap = new Map(ratingsData.map(r => [r._id.toString(), parseFloat(r.avgRating.toFixed(1))]));
+
+//         const productsWithAvgRating = products.map(product => ({
+//             ...product.toObject(),
+//             avgRating: ratingsMap.get(product._id.toString()) || 0
+//         }));
+
+      
+//         if (sort === "rating-desc") {
+//             productsWithAvgRating.sort((a, b) => b.avgRating - a.avgRating);
+//         } else if (sort === "rating-asc") {
+//             productsWithAvgRating.sort((a, b) => a.avgRating - b.avgRating);
+//         }
+//         const totalProducts = await Product.countDocuments(filter);
+//         if (req.xhr) {
+//             console.log("Sending AJAX response with applied filters");
+//             return res.json({
+//                 products: productsWithAvgRating,
+//                 appliedFilters: {
+//                     category: category || null,
+//                     minPrice: minPrice || null,
+//                     maxPrice: maxPrice || null,
+//                     sort: sort || null,
+//                     query: query || null
+//                 },
+//                 currentpage,
+//                 totalpages:Math.ceil(totalProducts/perpage),
+//                 totalProducts
+//             });
+//         }
+
+//         const latestProduct = await Product.find().sort({ createdAt: -1 }).limit(1) || [];
+//         console.log("Latest Product:", latestProduct);
+
+//         res.render("user/shop", {
+//             user: req.user,
+//             categories: await Category.find({ isListed: false }),
+//             product: productsWithAvgRating,
+//             date: latestProduct.length > 0 ? latestProduct : [],
+//             cartItems,
+//             currentpage,
+//             totalPages: Math.ceil(totalProducts / perpage),
+//             session: req.session,
+//             wishlistProducts 
+//         });
+
+//     } catch (error) {
+//         console.error("Error fetching shop page data:", error);
+//         res.status(500).send("Internal Server Error");
+//     }
+// };
+
 export const shoppage = async (req, res) => {
     try {
-        const { sort, query, category } = req.query;
+        const { sort, query, category, minPrice, maxPrice, page = 1, limit = 10 } = req.query;
         let filter = { isdelete: false };
+        let currentpage = parseInt(page) || 1;
+        let perpage = parseInt(limit) || 10;
 
+        console.log("Received request with params:", req.query);
+
+        // Apply filters based on query parameters
         if (query) {
             filter.name = { $regex: `^${query}`, $options: "i" };
         }
 
-     
         if (category) {
-            const decodedCategory = decodeURIComponent(category.trim());
-            const categoryDoc = await Category.findOne({
-                name: { $regex: `^${decodedCategory}$`, $options: "i" }
-            });
-
+            const decodedCategory = decodeURIComponent(category.trim().toLowerCase());
+            const categoryDoc = await Category.findOne({ name: decodedCategory });
             if (categoryDoc) {
                 filter.category = categoryDoc._id;
             } else {
@@ -656,36 +853,55 @@ export const shoppage = async (req, res) => {
                     user: req.user,
                     categories: await Category.find({ isListed: false }),
                     product: [],
-                    date: await Product.find().sort({ createdAt: -1 }).limit(1),
-                    cartItems: req.user ? (await Cart.findOne({ userId: req.user._id }))?.items || [] : [],
-                    session: req.session,
-                    wishlistProducts: []
+                    message: "No products found for this category."
                 });
             }
         }
 
-       
-        let sortQuery = {};
-        if (sort === "price-asc") sortQuery = { price: 1 };
-        if (sort === "price-desc") sortQuery = { price: -1 };
-        if (sort === "name-asc") sortQuery = { name: 1 };  
-        if (sort === "name-desc") sortQuery = { name: -1 }; 
+        if (minPrice || maxPrice) {
+            filter.price = {};
+            if (minPrice) filter.price.$gte = parseInt(minPrice);
+            if (maxPrice) filter.price.$lte = parseInt(maxPrice);
+        }
 
-       
+        let sortQuery = {};
+        switch (sort) {
+            case "price-asc":
+                sortQuery.price = 1;
+                break;
+            case "price-desc":
+                sortQuery.price = -1;
+                break;
+            case "name-asc":
+                sortQuery.name = 1;
+                break;
+            case "name-desc":
+                sortQuery.name = -1;
+                break;
+        }
+
         let products = await Product.find(filter)
             .populate("category")
             .sort(sortQuery)
-            .collation({ locale: "en", strength: 2 });  
+            .collation({ locale: "en", strength: 2 })
+            .skip((currentpage - 1) * perpage)
+            .limit(perpage);
 
-            let wishlistProducts = [];
-            if (req.user) {
-                const wishlist = await Wishlist.findOne({ userId: req.user._id });
-                if (wishlist) {
-                    wishlistProducts = wishlist.products.map(p => p.toString());
-                }
-            }
+        const totalProducts = await Product.countDocuments(filter);
+        const totalPages = Math.ceil(totalProducts / perpage);
 
-       
+        let wishlistProducts = [];
+        if (req.user) {
+            const wishlist = await Wishlist.findOne({ userId: req.user._id }) || { products: [] };
+            wishlistProducts = wishlist.products.map(p => p.toString());
+        }
+
+        let cartItems = [];
+        if (req.user) {
+            const cart = await Cart.findOne({ userId: req.user._id });
+            cartItems = cart && cart.items ? cart.items : [];
+        }
+
         const ratingsData = await Order.aggregate([
             { $unwind: "$items" },
             { $match: { "items.rating": { $ne: null } } },
@@ -699,32 +915,43 @@ export const shoppage = async (req, res) => {
 
         const ratingsMap = new Map(ratingsData.map(r => [r._id.toString(), parseFloat(r.avgRating.toFixed(1))]));
 
-        const productsWithAvgRating = products.map(product => ({
+        let productsWithAvgRating = products.map(product => ({
             ...product.toObject(),
-            avgRating: ratingsMap.get(product._id.toString()) || 0 
+            avgRating: ratingsMap.get(product._id.toString()) || 0
         }));
-        
-        
-        if (sort === "rating-desc") { 
-            
+
+        if (sort === "rating-desc") {
             productsWithAvgRating.sort((a, b) => b.avgRating - a.avgRating);
-        } else if (sort === "rating-asc") { 
-          
+        } else if (sort === "rating-asc") {
             productsWithAvgRating.sort((a, b) => a.avgRating - b.avgRating);
         }
-        
 
-        
         if (req.xhr) {
-            return res.json({ products: productsWithAvgRating });
+            return res.json({
+                products: productsWithAvgRating,
+                appliedFilters: {
+                    category: category || null,
+                    minPrice: minPrice || null,
+                    maxPrice: maxPrice || null,
+                    sort: sort || null,
+                    query: query || null
+                },
+                currentpage,
+                totalPages,
+                totalProducts
+            });
         }
+
+        const latestProduct = await Product.find().sort({ createdAt: -1 }).limit(1) || [];
 
         res.render("user/shop", {
             user: req.user,
             categories: await Category.find({ isListed: false }),
             product: productsWithAvgRating,
-            date: await Product.find().sort({ createdAt: -1 }).limit(1),
-            cartItems: req.user ? (await Cart.findOne({ userId: req.user._id }))?.items || [] : [],
+            date: latestProduct.length > 0 ? latestProduct : [],
+            cartItems,
+            currentpage,
+            totalPages,
             session: req.session,
             wishlistProducts
         });
@@ -734,7 +961,6 @@ export const shoppage = async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 };
-
 
 
 export const productview = async (req, res) => {
@@ -791,7 +1017,7 @@ export const productview = async (req, res) => {
             simProducts.push(similarProducts[index]);
         });
 
-        res.render("user/productview", { product, avgRating, simProducts });
+        res.render("user/productview", { product, avgRating, simProducts ,breadcrumbs:res.locals.breadcrumbs});
 
     } catch (error) {
         console.error("Error fetching product:", error);
@@ -863,7 +1089,7 @@ export const productview = async (req, res) => {
 
 
 
-export const getprofile = async (req, res) => {
+export const    getprofile = async (req, res) => {
     try {
         if (!req.user || !req.user._id) {
             return res.redirect("/user/profile")
@@ -885,7 +1111,8 @@ export const getprofile = async (req, res) => {
             referralCode:user.referralCode,
             referralRewards:user.referralRewards,
             success: req.flash('success'),
-            error: req.flash('error')
+            error: req.flash('error'),
+            breadcrumbs: res.locals.breadcrumbs
         });
     } catch (error) {
         console.error("Error fetching profile:", error);
@@ -972,7 +1199,7 @@ export const getaddress = async (req, res) => {
         console.log("here");
         
        
-        res.render('user/address', { address, error: req.flash('error') });
+        res.render('user/address', { address, error: req.flash('error'),breadcrumbs:res.locals.breadcrumbs });
     } catch (error) {
         console.error(error, "Address fetching error");
         res.status(500).send("Address not fetched");

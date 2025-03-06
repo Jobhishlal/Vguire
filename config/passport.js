@@ -32,7 +32,7 @@ async (req,accessToken, refreshToken, profile, done) => {
                 profileImage: profile.photos[0].value,
                 fname: profile.name.givenName, 
                 lname: profile.name.familyName, 
-                password: 'google-login-placeholder-password' 
+                password: '' 
             });
           
             await user.save();

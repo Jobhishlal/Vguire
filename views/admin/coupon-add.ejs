@@ -328,7 +328,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="form-label">Coupon Code<span class="required-star">*</span></label>
-                            <input type="text" class="form-control text-uppercase" id="code" name="code" required 
+                            <input type="text" class="form-control text-uppercase" id="code" name="code" 
                                    placeholder="e.g. SUMMER2025">
                         </div>
                     </div>
@@ -336,7 +336,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="form-label">Discount Type<span class="required-star">*</span></label>
-                            <select class="form-select" id="discountType" name="discountType" required>
+                            <select class="form-select" id="discountType" name="discountType" >
                                 <option value="percentage">Percentage Discount</option>
                                 <option value="flat">Flat Amount</option>
                             </select>
@@ -347,24 +347,30 @@
                         <div class="form-group">
                             <label class="form-label">Discount Value<span class="required-star">*</span></label>
                             <div class="input-group">
-                                <input type="number" class="form-control" id="value" name="value" required 
+                                <input type="number" class="form-control" id="value" name="value" 
                                        placeholder="Enter discount value">
                                 <span class="input-group-text" id="valueSymbol">%</span>
                             </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Start Date<span class="required-star">*</span></label>
+                            <input type="date" class="form-control" id="startDate" name="startDate">
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="form-label">Expiration Date<span class="required-star">*</span></label>
-                            <input type="date" class="form-control" id="expirationDate" name="expirationDate" required>
+                            <input type="date" class="form-control" id="expirationDate" name="expirationDate">
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="form-label">Usage Limit<span class="required-star">*</span></label>
-                            <input type="number" class="form-control" id="usageLimit" name="usageLimit" required 
+                            <input type="number" class="form-control" id="usageLimit" name="usageLimit" 
                                    placeholder="Maximum number of uses">
                         </div>
                     </div>
@@ -374,7 +380,7 @@
                             <label class="form-label">Minimum Order Amount<span class="required-star">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text">₹</span>
-                                <input type="number" class="form-control" id="minOrderAmount" name="minOrderAmount" required 
+                                <input type="number" class="form-control" id="minOrderAmount" name="minOrderAmount" 
                                        placeholder="Minimum purchase amount">
                             </div>
                         </div>

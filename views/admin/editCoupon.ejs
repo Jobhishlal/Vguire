@@ -328,14 +328,14 @@
                         <div class="form-group">
                             <label class="form-label">Coupon Code<span class="required-star">*</span></label>
                             <input type="text" class="form-control text-uppercase" id="code" name="code" 
-                                   value="<%= coupon.code %>" required>
+                                   value="<%= coupon.code %>" >
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="form-label">Discount Type<span class="required-star">*</span></label>
-                            <select class="form-select" id="discountType" name="discountType" required>
+                            <select class="form-select" id="discountType" name="discountType" >
                                 <option value="percentage" <%= coupon.discountType === 'percentage' ? 'selected' : '' %>>
                                     Percentage Discount
                                 </option>
@@ -351,7 +351,7 @@
                             <label class="form-label">Discount Value<span class="required-star">*</span></label>
                             <div class="input-group">
                                 <input type="number" class="form-control" id="value" name="value" 
-                                       value="<%= coupon.value %>" required>
+                                       value="<%= coupon.value %>" >
                                 <span class="input-group-text" id="valueSymbol">
                                     <%= coupon.discountType === 'percentage' ? '%' : '₹' %>
                                 </span>
@@ -359,21 +359,25 @@
                         </div>
                     </div>
 
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Start Date<span class="required-star">*</span></label>
+                            <input type="date" class="form-control" id="startDate" name="startDate" 
+                                   value="<%= coupon.startDate && !isNaN(new Date(coupon.startDate)) ? new Date(coupon.startDate).toISOString().split('T')[0] : '' %>">
+                        </div>
+                    </div>
+                    
+
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="form-label">Expiration Date<span class="required-star">*</span></label>
                             <input type="date" class="form-control" id="expirationDate" name="expirationDate" 
-                                   value="<%= new Date(coupon.expirationDate).toISOString().split('T')[0] %>" required>
+                                   value="<%= new Date(coupon.expirationDate).toISOString().split('T')[0] %>" >
                         </div>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="form-label">Usage Limit<span class="required-star">*</span></label>
-                            <input type="number" class="form-control" id="usageLimit" name="usageLimit" 
-                                   value="<%= coupon.usageLimit %>" required>
-                        </div>
-                    </div>
+                    
 
                     <div class="col-md-6">
                         <div class="form-group">
@@ -381,7 +385,7 @@
                             <div class="input-group">
                                 <span class="input-group-text">₹</span>
                                 <input type="number" class="form-control" id="minOrderAmount" name="minOrderAmount" 
-                                       value="<%= coupon.minOrderAmount %>" required>
+                                       value="<%= coupon.minOrderAmount %>" >
                             </div>
                         </div>
                     </div>

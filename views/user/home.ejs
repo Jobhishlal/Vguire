@@ -9,6 +9,39 @@
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="/style.css">
 </head>
+<!-- <style>
+    body{
+        background-color: white;   
+
+
+    }
+    .product-rating {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ff9800; /* Orange rating color */
+}
+
+.rating-count {
+    font-size: 14px;
+    color: #666;
+}
+
+ 
+
+    #sortSelect:hover {
+        background: linear-gradient(135deg, #0056b3, #0084ff);
+        transform: scale(1.05);
+    }
+
+    #sortSelect:focus {
+        box-shadow: 0px 0px 8px rgba(255, 75, 43, 0.7);
+    }
+
+
+
+
+
+</style> -->
 <style>
     body{
         background-color: white;   
@@ -36,6 +69,94 @@
     #sortSelect:focus {
         box-shadow: 0px 0px 8px rgba(255, 75, 43, 0.7);
     }
+
+
+    .product-price {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.offer-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ff6600; /* Highlight offer price */
+}
+
+.original-price {
+    font-size: 1rem;
+    text-decoration: line-through;
+    color: #888; /* Faded color for original price */
+    margin-left: 8px;
+}
+
+.regular-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333; /* Regular price if no discount */
+}
+.price-filter {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #fff;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.price-filter label {
+    font-weight: 600;
+    color: #444;
+    font-size: 14px;
+}
+
+.price-filter input {
+    width: 130px;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.price-filter input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+#filterBtn {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+#filterBtn:hover {
+    background: linear-gradient(135deg, #0056b3, #003d80);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 600px) {
+    .price-filter {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .price-filter input {
+        width: 100%;
+    }
+}
+
 
 
 
@@ -105,7 +226,7 @@
     <div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <img src="/image/austrian-national-library-aHMpOhw7u1E-unsplash.jpg" class="d-block w-100" alt="Banner 1">
+                <img src="/image/pexels-jddaniel-2385477.jpg" class="d-block w-100" alt="Banner 1">
                 <div class="carousel-caption d-none d-md-block">
                     <h2>Welcome to Our Store</h2>
                     <p>Discover amazing products at great prices</p>
@@ -174,85 +295,80 @@
       <!-- Product Categories -->
           
 
-      <div class="container">
-        <div class="row">
-            <h1 class="product-categories">PRODUCT CATEGORIES</h1>
-
-        <div class="categories-container col-md-12">
-            <% categories.forEach(category => { %> 
-                <div class="category">
-                    <a href="/user/shop?category=<%= category.name %>" class="category-link <%= category.isActive ? 'active' : '' %>">
-                        <img src="/uploads/categories/<%= category.image %>" alt="<%= category.name %>" class="category-img">
-                        <span><%= category.name %></span>  
-                    </a>
-                </div><h1 class="product-categories"></h1>
-            <% }) %>
-        </div>
-        </div>
-
-
-
-             
-
-
-         </div>
-
+     
          
        
         
 
 
-        <h1 class="product-overview text-center my-4">PRODUCT OVERVIEW</h1>
+         <h1 class="product-overview text-center my-4">PRODUCT OVERVIEW</h1>
 
-        <section class="product-overview">
-            <div class="container">
-                <div class="row">
-                    <% if (product && product.length > 0) { %>
-                        <% product.forEach(product => { %>
-                            <div class="col-md-4">
-                                <div class="product-card">
-                                    <a href="/user/productview/<%= product._id %>">
-                                        <div class="product-image-wrapper">
-                                            <img src="<%= product.images[0] %>" alt="<%= product.name %>" class="product-image">
-                                            <div class="product-overlay"></div>
-                                            <button class="wishlist-btn">
-                                                <i class="far fa-heart"></i>
-                                            </button>
-                                        </div>
-                                    </a>
-                                    <div class="product-info d-flex justify-content-between align-items-center">
-                                        <h3 class="product-title"><%= product.name %></h3>
-                                        
-                                     
-                                        <% if (product.avgRating && product.avgRating !== "No ratings yet") { %>
-                                            <div class="product-stars">
-                                                <% let rating = Math.round(product.avgRating); %>
-                                                <% for (let i = 1; i <= 5; i++) { %>
-                                                    <% if (i <= rating) { %>
-                                                        <i class="fas fa-star text-warning"></i> 
-                                                    <% } else { %>
-                                                        <i class="far fa-star text-warning"></i> 
-                                                    <% } %>
-                                                <% } %>
-                                            </div>
-                                        <% } %>
-                                    </div>
-                                    <p class="product-price">$<%= product.price %></p>
-                                    <p class="product-price">$<%= product.Offer %></p>
-                                    <a href="/user/productview/<%= product._id %>">
-                                        <button class="quick-view-btn">Quick View</button>
-                                    </a>
-                                </div>
-                            </div>
-                        <% }); %>
-                    <% } else { %>
-                        <p class="text-center">No products found matching your search.</p>
-                    <% } %>
-                </div>
-            </div>
-        </section>
         
-        
+         <% let wishlistProductIds = wishlistProducts.map(id => id.toString()); %>
+         <section class="product-overview">
+             <div class="container">
+                 <div class="row" id="productContainer">
+                     <% if (product && product.length > 0) { %>
+                         <% product.forEach(product => { %>
+                             <div class="col-md-4 product-item">
+                                 <div class="product-card">
+                                     <a href="/user/productview/<%= product._id %>">
+                                         <div class="product-image-wrapper">
+                                             <img src="<%= product.images[0] %>" alt="<%= product.name %>" class="product-image">
+                                             <div class="product-overlay"></div>
+                                         </div>
+                                     </a>
+         
+                                     <!-- Wishlist Button -->
+                                     <button class="wishlist-btn" onclick="toggleWishlist(event, '<%= product._id %>')" id="wishlist-<%= product._id %>">
+                                         <i class="fa-heart <%= wishlistProducts.includes(product._id.toString()) ? 'fas text-primary' : 'far text-black' %>"></i>
+                                     </button>
+         
+                                     <div class="product-info d-flex justify-content-between align-items-center">
+                                         <h3 class="product-title"><%= product.name %></h3>
+         
+                                         <% if (product.avgRating && product.avgRating !== "No ratings yet") { %>
+                                             <div class="product-stars">
+                                                 <% let rating = Math.round(product.avgRating); %>
+                                                 <% for (let i = 1; i <= 5; i++) { %>
+                                                     <% if (i <= rating) { %>
+                                                         <i class="fas fa-star text-warning"></i> 
+                                                     <% } else { %>
+                                                         <i class="far fa-star text-warning"></i> 
+                                                     <% } %>
+                                                 <% } %>
+                                             </div>
+                                         <% } %>
+                                     </div>
+         
+                                     <!-- Product Price with Discount Styling -->
+                                     <div class="product-price">
+                                         <% if (product.isOfferActive) { %>
+                                             <% if (product.offerType === "product") { %>
+                                                 <span class="offer-price">₹<%= product.Offerprice %></span>
+                                             <% } else if (product.offerType === "category") { %>
+                                                 <span class="offer-price">₹<%=Math.floor(product.price - (product.price * product.discountPercentage / 100)) %></span>
+                                             <% } %>
+                                             <span class="original-price">₹<%= product.price %></span>
+                                         <% } else { %>
+                                             <span class="regular-price">₹<%= product.price %></span>
+                                         <% } %>
+                                     </div>
+         
+                                     <a href="/user/productview/<%= product._id %>">
+                                         <button class="quick-view-btn">Quick View</button>
+                                     </a>
+                                 </div>
+                             </div>
+                         <% }); %>
+                     <% } else { %>
+                         <p class="text-center">No products found matching your search.</p>
+                     <% } %>
+                 </div>
+             </div>
+             <span id="wishlist-count" hidden>(0)</span>
+         </section>
+         
         
 
     <!-- Footer -->

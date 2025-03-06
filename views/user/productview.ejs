@@ -552,6 +552,42 @@
     color: white;
     border: 2px solid #ff5733;
 }
+.breadcrumb {
+    list-style: none;
+    display: flex;
+    gap: 8px;
+    font-size: 14px;
+    padding: 10px 0;
+}
+
+.breadcrumb li {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb li a {
+    text-decoration: none;
+    color: #007bff; /* Blue color */
+    font-weight: 500;
+    transition: color 0.3s ease-in-out;
+}
+
+.breadcrumb li a:hover {
+    color: #0056b3; /* Darker blue on hover */
+}
+
+.breadcrumb li::after {
+    content: "›"; /* Breadcrumb separator */
+    margin: 0 8px;
+    color: #666;
+}
+
+.breadcrumb li:last-child::after {
+    content: ""; /* Remove separator from last item */
+}
+
+
+
     </style>
 </head>
 <body>
@@ -579,17 +615,18 @@
             </div>
         </div>
     </nav>
+    <div class="container" style="margin-top: 100px;">
+        <ul class="breadcrumb">
+            <% breadcrumbs.forEach(breadcrumb => { %>
+                <li><a href="<%= breadcrumb.url %>"><%= breadcrumb.name %></a></li>
+            <% }) %>
+        </ul>
+    </div>
     
     <!-- Product View Section -->
-    <div class="container py-5" style="margin-top: 100px;">
+    <div class="container py-5" style="margin-top: -30px;">
         <div class="product-container">
-            <div style="font-size: 16px; font-weight: 500; padding: 10px; background: #f8f9fa; border-radius: 8px;">
-                <a href="/user/home" style="text-decoration: none; color:black; font-weight: bold;">Home</a>
-                <span style="color: #6c757d; margin: 0 5px;"> &gt; </span>
-                <a href="/user/shop" style="text-decoration: none; color: black; font-weight: bold;">Shop</a>
-                <span style="color: #6c757d; margin: 0 5px;"> &gt; </span>
-                <a href="#" style="text-decoration: none; color: black; font-weight: bold;">Product Details</a>
-            </div>
+           
     
             <!-- Main Product Section -->
             <div class="row mb-5">

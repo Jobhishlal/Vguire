@@ -47,6 +47,7 @@ const userSchema = new mongoose.Schema({
   
   referralCode: { type: String, unique: true, default: () => nanoid(8) },
   referredBy: { type: String, ref: 'User', required: false },
+  walletBalance:{type:Number,default:0}
 }, { timestamps: true });
 
 export default mongoose.model("User", userSchema);

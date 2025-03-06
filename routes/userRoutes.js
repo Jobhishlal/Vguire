@@ -1,6 +1,7 @@
 import express from 'express';
 
 import {  isCheckAuth, isAuth, print ,checkBlockedUser} from '../middlewares/authMiddleware.js';
+import { generateBrudcrumbs } from '../middlewares/brudcrumbs.js';
 import passport from 'passport';
 
 
@@ -36,12 +37,23 @@ import {
 } from '../controllers/userController.js';
 
 import {getcart,addToCart,updateCartQuantity,removeFromCart} from '../controllers/CartController.js'
-import {singlecheckout,cartproduct,placeorder,buyNowCartView,addaddress,editaddress,getcheckout,singleCheckoutView,updateCheckoutQuantity,getorder,ordersucccess,orderdetails,orderview,ordercancel,ratingadd,createRazorpayOrder,verifyPayment,couponapplied} from '../controllers/checkoutController.js'
+import {singlecheckout,cartproduct,placeorder,buyNowCartView,addaddress,editaddress,getcheckout,
+    singleCheckoutView,updateCheckoutQuantity,getorder,ordersucccess,orderdetails,orderview,ordercancel,
+    ratingadd,createRazorpayOrder,verifyPayment,couponapplied,totalordercancel,removecoupon,returnsingle,
+    returnentireorder,placeorderwallet,createRAZO,verifyRazorpayPaymentorderview} from '../controllers/checkoutController.js'
 import { profileUpload } from '../middlewares/multerConfig.js';
 import {getwishlist, postwishlist,togglewishlist,wishlistcount} from '../controllers/wishlistController.js';
-import {createorder} from '../controllers/peymentController.js'
+import {createorder} from '../controllers/peymentController.js';
+import {walletget,addmoney,verifymoney} from '../controllers/walletController.js';
 
 const router = express.Router();
+
+
+router.use(generateBrudcrumbs);
+
+router.get("/",(req,res)=>{
+res.render("user/home")
+})
 
 // Signup routes
 router.get('/signup',loadSignup);
@@ -73,7 +85,7 @@ router.post('/resend-otp',resendOtp)
 
 
 router.get('/home',checkBlockedUser,isAuth,homepage)
-router.get('/shop', checkBlockedUser,shoppage)
+router.get('/shop' ,isAuth,checkBlockedUser,shoppage)
 router.get('/productview/:id',checkBlockedUser,productview)
 
 //google
@@ -113,13 +125,22 @@ router.post("/checkout/update-quantity", isAuth,checkBlockedUser,updateCheckoutQ
 
 
 router.post("/checkout/placeorder",isAuth,checkBlockedUser,placeorder)
+router.post("/checkout/placeorderwallet",isAuth,checkBlockedUser,placeorderwallet)
 router.get("/orders",isAuth,checkBlockedUser,getorder)
 router.get('/order-success',isAuth,checkBlockedUser,ordersucccess)
 
 router.get('/order-details/',isAuth,checkBlockedUser,orderdetails)
+
+router.post("/order/create-razorpay-order",isAuth,checkBlockedUser, createRAZO);
+router.post("/order/verify-razorpay-payment",isAuth,checkBlockedUser, verifyRazorpayPaymentorderview);
 router.get('/order-view/:orderId',isAuth,checkBlockedUser,orderview)
 
-router.post("/order/cancel/:orderId/:productId", isAuth,checkBlockedUser, ordercancel);
+router.post("/order/cancel-product", isAuth, checkBlockedUser, ordercancel);
+router.post("/order/order-cancel",isAuth,checkBlockedUser,totalordercancel)
+router.post("/order/returnorder",isAuth,checkBlockedUser,returnsingle)
+router.post("/order/returnfullorder",isAuth,checkBlockedUser,returnentireorder)
+
+
 router.post("/order/rate-product", isAuth,checkBlockedUser, ratingadd);
 
 
@@ -137,8 +158,13 @@ router.post("/create-order",isAuth,checkBlockedUser,createorder)
 router.post("/checkout/razorpay-order",isAuth,checkBlockedUser, createRazorpayOrder);
 router.post("/checkout/verify-payment",isAuth,checkBlockedUser, verifyPayment);
 router.post("/checkout/apply-coupon",isAuth,checkBlockedUser,couponapplied)
+router.delete("/checkout/delete-coupon",isAuth,checkBlockedUser,removecoupon)
 
+router.get("/wallet",isAuth,checkBlockedUser,walletget)
+router.post("/add-money", isAuth, checkBlockedUser, addmoney);
+router.post("/verify-payment", isAuth, checkBlockedUser, verifymoney);
 
+ 
 
 export default router;
 

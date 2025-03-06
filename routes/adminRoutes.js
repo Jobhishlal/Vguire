@@ -16,6 +16,10 @@ import { isAuthenticatedAdmin, preventLoggedInAdmin } from '../middlewares/authM
 import { error } from 'console';
 
 const router = express.Router();
+router.get('/error', (req, res) => {
+    res.status(404).render('admin/error', { errorMessage: 'Page not found' });
+});
+
 
 // Admin routes
 router.get('/login', preventLoggedInAdmin, renderLoginPage);
@@ -57,25 +61,25 @@ router.post('/add-category', isAuthenticatedAdmin, categoryUpload, addCategory);
 router.get('/edit-category/:id', isAuthenticatedAdmin, getEditCategory);
 router.post('/edit-category/:id', isAuthenticatedAdmin, categoryUpload, updateCategory);
 
-router.post("/listcategory/:id" ,list)
+router.post("/listcategory/:id" ,isAuthenticatedAdmin,list)
 
-router.post('/delete-image', productController.deleteimage)
+router.post('/delete-image',isAuthenticatedAdmin, productController.deleteimage)
 
 
 
-router.get('/ordermanagement',adminorderController.getorder)
-router.get("/ordermanagement/:orderId", adminorderController.getOrderDetails);
+router.get('/ordermanagement',isAuthenticatedAdmin,adminorderController.getorder)
+router.get("/ordermanagement/:orderId",isAuthenticatedAdmin, adminorderController.getOrderDetails);
 
-router.post("/ordermanagement/:orderId/update-status", adminorderController.updateOrderStatus);
+router.post("/ordermanagement/:orderId/update-status", isAuthenticatedAdmin,adminorderController.updateOrderStatus);
 
 // offer
 
-router.get("/product/:id/offer",productController.offerpage)
-router.post("/product/:id/offer",productController.offerpost)
-router.get("/product/:id/remove-offer",productController.removeoffer)
-router.get("/category/:id/offer", applyCategoryOffer);
-router.post("/category/:id/offer", applyCategoryOfferPost);
-router.delete('/category/:id/remove-offer', removeCategoryOffer);
+router.get("/product/:id/offer",isAuthenticatedAdmin,productController.offerpage)
+router.post("/product/:id/offer",isAuthenticatedAdmin,productController.offerpost)
+router.get("/product/:id/remove-offer",isAuthenticatedAdmin,productController.removeoffer)
+router.get("/category/:id/offer",isAuthenticatedAdmin, applyCategoryOffer);
+router.post("/category/:id/offer", isAuthenticatedAdmin,applyCategoryOfferPost);
+router.delete('/category/:id/remove-offer',isAuthenticatedAdmin, removeCategoryOffer);
 
 
 
@@ -95,5 +99,12 @@ router.put("/coupons/edit/:id",isAuthenticatedAdmin,couponcontroller.editCoupon)
 
 
 router.get("/sales-report",isAuthenticatedAdmin,dashboardController.salesreportget)
+router.get("/chart-data",isAuthenticatedAdmin,dashboardController.chart)
+
+
+
+
+router.get("/returnRequests", isAuthenticatedAdmin, adminorderController.getReturnRequests);
+router.post("/return-controller",isAuthenticatedAdmin,adminorderController.returnrequest)
 
 export default router;

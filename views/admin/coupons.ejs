@@ -234,9 +234,9 @@
                 </a>
             </div>
             <div class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-gift"></i>
-                    <span>Offers</span>
+                <a href="/admin/returnRequests" class="nav-link">
+                    <i class="fas fa-undo-alt"></i> 
+                    <span>Returns & Refunds</span>  
                 </a>
             </div>
             <div class="nav-item">
@@ -289,8 +289,9 @@
                                 <th>Code</th>
                                 <th>Discount Type</th>
                                 <th>Value</th>
+                                <th>Start Date</th>
                                 <th>Expiration</th>
-                                <th>Usage</th>
+                                
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -308,28 +309,40 @@
                                     <%= coupon.value %><%=coupon.discountType === 'percentage' ? '%' : '₹' %>
                                 </td>
                                 <td>
+                                    <span class="<%= new Date(coupon.startDate) > new Date() ? 'text-danger' : 'text-success' %>">
+                                        <%= new Date(coupon.startDate).toLocaleDateString() %>
+                                    </span>
+                                </td>
+                                
+                                <td>
                                     <span class="<%= new Date(coupon.expirationDate) < new Date() ? 'text-danger' : 'text-success' %>">
                                         <%= new Date(coupon.expirationDate).toLocaleDateString() %>
                                     </span>
                                 </td>
+                               
                                 <td>
-                                    <div class="progress bg-dark">
-                                        <div class="progress-bar bg-success" 
-                                             role="progressbar" 
-                                             style="width: <%= (coupon.usedCount/coupon.usageLimit)*100 %>%">
-                                            <%= coupon.usedCount %>/<%= coupon.usageLimit %>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <% if(new Date(coupon.expirationDate) < new Date()) { %>
+                                    <% 
+                                        const currentDate = new Date();
+                                        if (new Date(coupon.startDate) > currentDate) { 
+                                    %>
+                                        <span class="badge bg-secondary">Not Started</span>
+                                    <% 
+                                        } else if (new Date(coupon.expirationDate) < currentDate) { 
+                                    %>
                                         <span class="badge bg-danger">Expired</span>
-                                    <% } else if(coupon.usedCount >= coupon.usageLimit) { %>
+                                    <% 
+                                        } else if (coupon.usedCount >= coupon.usageLimit) { 
+                                    %>
                                         <span class="badge bg-warning">Limit Reached</span>
-                                    <% } else { %>
+                                    <% 
+                                        } else { 
+                                    %>
                                         <span class="badge bg-success">Active</span>
-                                    <% } %>
+                                    <% 
+                                        } 
+                                    %>
                                 </td>
+                                
                                 <td>
                                     <div class="btn-group">
                                         <a href="/admin/coupons/edit/<%= coupon._id %>" 

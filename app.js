@@ -13,6 +13,7 @@ import cookieParser from 'cookie-parser';
 import methodOverride from 'method-override';
 import { fileURLToPath } from 'url';
 import { isCheckAuth } from './middlewares/authMiddleware.js';
+import { homepage } from "./controllers/homeController.js";
 
 
 // Load environment variables
@@ -92,16 +93,24 @@ app.get('/auth/google/callback',
  
 
 
-// Logout route to destroy session
 app.get('/logout', (req, res) => {
     req.logout((err) => {
         res.redirect('/'); 
     });
 });
 
-
+app.get("/",homepage)
 app.use('/user', userRoutes);
 app.use('/admin', adminRoutes);
+app.use((req, res) => {
+    if (req.originalUrl.startsWith("/admin")) {
+        res.status(404).render("admin/error", { errorMessage: "Admin Page Not Found" });
+    } else {
+        res.status(404).render("user/error", { errorMessage: "Page Not Found" });
+    }
+});
+
+
 
 
 const PORT = process.env.PORT || 8010;

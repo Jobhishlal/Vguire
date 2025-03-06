@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wallet Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+   
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(120deg, #6366f1 0%, #4f46e5 100%);
+            --secondary-gradient: linear-gradient(120deg, #34d399 0%, #059669 100%);
+            --danger-gradient: linear-gradient(120deg, #f87171 0%, #dc2626 100%);
+        }
+
+        body {
+            background-color: #f1f5f9;
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            background: var(--primary-gradient);
+            padding: 2rem 0;
+            margin-bottom: -4rem;
+            color: white;
+        }
+
+        .stat-card {
+            border: none;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .balance-card {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .credit-card {
+            background: var(--secondary-gradient);
+            color: white;
+        }
+
+        .debit-card {
+            background: var(--danger-gradient);
+            color: white;
+        }
+
+        .transaction-item {
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .transaction-item:hover {
+            background-color: #f8fafc;
+            transform: translateX(5px);
+        }
+
+        .transaction-item.credit {
+            border-left-color: #34d399;
+        }
+
+        .transaction-item.debit {
+            border-left-color: #f87171;
+        }
+
+        .amount-badge {
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-weight: 600;
+        }
+
+        .amount-badge.credit {
+            background-color: rgba(52, 211, 153, 0.1);
+            color: #059669;
+        }
+
+        .amount-badge.debit {
+            background-color: rgba(248, 113, 113, 0.1);
+            color: #dc2626;
+        }
+
+        .action-button {
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .quick-action-card {
+            border: 2px dashed #e2e8f0;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .quick-action-card:hover {
+            border-color: #6366f1;
+            background-color: #f8fafc;
+        }
+
+        ..pagination-container {
+            margin-top: 2rem;
+        }
+
+        .page-link {
+            border-radius: 8px;
+            margin: 0 4px;
+            padding: 8px 16px;
+            color: #6366f1;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .page-link:hover {
+            background-color: #6366f1;
+            color: white;
+            border-color: #6366f1;
+        }
+
+        .page-item.active .page-link {
+            background-color: #6366f1;
+            border-color: #6366f1;
+        }
+
+        .page-item.disabled .page-link {
+            background-color: #f8fafc;
+            border-color: #e2e8f0;
+        }
+
+        
+.navbar {
+    padding: 1rem;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.navbar-brand img {
+    width: 60px;
+    margin-right: 50px;
+}
+
+@media (max-width: 992px) {
+    .navbar-brand img {
+        margin-right: 0;
+    }
+    
+    .nav-link {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .navbar .d-flex {
+        margin-top: 1rem;
+        justify-content: center;
+    }
+}
+
+.nav-link {
+    color: var(--primary-color);
+    margin: 0 1rem;
+    position: relative;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--secondary-color);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.login-btn {
+    background: var(--secondary-color);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.login-btn:hover {
+    background: #ff2e43;
+    color: white;
+    transform: translateY(-2px);
+}
+
+
+.footer {
+    background: black;
+    color: white;
+    padding: 4rem 0 2rem;
+}
+
+@media (max-width: 768px) {
+    .footer {
+        padding: 2rem 0 1rem;
+        text-align: center;
+    }
+    
+    .footer .col-md-4 {
+        margin-bottom: 2rem;
+    }
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 1rem;
+}
+
+.footer-links a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: var(--secondary-color);
+}
+
+
+    </style>
+</head>
+<body>
+    <!-- Dashboard Header -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="/image/Screenshot 2025-01-02 185508.png" alt="Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/shop">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                    <li class="nav-item">   
+                        <a class="nav-link" href="#">Profile</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    
+                    <a href="#" class="me-3"><i class="fas fa-search"></i></a>
+                    <a href="#" class="me-3"><i class="fas fa-shopping-cart"></i></a>
+                    <a href="#"><i class="fas fa-heart"></i></a>
+                </div>
+            </div>
+        </div>
+    </nav> 
+
+
+    <div class="container py-5" style="margin-top: 100px;">
+        <div class="row gy-4">
+            <!-- Stats Cards Row -->
+            <div class="col-md-4">
+                <div class="stat-card balance-card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="opacity-75">Total Balance</h5>
+                        <i class="fas fa-coins fa-2x opacity-50"></i>
+                    </div>
+                    <h2 class="mb-0 fw-bold">₹<%= wallet.balance.toFixed(2) %></h2>
+                    <p class="mt-2 mb-0 opacity-75">Available Funds</p>
+                </div>
+            </div>
+
+            
+
+            <!-- Quick Actions -->
+            <div class="col-12">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <a href="#" id="addMoneyBtn" class="text-decoration-none">
+                            <div class="quick-action-card p-4 text-center">
+                                <i class="fas fa-plus-circle fa-3x text-primary mb-3"></i>
+                                <h4>Add Money</h4>
+                                <p class="text-muted mb-0">Top up your wallet easily</p>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <% if (user) { %>
+                        <input type="hidden" id="userId" value="<%= user._id %>">
+                    <% } %>
+                    
+                   
+                </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="col-12">
+                <div class="stat-card p-4">
+                    <h3 class="mb-4">Recent Transactions</h3>
+                    
+                    <% if (wallet.transactions && wallet.transactions.length > 0) { %>
+                        <div class="transaction-list">
+                            <% wallet.transactions.slice(0, 5).forEach(txn => { %>
+                                <div class="transaction-item <%= txn.type %> p-3 mb-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <div class="transaction-icon me-3">
+                                                <% if (txn.type === 'credit' && txn.description.includes('Refund')) { %>
+                                                    <i class="fas fa-arrow-circle-down text-success fa-2x"></i>
+                                                <% } else { %>
+                                                    <i class="fas fa-arrow-circle-up text-danger fa-2x"></i>
+                                                <% } %>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1"><%= txn.description %></h6>
+                                                <small class="text-muted">
+                                                    <i class="far fa-clock me-1"></i>
+                                                    <%= new Date(txn.createdAt).toLocaleString() %>
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="amount-badge <%= txn.type %>">
+                                            ₹<%= txn.amount.toFixed(2) %>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }) %>
+                            
+                            <div class="pagination-container d-flex justify-content-center">
+                                <nav aria-label="Transaction navigation">
+                                    <ul class="pagination">
+                                        <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                            <a class="page-link" href="?page=<%= currentPage - 1 %>" <%= currentPage === 1 ? 'tabindex="-1" aria-disabled="true"' : '' %>>
+                                                <i class="fas fa-chevron-left"></i>
+                                            </a>
+                                        </li>
+                                        
+                                        <% for(let i = 1; i <= totalPages; i++) { %>
+                                            <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                                <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                                            </li>
+                                        <% } %>
+                                        
+                                        <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                                            <a class="page-link" href="?page=<%= currentPage + 1 %>" <%= currentPage === totalPages ? 'tabindex="-1" aria-disabled="true"' : '' %>>
+                                                <i class="fas fa-chevron-right"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <div class="text-center py-5">
+                            <i class="fas fa-receipt fa-4x text-muted mb-3"></i>
+                            <h5 class="text-muted">No transactions yet</h5>
+                            <p class="text-muted mb-0">Start by adding money to your wallet</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Back to Dashboard -->
+            <div class="col-12 text-center">
+                <a href="/user/profile" class="btn btn-secondary action-button">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+    <footer class="footer" style="display: block;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h4>About Us</h4>
+                    <p>We are committed to providing the best products and services to our customers.</p>
+                </div>
+                <div class="col-md-4">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Shop</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4>Contact Us</h4>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-phone me-2"></i> +1 234 567 890</li>
+                        <li><i class="fas fa-envelope me-2"></i> info@example.com</li>
+                        <li><i class="fas fa-map-marker-alt me-2"></i> 123 Street, City, Country</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <p>&copy; 2025 Your Company. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.getElementById("addMoneyBtn").addEventListener("click", async () => {
+    try {
+        const { value: amount } = await Swal.fire({
+            title: "Enter Amount",
+            input: "number",
+            inputAttributes: {
+                min: "1",
+                step: "1"
+            },
+            showCancelButton: true,
+            confirmButtonText: "Proceed",
+            cancelButtonText: "Cancel",
+            inputValidator: (value) => {
+                if (!value || isNaN(value) || value <= 0) {
+                    return "Please enter a valid amount!";
+                }
+            }
+        });
+
+        if (!amount) return; // If user cancels
+
+        const userId = document.getElementById("userId")?.value; // Fetch userId from hidden input
+
+        if (!userId) {
+            Swal.fire("Error", "User ID not found. Please log in again.", "error");
+            return;
+        }
+
+        Swal.fire({
+            title: "Processing...",
+            text: "Creating your order...",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        const orderRes = await fetch("/user/add-money", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount })
+        });
+
+        const orderData = await orderRes.json();
+        Swal.close();
+
+        if (!orderData.success) {
+            Swal.fire("Error", "Error creating order!", "error");
+            return;
+        }
+
+        const { order, razorpayKey } = orderData;
+        console.log(order);
+
+        const rzp = new Razorpay({
+            key: razorpayKey,
+            amount: order.amount,
+            currency: "INR",
+            order_id: order.id,
+            handler: async function (response) {
+                Swal.fire({
+                    title: "Verifying Payment...",
+                    text: "Please wait...",
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                const verifyRes = await fetch("/user/verify-payment", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_signature: response.razorpay_signature,
+                        amount: amount,
+                        userId: userId
+                    })
+                });
+
+                const verifyData = await verifyRes.json();
+                Swal.close();
+
+                if (verifyData.success) {
+                    Swal.fire("Success", "Amount successfully added!", "success").then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire("Error", "Payment verification failed!", "error");
+                }
+            },
+            modal: {
+                escape: false,
+                ondismiss: function () {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Payment Failed!",
+                        text: "You exited the payment process. Please try again.",
+                        confirmButtonText: "OK"
+                    });
+                }
+            }
+
+        });
+
+        rzp.open();
+    } catch (error) {
+        console.error("Error:", error);
+        Swal.fire("Error", "Something went wrong!", "error");
+    }
+});
+</script>
+
+</body>
+</html>

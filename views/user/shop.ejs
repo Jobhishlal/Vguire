@@ -64,7 +64,94 @@
     font-weight: bold;
     color: #333; /* Regular price if no discount */
 }
+.price-filter {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #fff;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    flex-wrap: wrap;
+    justify-content: center;
+}
 
+.price-filter label {
+    font-weight: 600;
+    color: #444;
+    font-size: 14px;
+}
+
+.price-filter input {
+    width: 130px;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.price-filter input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+#filterBtn {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+#filterBtn:hover {
+    background: linear-gradient(135deg, #0056b3, #003d80);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 600px) {
+    .price-filter {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .price-filter input {
+        width: 100%;
+    }
+}
+
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.pagination a {
+    padding: 8px 12px;
+    text-decoration: none;
+    border: 1px solid #007bff;
+    color: #007bff;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.pagination a:hover {
+    background: #007bff;
+    color: white;
+}
+
+.pagination a.active {
+    background: #007bff;
+    color: white;
+    font-weight: bold;
+}
 
 
 
@@ -116,7 +203,8 @@
         
         <a href="/user/cart" class="me-3">
             <i class="fas fa-shopping-cart"></i>
-            <% if (cartItems && cartItems.length > 0) { %>
+            <% if (typeof cartItems !== "undefined" && Array.isArray(cartItems) && cartItems.length > 0) { %>
+
                 <span class="badge bg-danger">
                     <%= cartItems.length %>
                 </span>
@@ -170,7 +258,15 @@
         <div class="row">
             <div class="col-md-4">
                 <div class="col-md-12">
-                    <div class="feature-box" style="background-image: url('<%= date[0] && date[0].images && date[0].images[0] ? date[0].images[0] : '' %>')">
+                  
+
+                    <% if (Array.isArray(date) && date.length > 0 && date[0].images && date[0].images.length > 0) { %>
+                        <div class="feature-box" style="background-image: url('<%= date[0].images[0] %>')">
+                    <% } else { %>
+                        <div class="feature-box" style="background-image: url('/path/to/default-image.jpg')"> <!-- Fallback image -->
+                    <% } %>
+                    
+
                         <div class="feature-content">
                             <h3>New Arrivals</h3>
                             <p>Check out our latest collection</p>
@@ -228,6 +324,16 @@
 
 
          </div>
+         <div class="price-filter">
+            <label for="minPrice">Min Price:</label>
+            <input type="number" id="minPrice" placeholder="Min Price" min="0">
+        
+            <label for="maxPrice">Max Price:</label>
+            <input type="number" id="maxPrice" placeholder="Max Price" min="0">
+        
+            <button id="filterBtn">Filter</button>
+        </div>
+        
 
          
          <div class="filters" style="margin-left: 50px; display: flex; align-items: center; gap: 12px;">
@@ -322,72 +428,21 @@
             </div>
             <span id="wishlist-count" hidden>(0)</span>
         </section>
+    
         
-
-        <!-- <section class="product-overview">
-            <div class="container">
-                <div class="row" id="productContainer">
-                    <% if (product && product.length > 0) { %>
-                        <% product.forEach(product => { %>
-                            <div class="col-md-4 product-item">
-                                <div class="product-card">
-                                    <a href="/user/productview/<%= product._id %>">
-                                        <div class="product-image-wrapper">
-                                            <img src="<%= product.images[0] %>" alt="<%= product.name %>" class="product-image">
-                                            <div class="product-overlay"></div>
-                                        </div>
-                                    </a>
-                                    
-                                    
-                                    <button class="wishlist-btn" onclick="toggleWishlist(event, '<%= product._id %>')" id="wishlist-<%= product._id %>">
-                                        <i class="fa-heart <%= wishlistProducts.includes(product._id.toString()) ? 'fas text-primary' : 'far text-black' %>"></i>
-                                    </button>
-                                    
-                                    
+        <div class="pagination">
+            <% if (currentpage > 1) { %>
+                <a href="?page=<%= currentpage - 1 %>&limit=10" class="prev">⏪ Previous</a>
+            <% } %>
         
-                                    <div class="product-info d-flex justify-content-between align-items-center">
-                                        <h3 class="product-title"><%= product.name %></h3>
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <a href="?page=<%= i %>&limit=10" class="<%= i === currentpage ? 'active' : '' %>"><%= i %></a>
+            <% } %>
         
-                                        <% if (product.avgRating && product.avgRating !== "No ratings yet") { %>
-                                            <div class="product-stars">
-                                                <% let rating = Math.round(product.avgRating); %>
-                                                <% for (let i = 1; i <= 5; i++) { %>
-                                                    <% if (i <= rating) { %>
-                                                        <i class="fas fa-star text-warning"></i> 
-                                                    <% } else { %>
-                                                        <i class="far fa-star text-warning"></i> 
-                                                    <% } %>
-                                                <% } %>
-                                            </div>
-                                        <% } %>
-                                    </div>
-                                    <span class="product-price">
-                                        ₹<% if (product.isOfferActive) { %>
-                                            <% if (product.offerType === "product") { %>
-                                                <%= product.Offerprice %>
-                                            <% } else if (product.offerType === "category") { %>
-                                                <%= (product.price - (product.price * product.discountPercentage / 100)).toFixed(2) %> 
-                                            <% } %>
-                                        <% } else { %>
-                                            <%= product.price %> 
-                                        <% } %>
-                                    </span>
-                                    <p class="product-price">₹<%= product.price %></p>
-                                    <a href="/user/productview/<%= product._id %>">
-                                        <button class="quick-view-btn">Quick View</button>
-                                    </a>
-                                </div>
-                            </div>
-                        <% }); %>
-                    <% } else { %>
-                        <p class="text-center">No products found matching your search.</p>
-                    <% } %>
-                </div>
-            </div>
-            <span id="wishlist-count" hidden>(0)</span>
-
-        </section> -->
-        
+            <% if (currentpage < totalPages) { %>
+                <a href="?page=<%= currentpage + 1 %>&limit=10" class="next">Next ⏩</a>
+            <% } %>
+        </div>
         
         
         
@@ -430,62 +485,173 @@
 
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
-    <script>
-  document.addEventListener("DOMContentLoaded", function () {
+<!-- 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
     AOS.init(); 
 
     const searchInput = document.getElementById("searchInput");
     const productContainer = document.getElementById("productContainer");
     const sortSelect = document.getElementById("sortSelect");
+    const categoryFilter = document.getElementById("categoryFilter");
+    const minPriceInput = document.getElementById("minPrice");
+    const maxPriceInput = document.getElementById("maxPrice");
+    const filterBtn = document.getElementById("filterBtn");
 
     let debounceTimer;
 
-    searchInput.addEventListener("input", function () {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(fetchProducts, 300);
-    });
+    // Store current filter state
+    let currentFilters = {
+        query: searchInput?.value?.trim() || "",
+        sort: sortSelect?.value || "",
+        category: categoryFilter?.value || "",
+        minPrice: minPriceInput?.value || "",
+        maxPrice: maxPriceInput?.value || ""
+    };
 
-    searchInput.addEventListener("keypress", function (e) {
-        if (e.key === "Enter") {
-            e.preventDefault();
+    // Update URL parameters to match current filters
+    function updateURLWithFilters() {
+        const url = new URL(window.location);
+        
+        // Clear existing parameters
+        url.search = "";
+        
+        // Add current filters to URL
+        if (currentFilters.query) url.searchParams.set("query", currentFilters.query);
+        if (currentFilters.sort) url.searchParams.set("sort", currentFilters.sort);
+        if (currentFilters.category) url.searchParams.set("category", currentFilters.category);
+        if (currentFilters.minPrice) url.searchParams.set("minPrice", currentFilters.minPrice);
+        if (currentFilters.maxPrice) url.searchParams.set("maxPrice", currentFilters.maxPrice);
+        
+        // Update URL without reloading the page
+        window.history.pushState({}, "", url);
+    }
+
+    // Initialize from URL parameters if any
+    function initializeFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        
+        if (params.has("query") && searchInput) searchInput.value = params.get("query");
+        if (params.has("sort") && sortSelect) sortSelect.value = params.get("sort");
+        if (params.has("category") && categoryFilter) categoryFilter.value = params.get("category");
+        if (params.has("minPrice") && minPriceInput) minPriceInput.value = params.get("minPrice");
+        if (params.has("maxPrice") && maxPriceInput) maxPriceInput.value = params.get("maxPrice");
+        
+        // Update the current filters object
+        currentFilters = {
+            query: params.get("query") || "",
+            sort: params.get("sort") || "",
+            category: params.get("category") || "",
+            minPrice: params.get("minPrice") || "",
+            maxPrice: params.get("maxPrice") || ""
+        };
+        
+        console.log("Initialized filters from URL:", currentFilters);
+    }
+
+    // Call this on page load
+    initializeFromURL();
+
+    // Search input event handlers
+    if (searchInput) {
+        searchInput.addEventListener("input", function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                currentFilters.query = this.value.trim();
+                fetchProducts();
+            }, 300);
+        });
+
+        searchInput.addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                currentFilters.query = this.value.trim();
+                fetchProducts();
+            }
+        });
+    }
+
+    // Sort select event handler
+    if (sortSelect) {
+        sortSelect.addEventListener("change", function() {
+            currentFilters.sort = this.value;
             fetchProducts();
-        }
-    });
+        });
+    }
 
-  
-    sortSelect.addEventListener("change", fetchProducts);
+    // Category filter event handler
+    if (categoryFilter) {
+        categoryFilter.addEventListener("change", function() {
+            currentFilters.category = this.value;
+            fetchProducts();
+        });
+    }
 
-   
+    // Price filter event handlers
+    if (filterBtn) {
+        filterBtn.addEventListener("click", function() {
+            currentFilters.minPrice = minPriceInput?.value || "";
+            currentFilters.maxPrice = maxPriceInput?.value || "";
+            fetchProducts();
+        });
+    }
+
+    // Main function to fetch products with all current filters
     async function fetchProducts() {
-        const query = searchInput.value.trim();
-        const sortValue = sortSelect.value;
+        console.log("Fetching products with filters:", currentFilters);
+        
+        let queryParams = new URLSearchParams();
+        
+        if (currentFilters.query) queryParams.append("query", currentFilters.query);
+        if (currentFilters.sort) queryParams.append("sort", currentFilters.sort);
+        if (currentFilters.category) queryParams.append("category", currentFilters.category);
+        if (currentFilters.minPrice) queryParams.append("minPrice", currentFilters.minPrice);
+        if (currentFilters.maxPrice) queryParams.append("maxPrice", currentFilters.maxPrice);
 
-        let url = `/user/shop?`;
-        if (query) url += `query=${encodeURIComponent(query)}&`;
-        if (sortValue) url += `sort=${sortValue}`;
-       
+        console.log("Query parameters:", queryParams.toString());
+        
+        let url = `/user/shop?${queryParams.toString()}`;
+
         try {
-            const response = await fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } });
+            const response = await fetch(url, { 
+                headers: { "X-Requested-With": "XMLHttpRequest" } 
+            });
+            
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
             const data = await response.json();
+            
+            // Update URL to reflect current filters
+            updateURLWithFilters();
+            
+            if (!productContainer) {
+                console.error("Product container element not found");
+                return;
+            }
+            
             productContainer.innerHTML = "";
 
             if (!data.products || data.products.length === 0) {
-                productContainer.innerHTML = "<p class='text-center'>No products found matching your search.</p>";
+                productContainer.innerHTML = "<p class='text-center'>No products found matching your criteria.</p>";
                 return;
             }
 
             renderProducts(data.products);
+            
+            // Update any filter UI elements to match the returned data.appliedFilters if needed
+            console.log("Applied filters from server:", data.appliedFilters);
+            
         } catch (error) {
             console.error("Error fetching products:", error);
-            productContainer.innerHTML = "<p class='text-center text-danger'>Something went wrong. Please try again.</p>";
+            if (productContainer) {
+                productContainer.innerHTML = "<p class='text-center text-danger'>Something went wrong. Please try again.</p>";
+            }
         }
     }
 
     function renderProducts(products) {
+        if (!productContainer) return;
+        
         productContainer.innerHTML = products
             .map(product => `
                 <div class="col-md-4 product-item">
@@ -494,8 +660,8 @@
                             <div class="product-image-wrapper">
                                 <img src="${product.images?.[0] || "/path/to/default-image.jpg"}" alt="${product.name}" class="product-image">
                                 <div class="product-overlay"></div>
-                                <button class="wishlist-btn">
-                                    <i class="far fa-heart"></i>
+                                <button class="wishlist-btn" id="wishlist-${product._id}" onclick="toggleWishlist(event, '${product._id}')">
+                                    <i class="${wishlistProducts && wishlistProducts.includes(product._id.toString()) ? 'fas text-primary' : 'far text-black'} fa-heart"></i>
                                 </button>
                             </div>
                         </a>
@@ -512,7 +678,6 @@
             `).join("");
     }
 
-
     function generateStarRating(avgRating) {
         if (!avgRating || avgRating === "No ratings yet") return "<div class='product-stars'></div>";
         let ratingHTML = '<div class="product-stars">';
@@ -524,7 +689,44 @@
 
         return ratingHTML + '</div>';
     }
+
+    // Access wishlistProducts variable for the renderProducts function
+    let wishlistProducts = [];
+    // Fetch wishlist data on page load if needed
+    if (document.getElementById("wishlist-count")) {
+        fetch("/user/wishlist/count")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Wishlist Count:", data.count);
+                document.getElementById("wishlist-count").innerText = `(${data.count})`;
+                
+                // If you have a wishlistProducts array available, update it here
+                if (data.products) {
+                    wishlistProducts = data.products;
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching wishlist count:", error);
+            });
+    }
+
+    // If filters are preset, trigger a product fetch on page load
+    if (window.location.search) {
+        fetchProducts();
+    }
+
+
+
+
+    
 });
+
+// Keep the existing toggleWishlist function outside the DOMContentLoaded event
 function toggleWishlist(event, productId) {
     event.stopPropagation();
     event.preventDefault();
@@ -587,30 +789,403 @@ function toggleWishlist(event, productId) {
         })
         .catch(error => {
             console.log(error);
-            
             console.error("Error fetching wishlist count:", error);
             Swal.fire("Error!", "Could not check wishlist count.", "error");
         });
 }
 
-fetch("/user/wishlist/count")
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log("Wishlist Count:", data.count);
-        document.getElementById("wishlist-count").innerText = `(${data.count})`;
-    })
-    .catch(error => {
-        console.error("Error fetching wishlist count:", error);
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".pagination a").forEach(link => {
+        link.addEventListener("click", async (e) => {
+            e.preventDefault();
+            const url = e.target.href;
+
+            const response = await fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } });
+            const data = await response.json();
+
+            const productContainer = document.querySelector("#productContainer");
+            if (productContainer) {
+                productContainer.innerHTML = data.products.map(product => `
+                    <div class="col-md-4 product-item">
+                        <div class="product-card">
+                            <a href="/user/productview/${product._id}">
+                                <div class="product-image-wrapper">
+                                    <img src="${product.images?.[0] || "/path/to/default-image.jpg"}" alt="${product.name}" class="product-image">
+                                    <div class="product-overlay"></div>
+                                    <button class="wishlist-btn" id="wishlist-${product._id}" onclick="toggleWishlist(event, '${product._id}')">
+                                        <i class="${wishlistProducts && wishlistProducts.includes(product._id.toString()) ? 'fas text-primary' : 'far text-black'} fa-heart"></i>
+                                    </button>
+                                </div>
+                            </a>
+                            <div class="product-info d-flex justify-content-between align-items-center">
+                                <h3 class="product-title">${product.name}</h3>
+                                ${generateStarRating(product.avgRating)}
+                            </div>
+                            <p class="product-price">₹${product.price}</p>
+                            <a href="/user/productview/${product._id}">
+                                <button class="quick-view-btn">Quick View</button>
+                            </a>
+                        </div>
+                    </div>
+                `).join("");
+            }
+
+            const paginationContainer = document.querySelector(".pagination");
+            if (paginationContainer) {
+                paginationContainer.innerHTML = `
+                    ${data.currentPage > 1 ? `<a href="?page=${data.currentPage - 1}&limit=10">⏪ Previous</a>` : ""}
+                    ${Array.from({ length: data.totalPages }, (_, i) =>
+                        `<a href="?page=${i + 1}&limit=10" class="${i + 1 === data.currentPage ? 'active' : ''}">${i + 1}</a>`
+                    ).join("")}
+                    ${data.currentPage < data.totalPages ? `<a href="?page=${data.currentPage + 1}&limit=10">Next ⏩</a>` : ""}
+                `;
+            }
+        });
     });
+});
 
 
+</script> -->
+<script>document.addEventListener("DOMContentLoaded", function () {
+    AOS.init();
 
-    </script>
-    
+    const searchInput = document.getElementById("searchInput");
+    const productContainer = document.getElementById("productContainer");
+    const sortSelect = document.getElementById("sortSelect");
+    const categoryFilter = document.getElementById("categoryFilter");
+    const minPriceInput = document.getElementById("minPrice");
+    const maxPriceInput = document.getElementById("maxPrice");
+    const filterBtn = document.getElementById("filterBtn");
+
+    let debounceTimer;
+    let wishlistProducts = []; // Declare wishlistProducts here
+
+    // Store current filter state
+    let currentFilters = {
+        query: searchInput?.value?.trim() || "",
+        sort: sortSelect?.value || "",
+        category: categoryFilter?.value || "",
+        minPrice: minPriceInput?.value || "",
+        maxPrice: maxPriceInput?.value || ""
+    };
+
+    // Update URL parameters to match current filters
+    function updateURLWithFilters() {
+        const url = new URL(window.location);
+        url.search = "";
+        if (currentFilters.query) url.searchParams.set("query", currentFilters.query);
+        if (currentFilters.sort) url.searchParams.set("sort", currentFilters.sort);
+        if (currentFilters.category) url.searchParams.set("category", currentFilters.category);
+        if (currentFilters.minPrice) url.searchParams.set("minPrice", currentFilters.minPrice);
+        if (currentFilters.maxPrice) url.searchParams.set("maxPrice", currentFilters.maxPrice);
+        window.history.pushState({}, "", url);
+    }
+
+    // Initialize from URL parameters if any
+    function initializeFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has("query") && searchInput) searchInput.value = params.get("query");
+        if (params.has("sort") && sortSelect) sortSelect.value = params.get("sort");
+        if (params.has("category") && categoryFilter) categoryFilter.value = params.get("category");
+        if (params.has("minPrice") && minPriceInput) minPriceInput.value = params.get("minPrice");
+        if (params.has("maxPrice") && maxPriceInput) maxPriceInput.value = params.get("maxPrice");
+
+        currentFilters = {
+            query: params.get("query") || "",
+            sort: params.get("sort") || "",
+            category: params.get("category") || "",
+            minPrice: params.get("minPrice") || "",
+            maxPrice: params.get("maxPrice") || ""
+        };
+
+        console.log("Initialized filters from URL:", currentFilters);
+    }
+
+    // Call this on page load
+    initializeFromURL();
+
+    // Search input event handlers
+    if (searchInput) {
+        searchInput.addEventListener("input", function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                currentFilters.query = this.value.trim();
+                fetchProducts();
+            }, 300);
+        });
+
+        searchInput.addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                currentFilters.query = this.value.trim();
+                fetchProducts();
+            }
+        });
+    }
+
+    // Sort select event handler
+    if (sortSelect) {
+        sortSelect.addEventListener("change", function() {
+            currentFilters.sort = this.value;
+            fetchProducts();
+        });
+    }
+
+    // Category filter event handler
+    if (categoryFilter) {
+        categoryFilter.addEventListener("change", function() {
+            currentFilters.category = this.value;
+            fetchProducts();
+        });
+    }
+
+    // Price filter event handlers
+    if (filterBtn) {
+        filterBtn.addEventListener("click", function() {
+            currentFilters.minPrice = minPriceInput?.value || "";
+            currentFilters.maxPrice = maxPriceInput?.value || "";
+            fetchProducts();
+        });
+    }
+
+    // Main function to fetch products with all current filters
+    async function fetchProducts() {
+        console.log("Fetching products with filters:", currentFilters);
+
+        let queryParams = new URLSearchParams();
+        if (currentFilters.query) queryParams.append("query", currentFilters.query);
+        if (currentFilters.sort) queryParams.append("sort", currentFilters.sort);
+        if (currentFilters.category) queryParams.append("category", currentFilters.category);
+        if (currentFilters.minPrice) queryParams.append("minPrice", currentFilters.minPrice);
+        if (currentFilters.maxPrice) queryParams.append("maxPrice", currentFilters.maxPrice);
+
+        console.log("Query parameters:", queryParams.toString());
+
+        let url = `/user/shop?${queryParams.toString()}`;
+
+        try {
+            const response = await fetch(url, {
+                headers: { "X-Requested-With": "XMLHttpRequest" }
+            });
+
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+            const data = await response.json();
+
+            // Update URL to reflect current filters
+            updateURLWithFilters();
+
+            if (!productContainer) {
+                console.error("Product container element not found");
+                return;
+            }
+
+            productContainer.innerHTML = "";
+
+            if (!data.products || data.products.length === 0) {
+                productContainer.innerHTML = "<p class='text-center'>No products found matching your criteria.</p>";
+                return;
+            }
+
+            renderProducts(data.products);
+
+            console.log("Applied filters from server:", data.appliedFilters);
+
+        } catch (error) {
+            console.error("Error fetching products:", error);
+            if (productContainer) {
+                productContainer.innerHTML = "<p class='text-center text-danger'>Something went wrong. Please try again.</p>";
+            }
+        }
+    }
+
+    function renderProducts(products) {
+        if (!productContainer) return;
+
+        productContainer.innerHTML = products
+            .map(product => `
+                <div class="col-md-4 product-item">
+                    <div class="product-card">
+                        <a href="/user/productview/${product._id}">
+                            <div class="product-image-wrapper">
+                                <img src="${product.images?.[0] || "/path/to/default-image.jpg"}" alt="${product.name}" class="product-image">
+                                <div class="product-overlay"></div>
+                                <button class="wishlist-btn" id="wishlist-${product._id}" onclick="toggleWishlist(event, '${product._id}')">
+                                    <i class="${wishlistProducts.includes(product._id.toString()) ? 'fas text-primary' : 'far text-black'} fa-heart"></i>
+                                </button>
+                            </div>
+                        </a>
+                        <div class="product-info d-flex justify-content-between align-items-center">
+                            <h3 class="product-title">${product.name}</h3>
+                            ${generateStarRating(product.avgRating)}
+                        </div>
+                        <p class="product-price">₹${product.price}</p>
+                        <a href="/user/productview/${product._id}">
+                            <button class="quick-view-btn">Quick View</button>
+                        </a>
+                    </div>
+                </div>
+            `).join("");
+    }
+
+    function generateStarRating(avgRating) {
+        if (!avgRating || avgRating === "No ratings yet") return "<div class='product-stars'></div>";
+        let ratingHTML = '<div class="product-stars">';
+        let rating = Math.round(avgRating);
+
+        for (let i = 1; i <= 5; i++) {
+            ratingHTML += i <= rating ? '<i class="fas fa-star text-warning"></i>' : '<i class="far fa-star text-warning"></i>';
+        }
+
+        return ratingHTML + '</div>';
+    }
+
+    // Fetch wishlist data on page load if needed
+    if (document.getElementById("wishlist-count")) {
+        fetch("/user/wishlist/count")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Wishlist Count:", data.count);
+                document.getElementById("wishlist-count").innerText = `(${data.count})`;
+
+                if (data.products) {
+                    wishlistProducts = data.products;
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching wishlist count:", error);
+            });
+    }
+
+    // If filters are preset, trigger a product fetch on page load
+    if (window.location.search) {
+        fetchProducts();
+    }
+
+    // Pagination event listener
+    function setupPagination() {
+        document.querySelectorAll(".pagination a").forEach(link => {
+            link.addEventListener("click", async (e) => {
+                e.preventDefault();
+                const url = e.target.href;
+
+                const response = await fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } });
+                const data = await response.json();
+
+                if (productContainer) {
+                    productContainer.innerHTML = data.products.map(product => `
+                        <div class="col-md-4 product-item">
+                            <div class="product-card">
+                                <a href="/user/productview/${product._id}">
+                                    <div class="product-image-wrapper">
+                                        <img src="${product.images?.[0] || "/path/to/default-image.jpg"}" alt="${product.name}" class="product-image">
+                                        <div class="product-overlay"></div>
+                                        <button class="wishlist-btn" id="wishlist-${product._id}" onclick="toggleWishlist(event, '${product._id}')">
+                                            <i class="${wishlistProducts.includes(product._id.toString()) ? 'fas text-primary' : 'far text-black'} fa-heart"></i>
+                                        </button>
+                                    </div>
+                                </a>
+                                <div class="product-info d-flex justify-content-between align-items-center">
+                                    <h3 class="product-title">${product.name}</h3>
+                                    ${generateStarRating(product.avgRating)}
+                                </div>
+                                <p class="product-price">₹${product.price}</p>
+                                <a href="/user/productview/${product._id}">
+                                    <button class="quick-view-btn">Quick View</button>
+                                </a>
+                            </div>
+                        </div>
+                    `).join("");
+                }
+
+                const paginationContainer = document.querySelector(".pagination");
+                if (paginationContainer) {
+                    paginationContainer.innerHTML = `
+                        ${data.currentPage > 1 ? `<a href="?page=${data.currentPage - 1}&limit=10">⏪ Previous</a>` : ""}
+                        ${Array.from({ length: data.totalPages }, (_, i) =>
+                            `<a href="?page=${i + 1}&limit=10" class="${i + 1 === data.currentPage ? 'active' : ''}">${i + 1}</a>`
+                        ).join("")}
+                        ${data.currentPage < data.totalPages ? `<a href="?page=${data.currentPage + 1}&limit=10">Next ⏩</a>` : ""}
+                    `;
+                }
+
+                // Re-attach event listeners to new pagination links
+                setupPagination();
+            });
+        });
+    }
+
+    // Initial setup of pagination event listeners
+    setupPagination();
+});
+
+// Keep the existing toggleWishlist function outside the DOMContentLoaded event
+function toggleWishlist(event, productId) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    let wishlistBtn = document.getElementById(`wishlist-${productId}`);
+    let icon = wishlistBtn.querySelector("i");
+    let isAdded = icon.classList.contains("fas");
+
+    fetch("/user/wishlist/count")
+        .then(response => response.json())
+        .then(data => {
+            const wishlistCount = data.count || 0;
+
+            if (!isAdded && wishlistCount >= 5) {
+                Swal.fire("Limit Reached!", "You can only have 5 items in your wishlist.", "warning");
+                return;
+            }
+
+            Swal.fire({
+                title: isAdded ? "Remove from Wishlist?" : "Add to Wishlist?",
+                text: isAdded ? "Are you sure you want to remove this item from your wishlist?" : "Do you want to add this item to your wishlist?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: isAdded ? "Yes, Remove" : "Yes, Add"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch("/user/wishlist/toggle", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ productId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (data.added) {
+                                icon.classList.remove("far", "text-black");
+                                icon.classList.add("fas", "text-primary");
+                                Swal.fire("Added!", "Product added to wishlist.", "success");
+                            } else {
+                                icon.classList.remove("fas", "text-primary");
+                                icon.classList.add("far", "text-black");
+                                Swal.fire("Removed!", "Product removed from wishlist.", "success");
+                            }
+                        } else {
+                            Swal.fire("Error!", data.message || "Something went wrong!", "error");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        Swal.fire("Error!", "Failed to update wishlist.", "error");
+                    });
+                }
+            });
+        })
+        .catch(error => {
+            console.error("Error fetching wishlist count:", error);
+            Swal.fire("Error!", "Could not check wishlist count.", "error");
+        });
+}
+</script>
 </body>
 </html>

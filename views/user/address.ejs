@@ -83,7 +83,7 @@
         }
 
         .main-content {
-            padding: 10rem 0;
+            padding: 2rem 0;
            
             background: #f8fafc;
         }
@@ -259,6 +259,40 @@
                 margin: 1rem 0;
             }
         }
+        .breadcrumb {
+    list-style: none;
+    display: flex;
+    gap: 8px;
+    font-size: 14px;
+    padding: 10px 0;
+}
+
+.breadcrumb li {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb li a {
+    text-decoration: none;
+    color: #007bff; /* Blue color */
+    font-weight: 500;
+    transition: color 0.3s ease-in-out;
+}
+
+.breadcrumb li a:hover {
+    color: #0056b3; /* Darker blue on hover */
+}
+
+.breadcrumb li::after {
+    content: "›"; /* Breadcrumb separator */
+    margin: 0 8px;
+    color: #666;
+}
+
+.breadcrumb li:last-child::after {
+    content: ""; /* Remove separator from last item */
+}
+
     </style>
 </head>
 <body>
@@ -286,24 +320,29 @@
                         <a class="nav-link" href="#">Contact</a>
                     </li>
                     <li class="nav-item">   
-                        <a class="nav-link" href="#">Profile</a>
+                        <a class="nav-link" href="/user/profile">Profile</a>
                     </li>
                 </ul>
-                <div class="d-flex align-items-center">
-                    
-                    <a href="#" class="me-3"><i class="fas fa-search"></i></a>
-                    <a href="/user/cart" class="me-3"><i class="fas fa-shopping-cart"></i></a>
-                    <a href="#"><i class="fas fa-heart"></i></a>
-                </div>
             </div>
         </div>
-    </nav> 
+    </nav>
+    
+    <!-- Breadcrumb Section (Move it below the navbar) -->
+    <div class="container" style="margin-top: 100px;">
+        <ul class="breadcrumb">
+            <% breadcrumbs.forEach(breadcrumb => { %>
+                <li><a href="<%= breadcrumb.url %>"><%= breadcrumb.name %></a></li>
+            <% }) %>
+        </ul>
+    </div>
+    
+   
 
 
     <!-- Just the main content section -->
-    <div class="main-content" style="margin-bottom: 40px;">
-        <div class="container">
-            <div class="card address-form-card mb-5 " >
+    <div class="main-content " >
+        <div class="container" style="margin-bottom: 30px;">
+            <div class="card address-form-card " >
                 <div class="card-header">
                     <h4 class="m-0"><i class="fas fa-plus-circle me-2"></i>Add New Address</h4>
                 </div>

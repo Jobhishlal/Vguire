@@ -317,6 +317,40 @@
 .footer-links a:hover {
     color: var(--secondary-color);
 }
+.breadcrumb {
+    list-style: none;
+    display: flex;
+    gap: 8px;
+    font-size: 14px;
+    padding: 10px 0;
+}
+
+.breadcrumb li {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb li a {
+    text-decoration: none;
+    color: #007bff; /* Blue color */
+    font-weight: 500;
+    transition: color 0.3s ease-in-out;
+}
+
+.breadcrumb li a:hover {
+    color: #0056b3; /* Darker blue on hover */
+}
+
+.breadcrumb li::after {
+    content: "›"; /* Breadcrumb separator */
+    margin: 0 8px;
+    color: #666;
+}
+
+.breadcrumb li:last-child::after {
+    content: ""; /* Remove separator from last item */
+}
+
 
     
   </style>
@@ -358,7 +392,16 @@
         </div>
     </div>
 </nav> 
-  <div class="checkout-wrapper" style="margin-top: 150px;">
+
+
+<div class="container" style="margin-top: 100px;">
+  <ul class="breadcrumb">
+      <% breadcrumbs.forEach(breadcrumb => { %>
+          <li><a href="<%= breadcrumb.url %>"><%= breadcrumb.name %></a></li>
+      <% }) %>
+  </ul>
+</div>
+  <div class="checkout-wrapper" style="margin-top: 30px;">
     
     
     <div class="row">
@@ -413,6 +456,9 @@
               View Available Coupons
           </button>
           <p id="couponMessage" class="mt-2 text-success"></p>
+          <p id="couponMessage" class="mt-2 text-success"></p>
+          <button id="removeCouponBtn" class="btn btn-danger d-none">Remove Coupon</button>
+
       </div>
       
       <!-- Coupon Modal -->
@@ -511,7 +557,8 @@
             <% }); %>
         
             <!-- Hidden Input for Total Amount -->
-            <input type="hidden" name="totalAmount" id="totalAmount" value="<%= totalAmount %>">
+            <input type="hidden" name="totalAmount" id="totalAmount" value="<%= totalAmount %>" data-original-amount="<%= totalAmount %>">
+
         
             <!-- Payment Method Selection -->
             <div class="mb-4">
@@ -519,6 +566,7 @@
                 <select id="paymentMethod" name="paymentMethod" class="form-select" required>
                     <option value="COD">Cash on Delivery</option>
                     <option value="UPI">Online Payment</option>
+                    <option value="Wallet">Wallet Payment</option>
                 </select>
             </div>
         
@@ -660,12 +708,166 @@
   <script>
 
 
+
+
+// document.getElementById("checkoutForm").addEventListener("submit", async function(event) {
+//     event.preventDefault();
+
+//     const totalAmount = parseFloat(document.getElementById("totalAmount").value);
+//     const paymentMethod = document.getElementById("paymentMethod").value;
+//     const addressId = document.querySelector("input[name='addressId']")?.value;
+    
+//     const items = Array.from(document.querySelectorAll("input[name^='items']"))
+//         .reduce((acc, input) => {
+//             const matches = input.name.match(/items\[(\d+)\]\[(.+)\]/);
+//             if (matches) {
+//                 const [_, index, key] = matches;
+//                 acc[index] = acc[index] || {};
+//                 acc[index][key] = input.value;
+//             }
+//             return acc;
+//         }, []);
+
+//     if (!addressId || items.length === 0) {
+//         Swal.fire("Error", "Address and items are required to place an order.", "error");
+//         return;
+//     }
+//     if (paymentMethod === "COD" && totalAmount > 1000) {
+//     Swal.fire("Error", "Cash on Delivery is not available for orders above ₹1000. Please choose another payment method.", "error");
+//     return;
+
+//         Swal.fire({
+//             title: "Order Placed!",
+//             text: "Your order has been placed successfully.",
+//             icon: "success",
+//             confirmButtonText: "OK",
+//             allowOutsideClick: false
+//         }).then((result) => {
+//             if (result.isConfirmed) {
+//                 event.target.submit();
+//             }
+//         });
+
+//     } else if (paymentMethod === "UPI") {
+//         try {
+//             const response = await fetch("/user/checkout/razorpay-order", {
+//                 method: "POST",
+//                 headers: { "Content-Type": "application/json" },
+//                 body: JSON.stringify({ amount: totalAmount, addressId, items })
+//             });
+
+//             const order = await response.json();
+            
+//             if (!order || !order.id) {
+//                 Swal.fire("Error", "Failed to create Razorpay order.", "error");
+//                 return;
+//             }
+
+//             const userId = order.userId;
+            
+//             if (!userId) {
+//                 Swal.fire("Error", "User authentication issue. Please log in again.", "error");
+//                 return;
+//             }
+
+//             const options = {
+//                 key: order.razorpayKey,
+//                 amount: order.amount,
+//                 currency: "INR",
+//                 name: "VGUIRE Ecommerce",
+//                 description: "Order Payment",
+//                 order_id: order.id,
+//                 handler: async function (response) {
+//                     const verifyResponse = await fetch("/user/checkout/verify-payment", {
+//                         method: "POST",
+//                         headers: { "Content-Type": "application/json" },
+//                         body: JSON.stringify({ 
+//                             ...response, 
+//                             addressId, 
+//                             items,
+//                             totalAmount,
+//                             userId
+//                         })
+//                     })
+                    
+
+//                     const verificationResult = await verifyResponse.json();
+//                     if (verificationResult.success) {
+//                         Swal.fire({
+//                             title: "Payment Successful!",
+//                             text: "Congratulations! Your order is confirmed.",
+//                             icon: "success",
+//                             confirmButtonText: "OK",
+//                             allowOutsideClick: false
+//                         }).then(() => {
+//                             window.location.href = "/user/order-success";
+//                         });
+//                     } else {
+//                         Swal.fire("Payment Failed", "Transaction could not be verified.", "error");
+//                     }
+//                 }, modal: {
+//                     escape: false, 
+//                     ondismiss: function () {
+//                         Swal.fire({
+//                             icon: "error",
+//                             title: "Payment Failed!",
+//                             text: "You exited the payment process. Please try again.",
+//                             confirmButtonText: "OK"
+//                         });
+//                     }
+//                 },
+//                 theme: { color: "#3399cc" }
+//             };
+
+//             const razorpay = new window.Razorpay(options);
+//             razorpay.open();
+//         } catch (error) {
+//             console.error("Payment Error:", error);
+//             Swal.fire("Error", "Something went wrong. Please try again.", "error");
+//         }
+
+//     } else if (paymentMethod === "Wallet") {
+//       try {
+//         const response = await fetch("/user/checkout/placeorderwallet", {
+//             method: "POST",
+//             headers: { "Content-Type": "application/json" },
+//             body: JSON.stringify({ totalAmount, addressId, items })
+//         });
+
+//         const textResponse = await response.text();
+
+//         try {
+//             const walletOrderResult = JSON.parse(textResponse); 
+//             if (walletOrderResult.success) {
+//                 Swal.fire({
+//                     title: "Payment Successful!",
+//                     text: "Your order has been placed using wallet balance.",
+//                     icon: "success",
+//                     confirmButtonText: "OK",
+//                     allowOutsideClick: false
+//                 }).then(() => {
+//                     window.location.href = "/user/order-success";
+//                 });
+//             } else {
+//                 Swal.fire("Error", walletOrderResult.message || "Something went wrong.", "error");
+//             }
+//         } catch (jsonError) {
+//             console.error("JSON Parsing Error:", jsonError, textResponse);
+//             Swal.fire("Error", "Unexpected response from server.", "error");
+//         }
+//     } catch (error) {
+//         console.error("Wallet Payment Fetch Error:", error);
+//         Swal.fire("Error", "Something went wrong. Please try again.", "error");
+//     }
+//     }
+// });
 document.getElementById("checkoutForm").addEventListener("submit", async function(event) {
     event.preventDefault();
 
-    const totalAmount = document.getElementById("totalAmount").value;
+    const totalAmount = parseFloat(document.getElementById("totalAmount").value);
     const paymentMethod = document.getElementById("paymentMethod").value;
     const addressId = document.querySelector("input[name='addressId']")?.value;
+
     const items = Array.from(document.querySelectorAll("input[name^='items']"))
         .reduce((acc, input) => {
             const matches = input.name.match(/items\[(\d+)\]\[(.+)\]/);
@@ -682,20 +884,12 @@ document.getElementById("checkoutForm").addEventListener("submit", async functio
         return;
     }
 
-    if (paymentMethod === "COD") {
-        Swal.fire({
-            title: "Order Placed!",
-            text: "Your order has been placed successfully.",
-            icon: "success",
-            confirmButtonText: "OK",
-            allowOutsideClick: false
-        }).then((result) => {
-            if (result.isConfirmed) {
-                event.target.submit();
-            }
-        });
-        
-    } else if (paymentMethod === "UPI") {
+    if (paymentMethod === "COD" && totalAmount > 1000) {
+        Swal.fire("Error", "Cash on Delivery is not available for orders above ₹1000. Please choose another payment method.", "error");
+        return;
+    }
+
+    if (paymentMethod === "UPI") {
         try {
             const response = await fetch("/user/checkout/razorpay-order", {
                 method: "POST",
@@ -704,18 +898,15 @@ document.getElementById("checkoutForm").addEventListener("submit", async functio
             });
 
             const order = await response.json();
-            console.log("order",order);
-            
+
             if (!order || !order.id) {
                 Swal.fire("Error", "Failed to create Razorpay order.", "error");
                 return;
             }
 
             const userId = order.userId;
-            console.log(userId);
-            
+
             if (!userId) {
-                console.error("User ID not received from server.");
                 Swal.fire("Error", "User authentication issue. Please log in again.", "error");
                 return;
             }
@@ -728,30 +919,23 @@ document.getElementById("checkoutForm").addEventListener("submit", async functio
                 description: "Order Payment",
                 order_id: order.id,
                 handler: async function (response) {
-                  
                     const verifyResponse = await fetch("/user/checkout/verify-payment", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ 
-                            ...response, 
-                            addressId, 
+                        body: JSON.stringify({
+                            ...response,
+                            addressId,
                             items,
                             totalAmount,
-                            userId,
-                            
+                            userId
                         })
                     });
-                    console.log( addressId, 
-                            items,
-                            totalAmount,
-                            userId);
-                    
 
                     const verificationResult = await verifyResponse.json();
                     if (verificationResult.success) {
                         Swal.fire({
                             title: "Payment Successful!",
-                            text: "congratulations your order confirmed",
+                            text: "Congratulations! Your order is confirmed.",
                             icon: "success",
                             confirmButtonText: "OK",
                             allowOutsideClick: false
@@ -759,7 +943,47 @@ document.getElementById("checkoutForm").addEventListener("submit", async functio
                             window.location.href = "/user/order-success";
                         });
                     } else {
-                        Swal.fire("Payment Failed", "Transaction could not be verified.", "error");
+                        Swal.fire({
+                            icon: "error",
+                            title: "Payment Failed!",
+                            text: "Transaction could not be verified. Do you want to retry the payment?",
+                            showCancelButton: true,
+                            confirmButtonText: "Retry",
+                            cancelButtonText: "Cancel"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Retry payment logic
+                                razorpay.open();
+                            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                // Store order with payment status as pending
+                                storeOrderAsPending(order.id, addressId, items, totalAmount, userId);
+                            }
+                        });
+                    }
+                },
+                modal: {
+                    escape: false,
+                    ondismiss: function () {
+                        Swal.fire({
+                            icon: "question",
+                            title: "Payment Cancelled!",
+                            text: "Do you want to retry the payment or place the order with payment status as Pending?",
+                            showCancelButton: true,
+                            confirmButtonText: "Retry",
+                            cancelButtonText: "Place Order",
+                            showDenyButton: true,
+                            denyButtonText: "Cancel Order"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Retry payment logic
+                                razorpay.open();
+                            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                // Place order with payment status as pending
+                                storeOrderAsPending(order.id, addressId, items, totalAmount, userId);
+                            } else if (result.isDenied) {
+                                Swal.fire("Order Cancelled", "Your order has been cancelled.", "info");
+                            }
+                        });
                     }
                 },
                 theme: { color: "#3399cc" }
@@ -768,13 +992,103 @@ document.getElementById("checkoutForm").addEventListener("submit", async functio
             const razorpay = new window.Razorpay(options);
             razorpay.open();
         } catch (error) {
-          console.log(error);
-          
             console.error("Payment Error:", error);
+            Swal.fire("Error", "Something went wrong. Please try again.", "error");
+        }
+    } else if (paymentMethod === "Wallet") {
+        try {
+            const response = await fetch("/user/checkout/placeorderwallet", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ totalAmount, addressId, items })
+            });
+
+            const textResponse = await response.text();
+
+            try {
+                const walletOrderResult = JSON.parse(textResponse);
+                if (walletOrderResult.success) {
+                    Swal.fire({
+                        title: "Payment Successful!",
+                        text: "Your order has been placed using wallet balance.",
+                        icon: "success",
+                        confirmButtonText: "OK",
+                        allowOutsideClick: false
+                    }).then(() => {
+                        window.location.href = "/user/order-success";
+                    });
+                } else {
+                    Swal.fire("Error", walletOrderResult.message || "Something went wrong.", "error");
+                }
+            } catch (jsonError) {
+                console.error("JSON Parsing Error:", jsonError, textResponse);
+                Swal.fire("Error", "Unexpected response from server.", "error");
+            }
+        } catch (error) {
+            console.error("Wallet Payment Fetch Error:", error);
             Swal.fire("Error", "Something went wrong. Please try again.", "error");
         }
     }
 });
+async function storeOrderAsPending(orderId, addressId, items, totalAmount, userId, couponCode = 0, discountAmount = 0, appliedCoupon = null, couponDetails = null) {
+    // Ensure totalAmount is a number
+    totalAmount = parseFloat(totalAmount);
+
+    if (isNaN(totalAmount)) {
+        console.error("totalAmount is not a valid number:", totalAmount);
+        Swal.fire("Error", "Invalid total amount. Please try again.", "error");
+        return;
+    }
+
+    const estimatedDeliveryDate = new Date();
+    estimatedDeliveryDate.setDate(estimatedDeliveryDate.getDate() + 5);
+
+    const payload = {
+        razorpay_order_id: orderId,
+        razorpay_payment_id: null,
+        razorpay_signature: null,
+        addressId,
+        items,
+        totalAmount: totalAmount + discountAmount,
+        userId,
+        couponCode,
+        paymentStatus: "Pending",
+        orderStatus: "Pending",
+        couponDiscount: discountAmount,
+        appliedCoupon,
+        paymentMethod: "UPI",
+        deliveryDate: estimatedDeliveryDate,
+        couponDetails
+    };
+
+    console.log("Payload being sent to server:", payload);
+
+    try {
+        const response = await fetch("/user/checkout/verify-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Server responded with status:", response.status, "and text:", errorText);
+            Swal.fire("Error", `Failed to save the order. Server responded with: ${errorText}`, "error");
+            return;
+        }
+
+        const result = await response.json();
+        if (result.success) {
+            Swal.fire("Order Saved", "Your order has been saved with a pending status.", "success");
+        } else {
+            Swal.fire("Error", "Failed to save the order. Please try again.", "error");
+        }
+    } catch (error) {
+        console.error("Error storing order:", error);
+        Swal.fire("Error", "Something went wrong while saving the order. Please try again.", "error");
+    }
+}
+
 
 
 document.querySelectorAll(".updateQuantityForm").forEach(form => {
@@ -874,10 +1188,19 @@ document.getElementById("editAddressForm").addEventListener("submit", async func
             icon: "success",
             title: "Address Updated",
             text: "Your address has been successfully updated.",
-            timer: 1500,
-            showConfirmButton: false
-        }).then(() => {
+            timer: 15000,
+            showConfirmButton: false,
+            
+           
+            
+        },console.log(window.location.href) , console.log(data.redirectUrl)
+        
+        ).then(() => {
+          console.log(window.location.href);
+          
             window.location.href = data.redirectUrl;
+            console.log(data.redirectUrl);
+            
         });
 
     } catch (error) {
@@ -894,7 +1217,93 @@ document.getElementById("editAddressForm").addEventListener("submit", async func
 function updateHiddenQuantity(input) {
       input.setAttribute("value", input.value);
   }
-  document.addEventListener("DOMContentLoaded", () => {
+
+
+//   document.addEventListener("DOMContentLoaded", () => {
+//     document.querySelectorAll(".apply-coupon-btn").forEach(button => {
+//         button.addEventListener("click", async function () {
+//             const couponCode = this.getAttribute("data-code");
+
+//             if (!couponCode) {
+//                 Swal.fire("Error", "Coupon code is missing.", "error");
+//                 return;
+//             }
+
+//             const totalAmount = parseFloat(document.getElementById("totalAmount")?.value || 0);
+//             if (isNaN(totalAmount)) {
+//                 Swal.fire("Error", "Invalid total amount.", "error");
+//                 return;
+//             }
+
+//             try {
+//                 const response = await fetch("/user/checkout/apply-coupon", {
+//                     method: "POST",
+//                     headers: { "Content-Type": "application/json" },
+//                     body: JSON.stringify({ couponcode: couponCode, totalAmount })
+//                 });
+
+//                 const result = await response.json();
+
+//                 if (!result.success) {
+//                     let alertType = "error";
+//                     let title = "Error!";
+
+//                     switch (result.type) {
+//                         case "alreadyApplied":
+//                             title = "Coupon Already Applied!";
+//                             alertType = "warning";
+//                             break;
+//                         case "alreadyUsed":
+//                             title = "Oops!";
+//                             alertType = "warning";
+//                             break;
+//                         case "expired":
+//                             title = "Expired!";
+//                             alertType = "info";
+//                             break;
+//                         case "limitExceeded":
+//                             title = "Limit Reached!";
+//                             alertType = "warning";
+//                             break;
+//                         case "minOrderAmount":
+//                             title = "Minimum Order Required!";
+//                             alertType = "warning";
+//                             break;
+//                         default:
+//                             break;
+//                     }
+
+//                     Swal.fire(title, result.message || "Invalid coupon code.", alertType);
+//                     return;
+//                 }
+
+//                 Swal.fire("Success", `Coupon Applied! Discount: ₹${result.discountAmount}`, "success");
+
+//                 document.getElementById("couponMessage").innerText = `Coupon Applied! Discount: ₹${result.discountAmount}`;
+//                 document.getElementById("couponMessage").style.display = "block";
+//                 document.getElementById("totalAmount").value = result.finalAmount;
+//                 document.querySelector(".total-price span:last-child").innerText = `₹${result.finalAmount.toLocaleString()}`;
+
+                
+//                 this.closest("li").remove();
+
+                
+//                 const couponModalEl = document.getElementById("couponModal");
+//                 const couponModal = bootstrap.Modal.getInstance(couponModalEl);
+//                 if (couponModal) couponModal.hide();
+
+//             } catch (error) {
+//                 console.error("Error applying coupon:", error);
+//                 Swal.fire("Error", "Something went wrong! Please try again later.", "error");
+//             }
+//         });
+//     });
+// });
+
+document.addEventListener("DOMContentLoaded", () => {
+    const couponMessage = document.getElementById("couponMessage");
+    const removeCouponBtn = document.getElementById("removeCouponBtn");
+
     document.querySelectorAll(".apply-coupon-btn").forEach(button => {
         button.addEventListener("click", async function () {
             const couponCode = this.getAttribute("data-code");
@@ -954,15 +1363,15 @@ function updateHiddenQuantity(input) {
 
                 Swal.fire("Success", `Coupon Applied! Discount: ₹${result.discountAmount}`, "success");
 
-                document.getElementById("couponMessage").innerText = `Coupon Applied! Discount: ₹${result.discountAmount}`;
-                document.getElementById("couponMessage").style.display = "block";
+                couponMessage.innerText = `Coupon Applied! Discount: ₹${result.discountAmount}`;
+                couponMessage.style.display = "block";
                 document.getElementById("totalAmount").value = result.finalAmount;
                 document.querySelector(".total-price span:last-child").innerText = `₹${result.finalAmount.toLocaleString()}`;
 
-                // Remove applied coupon from UI
                 this.closest("li").remove();
 
-                // Hide modal after applying coupon
+                removeCouponBtn.classList.remove("d-none"); 
+
                 const couponModalEl = document.getElementById("couponModal");
                 const couponModal = bootstrap.Modal.getInstance(couponModalEl);
                 if (couponModal) couponModal.hide();
@@ -973,7 +1382,89 @@ function updateHiddenQuantity(input) {
             }
         });
     });
+
+    document.getElementById("removeCouponBtn").addEventListener("click", async () => {
+    try {
+        const response = await fetch("/user/checkout/delete-coupon", { method: "DELETE" });
+        const result = await response.json();
+
+        if (result.success) {
+            Swal.fire("Removed", result.message, "success");
+
+            document.getElementById("couponMessage").innerText = "";
+
+            const totalAmountElement = document.getElementById("totalAmount");
+            
+          
+            const originalTotalAmount = parseFloat(totalAmountElement.getAttribute("data-original-amount") || "0");
+
+            if (!isNaN(originalTotalAmount) && originalTotalAmount > 0) {
+                totalAmountElement.value = originalTotalAmount;
+                document.querySelector(".total-price span:last-child").innerText = `₹${originalTotalAmount.toLocaleString()}`;
+            } else {
+                console.error("Error: originalTotalAmount is missing or invalid.");
+            }
+        } else {
+            Swal.fire("Error", result.message, "error");
+        }
+    } catch (error) {
+        console.error("Error removing coupon:", error);
+        Swal.fire("Error", "Something went wrong!", "error");
+    }
 });
+
+});
+
+document.getElementById("addAddressForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    const addressData = Object.fromEntries(formData.entries());
+
+    try {
+        const response = await fetch("/user/address/add", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(addressData),
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            Swal.fire({
+                icon: "error",
+                title: "Validation Errors",
+                html: `<ul style="text-align: left;">${data.errors.map(error => `<li>${error}</li>`).join('')}</ul>`,
+                confirmButtonText: "OK"
+            });
+            return;
+        }
+
+        
+        Swal.fire({
+            icon: "success",
+            title: "Address Added",
+            text: "Your address has been saved successfully.",
+            
+            showConfirmButton: false
+        }).then(() => {
+          console.log(data.redirectUrl);
+          
+            window.location.href = data.redirectUrl;
+            console.log(window.location.href);
+            
+        });
+
+    } catch (error) {
+        Swal.fire({
+            icon: "error",
+            title: "Server Error",
+            text: "Something went wrong. Please try again later.",
+            confirmButtonText: "OK"
+        });
+    }
+});
+
 
   </script>
 

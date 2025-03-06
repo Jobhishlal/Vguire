@@ -376,18 +376,22 @@
             <% wishlist.forEach(product => { %>
                 
                 <div class="wishlist-item" id="wishlist-item-<%= product._id %>">
+                    
 
                     
-              
+                    <a href="/user/productview/<%= product._id %>">
                     <img src="<%= product.images[0] %>" alt="<%= product.name %>" class="product-image">
+                </a>
                     <div class="product-info">
-                        <a href="/product/<%= product._id %>" class="product-title"><%= product.name %></a>
+                        <a href="/user/productview/<%= product._id %>" class="product-title"><%= product.name %></a>
                         
                         <div class="assured-badge">
                             <i class="fas fa-shield-alt"></i>
                             <%= product.description%>
                         </div>
                         <div class="price-info">
+                         
+                         <a href="/user/productview/<%= product._id %>">
                             <span class="current-price">
                                 ₹<% if (product.isOfferActive) { %>
                                     <% if (product.offerType === "product") { %>
@@ -399,6 +403,7 @@
                                     <%= product.price %> 
                                 <% } %>
                             </span>
+                         </a>
                             
                            
                             <span class="discount"><%= product.discountPercentage %>% off</span>

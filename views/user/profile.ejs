@@ -27,7 +27,7 @@
             background-color: white;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            margin-top: 130px;
+            margin-top: 24px;
             overflow: hidden;
         }
 
@@ -119,6 +119,40 @@
 .footer-links a:hover {
     color: var(--secondary-color);
 }
+.breadcrumb {
+    list-style: none;
+    display: flex;
+    gap: 8px;
+    font-size: 14px;
+    padding: 10px 0;
+}
+
+.breadcrumb li {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb li a {
+    text-decoration: none;
+    color: #007bff; 
+    font-weight: 500;
+    transition: color 0.3s ease-in-out;
+}
+
+.breadcrumb li a:hover {
+    color: #0056b3;
+}
+
+.breadcrumb li::after {
+    content: "›"; 
+    margin: 0 8px;
+    color: #666;
+}
+
+.breadcrumb li:last-child::after {
+    content: ""; 
+}
+
 
     </style>
 </head>
@@ -149,15 +183,22 @@
                         <a class="nav-link" href="#">Profile</a>
                     </li>
                 </ul>
-                <div class="d-flex align-items-center">
-                    
-                    <a href="#" class="me-3"><i class="fas fa-search"></i></a>
-                    <a href="#" class="me-3"><i class="fas fa-shopping-cart"></i></a>
-                    <a href="#"><i class="fas fa-heart"></i></a>
-                </div>
+              
+                         
+   
+
             </div>
         </div>
     </nav> 
+
+    <div class="container" style="margin-top: 100px;">
+        <ul class="breadcrumb">
+            <% breadcrumbs.forEach(breadcrumb => { %>
+                <li><a href="<%= breadcrumb.url %>"><%= breadcrumb.name %></a></li>
+            <% }) %>
+        </ul>
+    </div>
+
 
 
     <div class="container" style="padding-bottom: 40px;">
@@ -186,10 +227,15 @@
                         <a href="/user/referral" class="nav-link">
                             <i class="bi bi-gift me-2"></i>Referral Code
                         </a>
+                        <a href="/user/wallet" class="nav-link">
+                            <i class="bi bi-wallet2 me-2"></i>Wallet
+                        </a>
                     </div>
                 </nav>
                 
+                
             </div>
+   
 
             <!-- Profile Form -->
             <div class="col-md-9 p-4">
@@ -383,6 +429,7 @@
     });
 
 
+     
 
 
     </script>

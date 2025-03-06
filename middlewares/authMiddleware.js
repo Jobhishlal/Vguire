@@ -61,7 +61,7 @@ export const isAuth = async (req, res, next) => {
       if (!user) {
           return res.redirect("/user/login");
       }
-      console.log("hello middle");
+      
       
 
       req.user = user;  
@@ -109,7 +109,7 @@ export const checkBlockedUser = async (req, res, next) => {
       if (user?.blocked) {
         return res.render('user/blocked', { message: 'Your account has been blocked. Please contact support.' });
       }
-      console.log("user not bolck");
+   
       
     } catch (error) {
       console.error("Error checking if user is blocked:", error);
@@ -119,6 +119,9 @@ export const checkBlockedUser = async (req, res, next) => {
 
   next();
 };
+
+
+
 
 
 

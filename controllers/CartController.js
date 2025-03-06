@@ -45,7 +45,11 @@ export const getcart = async (req, res) => {
             messages: {
                 success: req.flash("success"),
                 error: req.flash("error")
-            }
+            },
+            breadcrumbs: res.locals.breadcrumbs
+            
+            
+
         });
     } catch (error) {
         console.error("Cart error:", error);

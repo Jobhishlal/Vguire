@@ -290,7 +290,10 @@
                                 <div class="product-meta">
                                     Size: <%= item.size %> | Quantity: <%= item.quantity %>
                                 </div>
-                                <div class="product-price">₹<%= item.price %></div>
+                                <div class="product-price">
+                                    ₹<%= item.Offerprice > 0 ? item.Offerprice : item.price %>
+                                </div>
+                                
                                 
                                 <div class="delivery-info">
                                     <% if (order.deliveryDate) { %>
@@ -321,7 +324,7 @@
                                     <p class="text-muted mb-0"><%= order.paymentMethod %></p>
                                 </div>
                                 <div class="total-amount">
-                                    Total: ₹<%= item.totalprice %>
+                                total payeble: ₹<%= order.totalAmount %>
                                 </div>
                             </div>
                         </div>

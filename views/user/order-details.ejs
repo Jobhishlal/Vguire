@@ -346,6 +346,40 @@
                 padding: 1rem;
             }
         }
+        .breadcrumb {
+    list-style: none;
+    display: flex;
+    gap: 8px;
+    font-size: 14px;
+    padding: 10px 0;
+}
+
+.breadcrumb li {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb li a {
+    text-decoration: none;
+    color: #007bff; /* Blue color */
+    font-weight: 500;
+    transition: color 0.3s ease-in-out;
+}
+
+.breadcrumb li a:hover {
+    color: #0056b3; /* Darker blue on hover */
+}
+
+.breadcrumb li::after {
+    content: "›"; /* Breadcrumb separator */
+    margin: 0 8px;
+    color: #666;
+}
+
+.breadcrumb li:last-child::after {
+    content: ""; /* Remove separator from last item */
+}
+
     </style>
 </head>
 <body>
@@ -384,6 +418,14 @@
             </div>
         </div>
     </nav>
+
+    <div class="container" style="margin-top: 40px;">
+        <ul class="breadcrumb">
+            <% breadcrumbs.forEach(breadcrumb => { %>
+                <li><a href="<%= breadcrumb.url %>"><%= breadcrumb.name %></a></li>
+            <% }) %>
+        </ul>
+    </div>
 
     <!-- Main Content -->
     <div class="order-details-container">
@@ -432,10 +474,7 @@
                             </td>
     
                             <td>
-                                <% order.items.forEach(item => { %>
-                                    <p>₹<%= item.price.toFixed(2) %></p>
-                                <% }); %>
-                            </td>
+                                <p>₹<%=order.totalAmount%></p>
                             
                             <td>
                                 <% if (order.status === "Delivered") { %>
