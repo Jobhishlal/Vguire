@@ -56,12 +56,20 @@ export const addProduct = async (req, res) => {
            return res.redirect("/admin/add-product")
         }
 
+    
       
         const categoryExists = await Category.findById(category);
         if (!categoryExists) {
             req.flash("error",'Invalid category selected')
             return res.redirect("/admin/add-product")
         }
+
+        
+        if (sizeS < 0 || sizeM < 0 || sizeL < 0 || sizeXL < 0 || sizeXXL < 0) {
+            req.flash("error", "Stock quantity cannot be negative.");
+            return res.redirect("/admin/add-product");
+        }
+        
 
         let imagePaths = [];
         let croppedImagePaths = [];
@@ -156,6 +164,7 @@ export const getEditProduct = async (req, res) => {
         if (!product) {
             return res.status(404).send('Product not found');
         }
+       
 
         const categories = await Category.find();
         res.render('admin/edit-product', { 
@@ -372,6 +381,9 @@ export const postEditProduct = async (req, res) => {
             req.flash("error", "All fields are required");
             return res.status(400).json({ message: "All fields are required" });
         }
+        
+
+       
 
         if (!mongoose.Types.ObjectId.isValid(category)) {
             req.flash("error", "Invalid category chosen");

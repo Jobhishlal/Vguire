@@ -534,6 +534,7 @@
                             });
                         }
                     } catch (error) {
+                        console.log(error)
                         Swal.fire({
                             icon: "error",
                             title: "Error",
@@ -553,6 +554,15 @@
                     const sizeXXL = parseInt(document.getElementById('sizeXXL').value) || 0;
 
                     const totalStock = sizeS + sizeM + sizeL + sizeXL + sizeXXL;
+                    if (sizeS < 0 || sizeM < 0 || sizeL < 0 || sizeXL < 0 || sizeXXL < 0) {
+                   Swal.fire({
+                   icon: "error",
+                   title: "Error",
+                 text: "Stock quantity cannot be negative.",
+                  confirmButtonColor: "#d33"
+             });
+              return;
+             }
                     document.getElementById('totalStock').value = totalStock;
                 }
             </script>

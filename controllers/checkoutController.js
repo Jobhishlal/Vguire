@@ -640,6 +640,7 @@ export const ordersucccess = async (req, res) => {
 
 export const orderdetails = async (req, res) => {
     try {
+        res.locals.cspNonce = crypto.randomBytes(16).toString("base64"); 
         const userId = req.user._id;
         let { page = 1, limit = 5 } = req.query; 
 
@@ -648,6 +649,7 @@ export const orderdetails = async (req, res) => {
 
      
         const totalOrders = await Order.countDocuments({ userId });
+        
 
       
         const orders = await Order.find({ userId })
@@ -656,13 +658,15 @@ export const orderdetails = async (req, res) => {
             .sort({ createdAt: -1 }) 
             .skip((page - 1) * limit)
             .limit(limit);
+            console.log("Fetched Orders with Items:", orders);
 
         res.render("user/order-details", {
             orders,
             userId,
             currentPage: page,
             totalPages: Math.ceil(totalOrders / limit),
-            breadcrumbs: res.locals.breadcrumbs
+            breadcrumbs: res.locals.breadcrumbs,
+            cspNonce: res.locals.cspNonce 
         });
     } catch (error) {
         console.error("Order Details Fetch Error:", error);

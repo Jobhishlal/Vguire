@@ -12,8 +12,11 @@ import nocache from 'nocache';
 import cookieParser from 'cookie-parser';
 import methodOverride from 'method-override';
 import { fileURLToPath } from 'url';
-import { isCheckAuth } from './middlewares/authMiddleware.js';
 import { homepage } from "./controllers/homeController.js";
+import morgan from "morgan";
+import fs from "fs"
+
+
 
 
 // Load environment variables
@@ -25,17 +28,30 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Serve static files correctly
+
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Middleware configuration
-app.use(express.json({ limit: '150mb' }));  // Increase request body size limit
+
+app.use(express.json({ limit: '150mb' }));  
 app.use(express.urlencoded({ limit: '150mb', extended: true }));
 app.use(cookieParser());
 app.use(methodOverride('_method'));
 app.use(flash());
 app.use(nocache())
+
+const userLogStream = fs.createWriteStream(path.join(process.cwd(), "user-access.log"), { flags: "a" });
+const adminLogStream = fs.createWriteStream(path.join(process.cwd(), "admin-access.log"), { flags: "a" });
+
+app.use("/user", morgan("combined", { stream: userLogStream }));
+
+
+app.use("/admin", morgan("combined", { stream: adminLogStream }));
+
+app.use(morgan("dev"));
+
+
+
 
 
 
@@ -94,7 +110,7 @@ app.get('/auth/google/callback',
 
 
 app.get('/logout', (req, res) => {
-    req.logout((err) => {
+    req.logout(() => {
         res.redirect('/'); 
     });
 });

@@ -56,6 +56,7 @@ export const getOrderDetails = async (req, res) => {
             return res.redirect("/admin/order");
         }
 
+
         let subtotal = 0;
         let totalProductDiscount = 0;
 
@@ -130,6 +131,76 @@ export const getOrderDetails = async (req, res) => {
 
 
 
+// export const updateOrderStatus = async (req, res) => { 
+//     try {
+//         const { orderId } = req.params;
+//         const { status } = req.body;  
+
+//         const order = await Order.findById(orderId);
+//         if (order.paymentMethod === "UPI" && order.paymentStatus === "Pending") {
+//             req.flash("error", "This order cannot be delivered as payment is pending via UPI.");
+//             return res.redirect("/admin/ordermanagement", { 
+//                 order, 
+//                 error: req.flash("error"),
+//             });
+//         }
+        
+//         if (!order) {
+//             req.flash("error", "Order not found.");
+//             return res.redirect("/admin/order");
+//         }
+        
+       
+//         if (order.status === "Delivered") {
+//             req.flash("error", "Delivered orders cannot be canceled.");
+//             return res.redirect(`/admin/ordermanagement/${orderId}`);
+//         }
+      
+
+//         if (status === "Cancelled") {
+//             for (const item of order.items) {
+//                 const product = await Product.findById(item.productId);
+//                 if (!product) continue;
+
+//                 product.totalStock += item.quantity;
+
+//                 if (item.size) {
+//                     const sizeKey = `size${item.size.trim()}`;
+//                     if (product[sizeKey] !== undefined) {
+//                         product[sizeKey] += item.quantity;
+//                     } else {
+//                         console.warn(` Size ${sizeKey} not found in product ${item.productId}`);
+//                     }
+//                 }
+
+//                 await product.save(); 
+//             }
+
+//             order.status = "Cancelled"; 
+//         } else if (status === "Delivered") {
+//             order.status = "Delivered";
+//             order.items.forEach(item => {
+//                 item.status = "Delivered"; 
+//             });
+
+     
+//             if (order.paymentMethod === "COD") {
+//                 order.paymentStatus = "Paid"; 
+//             }
+//         } else {
+//             order.status = status;
+//         }
+
+//         await order.save(); 
+
+//         req.flash("success", "Order status updated successfully.");
+//         res.redirect(`/admin/ordermanagement/${orderId}`);
+//     } catch (error) {
+//         console.error("Admin Order Update Error:", error);
+//         res.status(500).send("Server Error");
+//     }
+// };
+
 export const updateOrderStatus = async (req, res) => { 
     try {
         const { orderId } = req.params;
@@ -141,12 +212,21 @@ export const updateOrderStatus = async (req, res) => {
             req.flash("error", "Order not found.");
             return res.redirect("/admin/order");
         }
+        
+        // Check if payment method is UPI and payment status is Pending
+        if (order.paymentMethod === "UPI" && order.paymentStatus === "Pending" && status === "Delivered") {
+            req.flash("error", "This order cannot be delivered as payment is pending via UPI.");
+            return res.render("admin/order-details", { 
+                order, 
+                error: req.flash("error"),
+            });
+        }
 
-        if (order.status === "Delivered") {
+        if (order.status === "Delivered" && status === "Cancelled") {
             req.flash("error", "Delivered orders cannot be canceled.");
             return res.redirect(`/admin/ordermanagement/${orderId}`);
         }
-
+      
         if (status === "Cancelled") {
             for (const item of order.items) {
                 const product = await Product.findById(item.productId);
@@ -159,7 +239,7 @@ export const updateOrderStatus = async (req, res) => {
                     if (product[sizeKey] !== undefined) {
                         product[sizeKey] += item.quantity;
                     } else {
-                        console.warn(` Size ${sizeKey} not found in product ${item.productId}`);
+                        console.warn(`Size ${sizeKey} not found in product ${item.productId}`);
                     }
                 }
 
@@ -172,7 +252,6 @@ export const updateOrderStatus = async (req, res) => {
             order.items.forEach(item => {
                 item.status = "Delivered"; 
             });
-
      
             if (order.paymentMethod === "COD") {
                 order.paymentStatus = "Paid"; 
@@ -190,7 +269,6 @@ export const updateOrderStatus = async (req, res) => {
         res.status(500).send("Server Error");
     }
 };
-
 
 
 

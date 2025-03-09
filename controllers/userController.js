@@ -3,14 +3,13 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import User from '../models/userSchema.js'; 
-import { error, log } from 'console';
-import exp from 'constants';
+import { error} from 'console';
+
 import Category from '../models/category.js';
 import Product from '../models/products.js'; 
 import Address from '../models/address.js';
 import Cart from '../models/cart.js';
 import Order from '../models/order.js';
-import flash from 'express-flash';
 import passport from 'passport';
 import path from 'path';
 import fs from 'fs'
@@ -303,16 +302,19 @@ export const verifyOtp = async (req, res) => {
     }
 };
 
-
 export const getLoginPage = (req, res) => {
     if (req.session.isLogged) {
         return res.redirect('/user/home'); 
     }
-    const error = req.flash("error"); 
-    res.render("user/login", { error: error.length > 0 ? error[0] : null }); 
+
+    let errorMessages = req.flash("error") || []; 
+    let error = errorMessages.length > 0 ? errorMessages[0] : null; 
+
+    res.render("user/login", { 
+        error, 
+       
+    });
 };
-
-
 
 
 
@@ -323,20 +325,21 @@ export const loginUser = async (req, res) => {
     try {
         const user = await User.findOne({ email });
         if (!user) {
-            return res.render('user/login', { error: 'Invalid email or password' });
+            return res.render('user/login', { error: 'Invalid email or password' ,csrfToken: req.csrfToken() });
+            
         }
 
         if (!user.verified) {
-            return res.render('user/login', { error: 'Please verify your account first.' });
+            return res.render('user/login', { error: 'Please verify your account first.' ,csrfToken: req.csrfToken() });
         }
         if (user.blocked) {
-            return res.render('user/login',{error:'User  blocked'})
+            return res.render('user/login',{error:'User  blocked',csrfToken: req.csrfToken() })
           }
         
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch ) {
-            return res.render('user/login', { error: 'Invalid email or password' });
+            return res.render('user/login', { error: 'Invalid email or password',csrfToken: req.csrfToken()  });
         }
         
         req.session.isLogged=true
@@ -367,7 +370,7 @@ export const logoutUser=(req,res)=>{
 
         })
     } catch (error) {
-        
+        console.error("error", error)
     }
 }
 
@@ -1253,7 +1256,7 @@ export const geteditaddress = async(req,res)=>{
             return res.redirect("/user/address")
         }
         res.render("user/edit-address",{address})
-    } catch (error) {
+    } catch  {
         console.error("edit address error");
         return res.status(500).send("edit address is not working")
     }
@@ -1273,8 +1276,8 @@ export const posteditaddress = async(req,res)=>{
             return res.status(404).json({ success: false, message: "Address not found" });
         }
         res.redirect("/user/address")
-    } catch (error) {
-        console.error("edit address not work",err);
+    } catch  {
+        console.error("edit address not work");
         return res.status(500).send("its not working")
     }
 }

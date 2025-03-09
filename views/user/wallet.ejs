@@ -140,146 +140,14 @@
         }
 
         
-.navbar {
-    padding: 1rem;
-    background: white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
 
-.navbar-brand img {
-    width: 60px;
-    margin-right: 50px;
-}
-
-@media (max-width: 992px) {
-    .navbar-brand img {
-        margin-right: 0;
-    }
-    
-    .nav-link {
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #eee;
-    }
-
-    .navbar .d-flex {
-        margin-top: 1rem;
-        justify-content: center;
-    }
-}
-
-.nav-link {
-    color: var(--primary-color);
-    margin: 0 1rem;
-    position: relative;
-}
-
-.nav-link::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: 0;
-    left: 0;
-    background-color: var(--secondary-color);
-    transition: width 0.3s ease;
-}
-
-.nav-link:hover::after {
-    width: 100%;
-}
-
-.login-btn {
-    background: var(--secondary-color);
-    color: white;
-    padding: 0.5rem 1.5rem;
-    border-radius: 25px;
-    transition: all 0.3s ease;
-    text-decoration: none;
-}
-
-.login-btn:hover {
-    background: #ff2e43;
-    color: white;
-    transform: translateY(-2px);
-}
-
-
-.footer {
-    background: black;
-    color: white;
-    padding: 4rem 0 2rem;
-}
-
-@media (max-width: 768px) {
-    .footer {
-        padding: 2rem 0 1rem;
-        text-align: center;
-    }
-    
-    .footer .col-md-4 {
-        margin-bottom: 2rem;
-    }
-}
-
-.footer-links {
-    list-style: none;
-    padding: 0;
-}
-
-.footer-links li {
-    margin-bottom: 1rem;
-}
-
-.footer-links a {
-    color: white;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.footer-links a:hover {
-    color: var(--secondary-color);
-}
 
 
     </style>
 </head>
 <body>
     <!-- Dashboard Header -->
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="#">
-                <img src="/image/Screenshot 2025-01-02 185508.png" alt="Logo">
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/user/home">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/user/shop">Shop</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Contact</a>
-                    </li>
-                    <li class="nav-item">   
-                        <a class="nav-link" href="#">Profile</a>
-                    </li>
-                </ul>
-                <div class="d-flex align-items-center">
-                    
-                    <a href="#" class="me-3"><i class="fas fa-search"></i></a>
-                    <a href="#" class="me-3"><i class="fas fa-shopping-cart"></i></a>
-                    <a href="#"><i class="fas fa-heart"></i></a>
-                </div>
-            </div>
-        </div>
-    </nav> 
+    <%- include('../partials/user/navbar.ejs') %>
 
 
     <div class="container py-5" style="margin-top: 100px;">
@@ -323,7 +191,7 @@
             <div class="col-12">
                 <div class="stat-card p-4">
                     <h3 class="mb-4">Recent Transactions</h3>
-                    
+            
                     <% if (wallet.transactions && wallet.transactions.length > 0) { %>
                         <div class="transaction-list">
                             <% wallet.transactions.slice(0, 5).forEach(txn => { %>
@@ -339,11 +207,13 @@
                                             </div>
                                             <div>
                                                 <h6 class="mb-1"><%= txn.description %></h6>
+                                                <p><%= txn.type %></p>
                                                 <small class="text-muted">
                                                     <i class="far fa-clock me-1"></i>
                                                     <%= new Date(txn.createdAt).toLocaleString() %>
                                                 </small>
                                             </div>
+                                           
                                         </div>
                                         <div class="amount-badge <%= txn.type %>">
                                             ₹<%= txn.amount.toFixed(2) %>
@@ -351,7 +221,7 @@
                                     </div>
                                 </div>
                             <% }) %>
-                            
+            
                             <div class="pagination-container d-flex justify-content-center">
                                 <nav aria-label="Transaction navigation">
                                     <ul class="pagination">
@@ -360,13 +230,13 @@
                                                 <i class="fas fa-chevron-left"></i>
                                             </a>
                                         </li>
-                                        
+            
                                         <% for(let i = 1; i <= totalPages; i++) { %>
                                             <li class="page-item <%= currentPage === i ? 'active' : '' %>">
                                                 <a class="page-link" href="?page=<%= i %>"><%= i %></a>
                                             </li>
                                         <% } %>
-                                        
+            
                                         <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
                                             <a class="page-link" href="?page=<%= currentPage + 1 %>" <%= currentPage === totalPages ? 'tabindex="-1" aria-disabled="true"' : '' %>>
                                                 <i class="fas fa-chevron-right"></i>
@@ -385,6 +255,7 @@
                     <% } %>
                 </div>
             </div>
+            
 
             <!-- Back to Dashboard -->
             <div class="col-12 text-center">
@@ -396,36 +267,7 @@
     </div>
 
 
-    <footer class="footer" style="display: block;">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <h4>About Us</h4>
-                    <p>We are committed to providing the best products and services to our customers.</p>
-                </div>
-                <div class="col-md-4">
-                    <h4>Quick Links</h4>
-                    <ul class="footer-links">
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">Shop</a></li>
-                        <li><a href="#">About</a></li>
-                        <li><a href="#">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4">
-                    <h4>Contact Us</h4>
-                    <ul class="footer-links">
-                        <li><i class="fas fa-phone me-2"></i> +1 234 567 890</li>
-                        <li><i class="fas fa-envelope me-2"></i> info@example.com</li>
-                        <li><i class="fas fa-map-marker-alt me-2"></i> 123 Street, City, Country</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="text-center mt-4">
-                <p>&copy; 2025 Your Company. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+    <%- include('../partials/user/footer.ejs') %>
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>

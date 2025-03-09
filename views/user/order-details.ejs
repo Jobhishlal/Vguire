@@ -452,6 +452,8 @@
                 <tbody>
                     <% orders.forEach(order => { %>
                         <tr class="clickable-row" data-href="/user/order-view/<%= order._id %>">
+                            
+
                             <td>
                                 <% if (order.items.length > 0 && order.items[0].productId && order.items[0].productId.images.length > 0) { %>
                                     <img src="<%= order.items[0].productId.images[0] %>" alt="Product Image" class="product-image">

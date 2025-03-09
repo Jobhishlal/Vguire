@@ -19,10 +19,10 @@
         <p style="color: red;"><%= msg %></p>
     <% } %>
     <!-- otp.ejs -->
-    <form action="/user/forgotverify-otp" method="POST">
+    <form action="/user/forgotverify-otp" name="_csrf" value="<%= csrfToken %>" method="POST">
         <div class="form-group">
             <label for="otp">Enter the OTP:</label>
-            <input type="text" name="otp" class="form-control" placeholder="OTP" required />
+            <input type="text" name="otp" class="form-control" placeholder="OTP"  />
             <!-- <input type="hidden" name="email" /> -->
         </div>
         <button type="submit" class="btn btn-primary">Verify OTP</button>

@@ -13,7 +13,7 @@ import * as couponcontroller from '../controllers/couponcontroller.js';
 import * as dashboardController from '../controllers/dashboardController.js'
 
 import { isAuthenticatedAdmin, preventLoggedInAdmin } from '../middlewares/authMiddleware.js';
-import { error } from 'console';
+
 
 const router = express.Router();
 router.get('/error', (req, res) => {

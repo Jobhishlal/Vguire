@@ -12,10 +12,11 @@
         <div class="login-form-container">
             <div class="login-form">
                 <h2>Login</h2>
-                <% if (error) { %>
-                    <p style="color: red;"><%= error%></p>
-                  <% } %>
-                <form action="/user/login" method="POST">
+                <% if (error && typeof error === 'string') { %>
+                    <p style="color: red;"><%= error %></p>
+                <% } %>
+                <form action="/user/login"  method="POST">
+                    
                     <div class="form-group">
                         <label for="email">Email:</label>
 

@@ -7,99 +7,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <style>
-        :root {
-            --sidebar-width: 250px;
-            --sidebar-collapsed-width: 70px;
-            --header-height: 60px;
-            --primary-color: #cbcfda;
-            --secondary-color: #858796;
-            --dark-bg: #1a1a1a;
-            --card-bg: #242424;
-            --text-color: #e4e4e4;
-            --fluorescent-green: #08ee22;
-            --gradient-green: linear-gradient(135deg, #08ee22, #2ecc71);
-        }
-        body {
-            background-color: var(--dark-bg);
-            color: var(--text-color);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: var(--sidebar-width);
-            background: linear-gradient(180deg, #010612 0%, #224abe 100%);
-            transition: all 0.3s ease;
-            z-index: 1000;
-            padding-top: var(--header-height);
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
-        }
-        .sidebar.collapsed {
-            width: var(--sidebar-collapsed-width);
-        }
-        .sidebar-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: var(--sidebar-width);
-            height: var(--header-height);
-            background: rgba(1, 6, 18, 0.9);
-            display: flex;
-            align-items: center;
-            padding: 0 1rem;
-            transition: all 0.3s ease;
-            z-index: 1001;
-        }
-        .sidebar.collapsed .sidebar-header {
-            width: var(--sidebar-collapsed-width);
-        }
-        .logo-full {
-            display: flex;
-            align-items: center;
-            color: white;
-            text-decoration: none;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        .logo-mini {
-            display: none;
-            color: white;
-            text-decoration: none;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        .sidebar.collapsed .logo-full {
-            display: none;
-        }
-        .sidebar.collapsed .logo-mini {
-            display: block;
-        }
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-        }
-        .nav-link:hover {
-            color: white;
-            background: var(--gradient-green);
-        }
-        .nav-link i {
-            width: 20px;
-            text-align: center;
-            margin-right: 1rem;
-        }
-        .sidebar.collapsed .nav-link span {
-            display: none;
-        }
-        .sidebar.collapsed .nav-link i {
-            margin-right: 0;
-        }
+      
         .main-content {
             margin-left: var(--sidebar-width);
             padding: 2rem;
@@ -172,7 +80,7 @@
             font-size: 1.8rem;
             font-weight: bold;
             color: var(--fluorescent-green);
-            text-shadow: 0 0 5px rgba(8, 238, 34, 0.5);
+           
         }
         .chart-container {
             width: 100%;
@@ -228,35 +136,125 @@
             background: linear-gradient(135deg, #2ecc71, #08ee22);
             box-shadow: 0 0 10px var(--fluorescent-green);
         }
+        .dashboard-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px;
+}
+
+.dashboard-section {
+    flex: 1;
+    background: #1e1e1e;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    color: #fff;
+}
+/* Table Styling */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    padding: 10px;
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #2c2c2c;
+}
+
+.styled-table th, 
+.styled-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid #444;
+    color: #fff;
+}
+
+.styled-table thead {
+    background-color: #34495e;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.styled-table tbody tr:nth-child(even) {
+    background-color: #1a1a1a;
+}
+
+.styled-table tbody tr:hover {
+    background-color: #333;
+}
+
+/* Ensure Table is Always Visible */
+.styled-table {
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: table !important;
+}
+
+/* Image Styling */
+.product-image, .category-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+}
+
+.placeholder-image {
+    width: 50px;
+    height: 50px;
+    background: #555;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+    
+    .styled-table th, 
+    .styled-table td {
+        padding: 8px;
+        font-size: 14px;
+    }
+    
+    .product-image {
+        width: 40px;
+        height: 40px;
+    }
+    .category-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+}
+
+}
+.category-info {
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+}
+
+
     </style>
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <nav class="sidebar">
-            <div class="sidebar-header">
-                <a href="#" class="logo-full">
-                    <i class="fas fa-shopping-bag me-2"></i>
-                    VGURIE
-                </a>
-                <a href="#" class="logo-mini">
-                    <i class="fas fa-shopping-bag"></i>
-                </a>
-            </div>
-            <div class="nav flex-column p-3">
-                <a href="/admin/dashboard" class="nav-link mb-2"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
-                <a href="/admin/product" class="nav-link mb-2"><i class="fas fa-box"></i><span>Products</span></a>
-                <a href="/admin/ordermanagement" class="nav-link mb-2"><i class="fas fa-shopping-cart"></i><span>Orders</span></a>
-                <a href="/admin/usersmanagement" class="nav-link mb-2"><i class="fas fa-users"></i><span>Users</span></a>
-                <a href="/admin/categories" class="nav-link mb-2"><i class="fas fa-tags"></i><span>Categories</span></a>
-                <a href="/admin/returnRequests" class="nav-link mb-2"><i class="fas fa-undo-alt"></i><span>Returns & Refunds</span></a>
-                <a href="/admin/coupons" class="nav-link mb-2"><i class="fas fa-ticket-alt"></i><span>Coupons</span></a>
-                <a href="#" class="nav-link mb-2"><i class="fas fa-image"></i><span>Banners</span></a>
-                <a href="#" class="nav-link mb-2"><i class="fas fa-cog"></i><span>Settings</span></a>
-                <a href="#" class="nav-link text-danger mt-auto"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
-            </div>
-        </nav>
+        <%- include('../partials/admin/navbar.ejs') %>
 
+
+      
         <main class="main-content">
             <div class="filter-section">
                 <label for="filter" class="fw-bold">Report Type:</label>
@@ -267,9 +265,8 @@
                     <option value="yearly">Yearly</option>
                     <option value="custom">Custom Date</option>
                 </select>
-                
-
-                <!-- Month/Year Selection for Monthly -->
+        
+                <!-- Month/Year Selection and Custom Date Range -->
                 <div id="monthYearSelection" class="d-flex align-items-center gap-2">
                     <label for="month">Month:</label>
                     <select id="month" class="form-select w-auto">
@@ -299,20 +296,21 @@
                         <input type="date" id="endDate" class="form-control w-auto">
                     </div>
                 </div>
-
-                <!-- Custom Date Range -->
-                <div id="customDateRange" class="d-none d-flex align-items-center gap-2">
-                    <label for="startDate">Start:</label>
-                    <input type="date" id="startDate" class="form-control w-auto">
-                    <label for="endDate">End:</label>
-                    <input type="date" id="endDate" class="form-control w-auto">
+        
+                <!-- Line Chart Filter for Monthly -->
+                <div id="lineFilterSection" class="d-flex align-items-center gap-2" style="display: none;">
+                    <label for="lineFilter" class="fw-bold">Line Chart View:</label>
+                    <select id="lineFilter" class="form-select w-auto">
+                        <option value="week">Week</option>
+                        <option value="day">Day</option>
+                    </select>
                 </div>
-
+        
                 <button class="btn" onclick="fetchSalesReport()">
                     <i class="fas fa-chart-line me-2"></i>Get Report
                 </button>
             </div>
-
+        
             <div class="summary-boxes mt-4 d-flex flex-wrap gap-3">
                 <div class="summary-box flex-fill">
                     <h4>Users</h4>
@@ -331,23 +329,23 @@
                     <p id="totalCouponDiscountSummary">₹<%= totalCouponDiscount || 0 %></p>
                 </div>
             </div>
-
+        
             <!-- Chart Section -->
             <div class="report-container">
                 <h3 class="text-center mb-4">Sales Analytics</h3>
                 <div class="d-flex flex-wrap justify-content-center gap-4">
                     <div class="chart-container">
-                        <canvas id="barChart"></canvas>
+                        <canvas id="barChart" style="max-height: 400px;"></canvas>
                     </div>
                     <div class="chart-container">
-                        <canvas id="pieChart"></canvas>
+                        <canvas id="pieChart" style="max-height: 400px;"></canvas>
                     </div>
-                    <div class="chart-container mx-auto mt-4">
-                        <canvas id="lineChart"></canvas>
+                    <div class="chart-container">
+                        <canvas id="lineChart" style="max-height: 400px;"></canvas>
                     </div>
                 </div>
             </div>
-
+        
             <div class="report-container text-center">
                 <div class="report-summary">
                     <h3>Total Sales: ₹<span id="totalSales"><%= totalSales || 0 %></span></h3>
@@ -391,7 +389,7 @@
                     </div>
                 </div>
             </div>
-
+        
             <div class="download-buttons mt-4 d-flex justify-content-center gap-3">
                 <button class="btn btn-success" onclick="fetchSalesReport('excel')">
                     <i class="fas fa-file-excel me-2"></i>Excel
@@ -403,296 +401,575 @@
                     <i class="fas fa-eye me-2"></i>View Report
                 </button>
             </div>
+
+            <div class="dashboard-container">
+                <!-- Top 10 Ordered Products -->
+                <div class="dashboard-section">
+                    <h3>Top 10 Ordered Products</h3>
+                    <div class="table-container">
+                        <table class="styled-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Image</th>
+                                    <th>Product Name</th>
+                                    <th>Total Orders</th>
+                                    <th>Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% topProducts.forEach((product, index) => { %>
+                                    <tr>
+                                        <td><%= index + 1 %></td>
+                                        <td class="product-images">
+                                            <% if (product.productDetails.images && product.productDetails.images.length > 0) { %>
+                                                <img src="/uploads/products/<%= product.productDetails.images[0].split('/').pop() %>" 
+                                                     class="product-image" 
+                                                     alt="<%= product.productDetails.name %>">
+                                            <% } else { %>
+                                                <span>No Image</span>
+                                            <% } %>
+                                        </td>
+                                        <td><%= product.productDetails.name %></td>
+                                        <td><%= product.totalOrders %></td>
+                                        <td><%= product.productDetails.price.toFixed(2) %></td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            
+                
+                <div class="dashboard-section">
+                    <h3 class="dashboard-title">Top 10 Best-Selling Categories</h3>
+                    <div class="table-container">
+                        <table class="styled-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Category</th>
+                                    <th>Total Orders</th>
+                                    <th>Total Sales ($)</th> 
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% topCategories.forEach((category, index) => { %>
+                                    <tr>
+                                        <td><%= index + 1 %></td>
+                                        <td class="category-cell">
+                                            <div class="category-info">
+                                                <% if (category.image) { %>
+                                                    <img src="/uploads/categories/<%= category.image %>" 
+                                                         class="category-image" 
+                                                         alt="<%= category.name %>">
+                                                <% } else { %>
+                                                    <div class="placeholder-image">No Image</div>
+                                                <% } %>
+                                                <span class="category-name"><%= category.name %></span>
+                                            </div>
+                                        </td>
+                                        <td><%= category.totalOrders %></td>
+                                        <td><%= category.totalAmount ? category.totalAmount.toFixed(2) : "0.00" %></td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                
+                
+                
+            </div>
+            
         </main>
-    </div>
 
+            
+        
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    let barChartInstance = null;
-    let pieChartInstance = null;
-    let lineChartInstance = null; // New instance for line chart
-
-    document.addEventListener("DOMContentLoaded", function () {
-        const filterSelect = document.getElementById("filter");
-        const monthYearSelection = document.getElementById("monthYearSelection");
-        const customDateRange = document.getElementById("customDateRange");
-
-        // Show month/year selection by default since "Monthly" is the default filter
-        monthYearSelection.style.display = "flex";
-        customDateRange.style.display = "none";
-
-        filterSelect.addEventListener("change", function () {
-            monthYearSelection.style.display = this.value === "monthly" ? "flex" : "none";
-            customDateRange.style.display = this.value === "custom" ? "flex" : "none";
-        });
-
-        fetchSalesReport();
-        fetchChartData();
-    });
-
-    async function fetchSalesReport(format = "json") {
-        const filter = document.getElementById("filter").value;
-        let url = `/admin/sales-report?filter=${filter}&format=${format}`;
-
-        if (filter === "monthly") {
-            const month = document.getElementById("month").value;
-            const year = document.getElementById("year").value;
-            if (!month || !year) {
-                alert("Please select month and year!");
-                return;
+        <script >
+            let barChartInstance = null;
+            let pieChartInstance = null;
+            let lineChartInstance = null;
+        
+            async function fetchSalesReport(format = "json") {
+                const filter = document.getElementById("filter").value;
+                console.log("Fetching report for filter:", filter);
+                let url = `/admin/sales-report?filter=${filter}&format=${format}&t=${Date.now()}`;
+        
+                if (filter === "monthly") {
+                    const month = document.getElementById("month").value;
+                    const year = document.getElementById("year").value;
+                    if (!month || !year) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Missing Selection',
+                            text: 'Please select both month and year!',
+                            confirmButtonColor: '#3085d6',
+                            background: '#fff',
+                            customClass: { popup: 'animated fadeInDown' }
+                        });
+                        return;
+                    }
+                    url += `&month=${month}&year=${year}`;
+                } else if (filter === "custom") {
+                    const startDate = document.getElementById("startDate").value;
+                    const endDate = document.getElementById("endDate").value;
+                    console.log("Custom dates:", { startDate, endDate });
+                    if (!startDate || !endDate) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Date Range Required',
+                            text: 'Please select both start and end dates!',
+                            confirmButtonColor: '#3085d6',
+                            background: '#fff',
+                            customClass: { popup: 'animated fadeInDown' }
+                        });
+                        return;
+                    }
+                    url += `&startDate=${startDate}&endDate=${endDate}`;
+                }
+        
+                try {
+                    Swal.fire({
+                        title: 'Loading Report...',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+        
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || "Failed to fetch sales report");
+                    }
+        
+                    if (format === "json") {
+                        const data = await response.json();
+                        console.log("Fetched Data:", data);
+                        if (!data.orders || data.orders.length === 0) {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'No Data',
+                                text: 'No data found for the selected date range.',
+                                confirmButtonColor: '#3085d6',
+                                background: '#fff',
+                                customClass: { popup: 'animated fadeInDown' }
+                            });
+                        }
+                        renderSalesReport(data);
+                        fetchChartData();
+                    } else {
+                        const blob = await response.blob();
+                        const fileURL = window.URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        const fileName = format === "pdf" ? "Sales_Report.pdf" : "Sales_Report.xlsx";
+                        a.href = fileURL;
+                        a.download = fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    }
+                    Swal.close();
+                } catch (error) {
+                    console.error("Error fetching sales report:", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: `Failed to find sales report: ${error.message}.`,
+                        confirmButtonColor: '#d33',
+                        background: '#fff',
+                        customClass: { popup: 'animated fadeInDown' }
+                    });
+                }
             }
-            url += `&month=${month}&year=${year}`;
-        } else if (filter === "custom") {
-            const startDate = document.getElementById("startDate").value;
-            const endDate = document.getElementById("endDate").value;
-            if (!startDate || !endDate) {
-                alert("Please select start and end dates!");
-                return;
+        
+            function renderSalesReport(data) {
+                console.log("Rendering data:", data);
+                const ordersTableBody = document.getElementById("ordersTableBody");
+        
+                document.getElementById("totalSales").textContent = data.totalSales || 0;
+                document.getElementById("totalOrders").textContent = data.totalOrders || 0;
+                document.getElementById("totalProductsSold").textContent = data.totalProductsSold || 0;
+                const totalCouponDiscount = Math.floor(data.totalCouponDiscount || 0);
+                document.getElementById("totalCouponDiscount").textContent = totalCouponDiscount;
+        
+                document.getElementById("totalSalesSummary").textContent = `₹${data.totalSales || 0}`;
+                document.getElementById("totalCouponDiscountSummary").textContent = `₹${totalCouponDiscount}`;
+        
+                ordersTableBody.innerHTML = data.orders.map(order => `
+                    <tr>
+                        <td>${order["Order ID"]}</td>
+                        <td>${order["Total Items"]}</td>
+                        <td>${order["Total Amount"]}</td>
+                        <td>${order["Discount Applied"]}</td>
+                        <td>${order["Coupon Discount"]}</td>
+                        <td>${order["Final Amount"]}</td>
+                        <td>${order["Payment Method"]}</td>
+                        <td>${order["Order Status"]}</td>
+                    </tr>
+                `).join("");
             }
-            url += `&startDate=${startDate}&endDate=${endDate}`;
-        }
-
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Failed to fetch sales report");
+        
+            async function fetchChartData() {
+                const filter = document.getElementById("filter").value;
+                let url = `/admin/chart-data?filter=${filter}`;
+        
+                let lineFilterValue = "week"; // Default value
+                if (filter === "monthly") {
+                    const month = document.getElementById("month").value;
+                    const year = document.getElementById("year").value;
+                    const lineFilter = document.getElementById("lineFilter").value;
+                    if (!month || !year) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Missing Selection',
+                            text: 'Please select both month and year!',
+                            confirmButtonColor: '#3085d6',
+                        });
+                        return;
+                    }
+                    url += `&month=${month}&year=${year}&lineFilter=${lineFilter}`;
+                    lineFilterValue = lineFilter;
+                } else if (filter === "custom") {
+                    const startDate = document.getElementById("startDate").value;
+                    const endDate = document.getElementById("endDate").value;
+                    if (!startDate || !endDate) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Date Range Required',
+                            text: 'Please select both start and end dates!',
+                            confirmButtonColor: '#3085d6',
+                        });
+                        return;
+                    }
+                    url += `&startDate=${startDate}&endDate=${endDate}`;
+                }
+        
+                try {
+                    Swal.fire({
+                        title: 'Loading Charts...',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading(),
+                    });
+        
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error(`Failed to fetch chart data: ${response.statusText}`);
+                    const data = await response.json();
+                    console.log("Chart Data Received:", data);
+                    renderCharts(data, filter, lineFilterValue);
+                    Swal.close();
+                } catch (error) {
+                    console.error("Error fetching chart data:", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Chart Error',
+                        text: 'Failed to load charts. Please try again later.',
+                        confirmButtonColor: '#d33',
+                    });
+                }
             }
-
-            if (format === "json") {
-                const data = await response.json();
-                renderSalesReport(data);
-                fetchChartData(); // Update charts with new filter
-            } else {
-                const blob = await response.blob();
-                const fileURL = window.URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                const fileName = format === "pdf" ? "Sales_Report.pdf" : "Sales_Report.xlsx";
-                a.href = fileURL;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            }
-        } catch (error) {
-            console.error("Error fetching sales report:", error);
-            alert("Failed to fetch sales report. Please try again later.");
-        }
-    }
-
-    function renderSalesReport(data) {
-        const ordersTableBody = document.getElementById("ordersTableBody");
-
-        document.getElementById("totalSales").textContent = data.totalSales || 0;
-        document.getElementById("totalOrders").textContent = data.totalOrders || 0;
-        document.getElementById("totalProductsSold").textContent = data.totalProductsSold || 0;
-        const totalCouponDiscount = Math.floor(data.totalCouponDiscount || 0);
-        document.getElementById("totalCouponDiscount").textContent = totalCouponDiscount;
-
-        document.getElementById("totalSalesSummary").textContent = `₹${data.totalSales || 0}`;
-        document.getElementById("totalCouponDiscountSummary").textContent = `₹${totalCouponDiscount}`;
-
-        ordersTableBody.innerHTML = data.orders.map(order => `
-            <tr>
-                <td>${order["Order ID"]}</td>
-                <td>${order["Total Items"]}</td>
-                <td>${order["Total Amount"]}</td>
-                <td>${order["Discount Applied"]}</td>
-                <td>${order["Coupon Discount"]}</td>
-                <td>${order["Final Amount"]}</td>
-                <td>${order["Payment Method"]}</td>
-                <td>${order["Order Status"]}</td>
-            </tr>
-        `).join("");
-    }
-
-    async function fetchChartData() {
-        const filter = document.getElementById("filter").value;
-        let url = `/admin/chart-data?filter=${filter}`;
-
-        if (filter === "monthly") {
-            const month = document.getElementById("month").value;
-            const year = document.getElementById("year").value;
-            if (!month || !year) {
-                alert("Please select month and year!");
-                return;
-            }
-            url += `&month=${month}&year=${year}`;
-        } else if (filter === "custom") {
-            const startDate = document.getElementById("startDate").value;
-            const endDate = document.getElementById("endDate").value;
-            if (!startDate || !endDate) {
-                alert("Please select start and end dates!");
-                return;
-            }
-            url += `&startDate=${startDate}&endDate=${endDate}`;
-        }
-
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch chart data: ${response.statusText}`);
-            }
-            const data = await response.json();
-            if (!data.barChart || !data.pieChart || !data.lineChart) {
-                console.error("Invalid chart data:", data);
-                alert("No chart data available for the selected period.");
-                return;
-            }
-            renderCharts(data);
-        } catch (error) {
-            console.error("Error fetching chart data:", error);
-            alert("Failed to load charts. Please try again later.");
-        }
-    }
-
-    function renderCharts(data) {
-        if (barChartInstance) barChartInstance.destroy();
-        if (pieChartInstance) pieChartInstance.destroy();
-        if (lineChartInstance) lineChartInstance.destroy(); // Destroy previous line chart instance
-
-        // Bar Chart
-        const barCtx = document.getElementById("barChart").getContext("2d");
-        const barGradient = barCtx.createLinearGradient(0, 0, 0, 400);
-        barGradient.addColorStop(0, "rgba(8, 238, 34, 0.8)");
-        barGradient.addColorStop(1, "rgba(46, 204, 113, 0.6)");
-
-        barChartInstance = new Chart(barCtx, {
-            type: "bar",
-            data: {
-                labels: data.barChart.labels,
-                datasets: [{
-                    label: "Total Sales",
-                    data: data.barChart.sales,
-                    backgroundColor: barGradient,
-                    borderColor: "rgba(8, 238, 34, 1)",
-                    borderWidth: 2,
-                    borderRadius: 5,
-                    barThickness: 30,
-                }],
-            },
-            options: {
-                animation: {
-                    duration: 1500,
-                    easing: "easeInOutQuart",
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: { display: true, text: "Sales (₹)", color: "#e4e4e4", font: { size: 14 } },
-                        ticks: { color: "#e4e4e4", font: { size: 12 } },
-                        grid: { color: "rgba(255, 255, 255, 0.1)" },
+        
+            function renderCharts(data, filter = "monthly", lineFilter = "week") {
+                if (barChartInstance) barChartInstance.destroy();
+                if (pieChartInstance) pieChartInstance.destroy();
+                if (lineChartInstance) lineChartInstance.destroy();
+        
+                const barLabels = data.barChart?.labels || [];
+                const barSales = data.barChart?.sales || [];
+                const pieLabels = data.pieChart?.labels || [];
+                const pieSales = data.pieChart?.sales || [];
+                const lineLabels = data.lineChart?.labels || [];
+                const lineSales = data.lineChart?.sales || [];
+                const currentWeekSales = data.lineChart?.currentWeekSales || [];
+                const previousWeekSales = data.lineChart?.previousWeekSales || [];
+                const maxSales = Math.max(
+                    ...(currentWeekSales.length > 0 ? currentWeekSales : [0]),
+                    ...(previousWeekSales.length > 0 ? previousWeekSales : [0]),
+                    ...(lineSales.length > 0 ? lineSales : [0]),
+                    ...(barSales.length > 0 ? barSales : [0])
+                );
+        
+                console.log("RenderCharts - Bar Chart Data:", { barLabels, barSales });
+                console.log("RenderCharts - Pie Chart Data:", { pieLabels, pieSales });
+                console.log("RenderCharts - Line Chart Data:", { lineLabels, lineSales, currentWeekSales, previousWeekSales });
+        
+                // Bar Chart
+                const barCtx = document.getElementById("barChart")?.getContext("2d");
+                if (!barCtx) {
+                    console.error("Bar chart canvas not found!");
+                    return;
+                }
+                const barGradient = barCtx.createLinearGradient(0, 0, 0, 400);
+                barGradient.addColorStop(0, "rgba(8, 238, 34, 0.8)");
+                barGradient.addColorStop(1, "rgba(46, 204, 113, 0.6)");
+                barChartInstance = new Chart(barCtx, {
+                    type: "bar",
+                    data: {
+                        labels: barLabels,
+                        datasets: [{
+                            label: "Total Sales",
+                            data: barSales,
+                            backgroundColor: barGradient,
+                            borderColor: "#224abe",
+                            borderWidth: 2,
+                            borderRadius: 5,
+                            barThickness: 30,
+                        }],
                     },
-                    x: {
-                        title: { display: true, text: "Period", color: "#e4e4e4", font: { size: 14 } },
-                        ticks: { color: "#e4e4e4", font: { size: 12 } },
-                        grid: { display: false },
+                    options: {
+                        animation: { duration: 1500, easing: "easeInOutQuart" },
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                suggestedMax: barSales.length > 0 ? Math.max(...barSales) * 1.2 : 1000,
+                                title: { display: true, text: "Sales (₹)", color: "#e4e4e4", font: { size: 14 } },
+                                ticks: { color: "#e4e4e4", font: { size: 12 } },
+                                grid: { color: "rgba(255, 255, 255, 0.1)" },
+                            },
+                            x: {
+                                title: { display: true, text: filter === "weekly" ? "Day of Week" : "Period", color: "#e4e4e4", font: { size: 14 } },
+                                ticks: { color: "#e4e4e4", font: { size: 12 } },
+                                grid: { display: false },
+                            },
+                        },
+                        plugins: {
+                            title: { display: true, text: filter === "weekly" ? "Weekly Sales Trend" : "Sales Trend", color: "#224abe", font: { size: 16, weight: "bold" } },
+                            legend: { labels: { color: "#e4e4e4", font: { size: 12 } } },
+                            tooltip: { backgroundColor: "#333", titleColor: "#e4e4e4", bodyColor: "#e4e4e4" },
+                        },
                     },
-                },
-                plugins: {
-                    title: { display: true, text: "Sales Trend", color: "#e4e4e4", font: { size: 16, weight: "bold" } },
-                    legend: { labels: { color: "#e4e4e4", font: { size: 12 } } },
-                    tooltip: { backgroundColor: "#333", titleColor: "#e4e4e4", bodyColor: "#e4e4e4" },
-                },
-            },
-        });
-
-        // Pie Chart
-        const pieCtx = document.getElementById("pieChart").getContext("2d");
-        pieChartInstance = new Chart(pieCtx, {
-            type: "pie",
-            data: {
-                labels: data.pieChart.labels,
-                datasets: [{
-                    label: "Sales by Payment Method",
-                    data: data.pieChart.sales,
-                    backgroundColor: [
-                        "rgba(255, 99, 132, 0.8)",
-                        "rgba(54, 162, 235, 0.8)",
-                        "rgba(255, 206, 86, 0.8)",
-                        "rgba(75, 192, 192, 0.8)",
-                        "rgba(153, 102, 255, 0.8)",
-                    ],
-                    borderColor: [
-                        "rgba(255, 99, 132, 1)",
-                        "rgba(54, 162, 235, 1)",
-                        "rgba(255, 206, 86, 1)",
-                        "rgba(75, 192, 192, 1)",
-                        "rgba(153, 102, 255, 1)",
-                    ],
-                    borderWidth: 2,
-                }],
-            },
-            options: {
-                animation: {
-                    duration: 1500,
-                    easing: "easeInOutQuart",
-                },
-                plugins: {
-                    title: { display: true, text: "Sales by Payment Method", color: "#e4e4e4", font: { size: 16, weight: "bold" } },
-                    legend: {
-                        position: "right",
-                        labels: { color: "#e4e4e4", font: { size: 12 }, boxWidth: 20 },
+                });
+        
+                // Pie Chart
+                const pieCtx = document.getElementById("pieChart")?.getContext("2d");
+                if (!pieCtx) {
+                    console.error("Pie chart canvas not found!");
+                    return;
+                }
+                pieChartInstance = new Chart(pieCtx, {
+                    type: "pie",
+                    data: {
+                        labels: pieLabels,
+                        datasets: [{
+                            label: "Sales by Payment Method",
+                            data: pieSales,
+                            backgroundColor: [
+                                "rgba(255, 99, 132, 0.8)",
+                                "rgba(54, 162, 235, 0.8)",
+                                "rgba(255, 206, 86, 0.8)",
+                                "rgba(75, 192, 192, 0.8)",
+                                "rgba(153, 102, 255, 0.8)",
+                            ],
+                            borderColor: "#224abe",
+                            borderWidth: 2,
+                        }],
                     },
-                    tooltip: { backgroundColor: "#333", titleColor: "#e4e4e4", bodyColor: "#e4e4e4" },
-                },
-            },
-        });
-
-        // Line Chart (New)
-        const lineCtx = document.getElementById("lineChart").getContext("2d");
-        lineChartInstance = new Chart(lineCtx, {
-            type: "line",
-            data: {
-                labels: data.lineChart.labels,
-                datasets: [
-                    {
-                        label: "Current Week",
-                        data: data.lineChart.currentWeekSales,
-                        borderColor: "rgba(54, 162, 235, 1)", // Blue line (similar to the image)
-                        backgroundColor: "rgba(54, 162, 235, 0.2)",
-                        fill: false,
-                        tension: 0.4, // Smooth curve
-                        borderWidth: 2,
+                    options: {
+                        animation: { duration: 1500, easing: "easeInOutQuart" },
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: { display: true, text: "Sales by Payment Method", color: "#224abe", font: { size: 16, weight: "bold" } },
+                            legend: { position: "right", labels: { color: "#e4e4e4", font: { size: 12 }, boxWidth: 20 } },
+                            tooltip: { backgroundColor: "#333", titleColor: "#e4e4e4", bodyColor: "#e4e4e4" },
+                        },
                     },
-                    {
-                        label: "Previous Week",
-                        data: data.lineChart.previousWeekSales,
-                        borderColor: "rgba(46, 204, 113, 1)", // Green line (similar to the image)
-                        backgroundColor: "rgba(46, 204, 113, 0.2)",
-                        fill: false,
-                        tension: 0.4, // Smooth curve
-                        borderWidth: 2,
-                    },
-                ],
-            },
-            options: {
-                animation: {
-                    duration: 1500,
-                    easing: "easeInOutQuart",
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: { display: true, text: "Sales (₹)", color: "#e4e4e4", font: { size: 14 } },
-                        ticks: { color: "#e4e4e4", font: { size: 12 } },
-                        grid: { color: "rgba(255, 255, 255, 0.1)" },
-                    },
-                    x: {
-                        title: { display: true, text: "Day of Week", color: "#e4e4e4", font: { size: 14 } },
-                        ticks: { color: "#e4e4e4", font: { size: 12 } },
-                        grid: { display: false },
-                    },
-                },
-                plugins: {
-                    title: { display: true, text: "Weekly Sales Comparison", color: "#e4e4e4", font: { size: 16, weight: "bold" } },
-                    legend: { labels: { color: "#e4e4e4", font: { size: 12 } } },
-                    tooltip: { backgroundColor: "#333", titleColor: "#e4e4e4", bodyColor: "#e4e4e4" },
-                },
-            },
-        });
-    }
-</script>
+                });
+        
+                // Line Chart
+                const lineCtx = document.getElementById("lineChart")?.getContext("2d");
+                if (!lineCtx) {
+                    console.error("Line chart canvas not found!");
+                    return;
+                }
+                let lineConfig = {};
+                if (filter === "weekly") {
+                    console.log("Line Chart - Weekly Data:", { lineLabels, currentWeekSales, previousWeekSales });
+        
+                    // Validate data to ensure no null/undefined values
+                    const validCurrentWeekSales = currentWeekSales.map(val => (val || 0));
+                    const validPreviousWeekSales = previousWeekSales.map(val => (val || 0));
+        
+                    lineConfig = {
+                        type: "line",
+                        data: {
+                            labels: lineLabels,
+                            datasets: [
+                                {
+                                    label: "Current Week",
+                                    data: validCurrentWeekSales,
+                                    borderColor: "#224abe",
+                                    backgroundColor: "rgba(34, 74, 190, 0.2)",
+                                    fill: false,
+                                    tension: 0.4,
+                                    borderWidth: 2,
+                                },
+                                {
+                                    label: "Previous Week",
+                                    data: validPreviousWeekSales,
+                                    borderColor: "#46a35e",
+                                    backgroundColor: "rgba(70, 163, 94, 0.2)",
+                                    fill: false,
+                                    tension: 0.4,
+                                    borderWidth: 2,
+                                },
+                            ],
+                        },
+                        options: {
+                            animation: { duration: 1500, easing: "easeInOutQuart" },
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    suggestedMax: Math.max(...validCurrentWeekSales, ...validPreviousWeekSales, 0) * 1.2 || 1000,
+                                    title: { display: true, text: "Sales (₹)", color: "#e4e4e4", font: { size: 14 } },
+                                    ticks: { color: "#e4e4e4", font: { size: 12 } },
+                                    grid: { color: "rgba(255, 255, 255, 0.1)" },
+                                },
+                                x: {
+                                    title: { display: true, text: "Day of Week", color: "#e4e4e4", font: { size: 14 } },
+                                    ticks: { color: "#e4e4e4", font: { size: 12 } },
+                                    grid: { display: false },
+                                },
+                            },
+                            plugins: {
+                                title: { display: true, text: "Weekly Sales Comparison (Saturday to Friday)", color: "#224abe", font: { size: 16, weight: "bold" } },
+                                legend: { labels: { color: "#e4e4e4", font: { size: 12 } } },
+                                tooltip: { backgroundColor: "#333", titleColor: "#e4e4e4", bodyColor: "#e4e4e4" },
+                            },
+                        },
+                    };
+        
+                    if (validCurrentWeekSales.every(val => val === 0) && validPreviousWeekSales.every(val => val === 0)) {
+                        console.warn("No sales data for weekly comparison.");
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'No Data',
+                            text: 'No sales data available for the weekly comparison.',
+                            confirmButtonColor: '#3085d6',
+                        });
+                    }
+                } else {
+                    // Validate lineSales to ensure no null/undefined values
+                    const validLineSales = lineSales.map(val => (val || 0));
+        
+                    lineConfig = {
+                        type: "line",
+                        data: {
+                            labels: lineLabels,
+                            datasets: [{
+                                label: filter === "yearly" ? "Monthly Sales" : "Sales",
+                                data: validLineSales,
+                                borderColor: "#224abe",
+                                backgroundColor: "rgba(34, 74, 190, 0.2)",
+                                fill: false,
+                                tension: 0.4,
+                                borderWidth: 2,
+                            }],
+                        },
+                        options: {
+                            animation: { duration: 1500, easing: "easeInOutQuart" },
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    suggestedMax: validLineSales.length > 0 ? Math.max(...validLineSales) * 1.2 : 1000,
+                                    title: { display: true, text: "Sales (₹)", color: "#e4e4e4", font: { size: 14 } },
+                                    ticks: { color: "#e4e4e4", font: { size: 12 } },
+                                    grid: { color: "rgba(255, 255, 255, 0.1)" },
+                                },
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: filter === "yearly" ? "Month" : (filter === "monthly" ? (lineFilter === "day" ? "Day" : "Week") : "Date"),
+                                        color: "#e4e4e4",
+                                        font: { size: 14 },
+                                    },
+                                    ticks: {
+                                        color: "#e4e4e4",
+                                        font: { size: 12 },
+                                        maxRotation: lineFilter === "week" ? 45 : 0, // Rotate labels for week-based view
+                                        minRotation: lineFilter === "week" ? 45 : 0,
+                                    },
+                                    grid: { display: false },
+                                },
+                            },
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: filter === "yearly" ? "Yearly Monthly Sales" : (filter === "monthly" ? (lineFilter === "day" ? "Monthly Daily Sales" : "Monthly Weekly Sales") : "Sales Over Custom Range"),
+                                    color: "#224abe",
+                                    font: { size: 16, weight: "bold" },
+                                },
+                                legend: { labels: { color: "#e4e4e4", font: { size: 12 } } },
+                                tooltip: { backgroundColor: "#333", titleColor: "#e4e4e4", bodyColor: "#e4e4e4" },
+                            },
+                        },
+                    };
+        
+                    if (filter !== "weekly" && validLineSales.every(val => val === 0)) {
+                        console.warn("No sales data for the selected period.");
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'No Data',
+                            text: 'No sales data available for the selected period.',
+                            confirmButtonColor: '#3085d6',
+                        });
+                    }
+                }
+        
+                console.log("Line Chart Datasets:", lineConfig.data.datasets);
+                lineChartInstance = new Chart(lineCtx, lineConfig);
+        
+                // Handle empty data for non-weekly filters
+                if (filter !== "weekly" && barSales.every(val => val === 0) && pieSales.every(val => val === 0) && validLineSales.every(val => val === 0)) {
+                    console.warn("No sales data available for the selected period");
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'No Data',
+                        text: 'No sales data available for the selected period.',
+                        confirmButtonColor: '#3085d6',
+                    });
+                }
+            }
+        
+            document.addEventListener("DOMContentLoaded", function () {
+                const filterSelect = document.getElementById("filter");
+                const monthYearSelection = document.getElementById("monthYearSelection");
+                const customDateRange = document.getElementById("customDateRange");
+                const lineFilterSection = document.getElementById("lineFilterSection");
+                const lineFilter = document.getElementById("lineFilter");
+        
+                // Initial visibility based on default filter ("monthly")
+                monthYearSelection.style.display = "flex";
+                customDateRange.style.display = "none";
+                lineFilterSection.style.display = "flex";
+        
+                filterSelect.addEventListener("change", function () {
+                    monthYearSelection.style.display = this.value === "monthly" || this.value === "yearly" ? "flex" : "none";
+                    customDateRange.style.display = this.value === "custom" ? "flex" : "none";
+                    lineFilterSection.style.display = this.value === "monthly" ? "flex" : "none";
+                    if (this.value !== "custom") fetchSalesReport();
+                });
+        
+                document.getElementById("startDate").addEventListener("change", () => {
+                    if (filterSelect.value === "custom") fetchSalesReport();
+                });
+                document.getElementById("endDate").addEventListener("change", () => {
+                    if (filterSelect.value === "custom") fetchSalesReport();
+                });
+        
+                lineFilter.addEventListener("change", () => {
+                    if (filterSelect.value === "monthly") fetchChartData();
+                });
+        
+               
+                fetchSalesReport();
+                fetchChartData();
+            });
+        </script>
 </body>
 </html>
