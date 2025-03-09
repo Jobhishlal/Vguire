@@ -1267,38 +1267,320 @@ export const salesreportget = async (req, res) => {
     }
 };
 
+// export const chart = async (req, res) => {
+//     try {
+//         const { filter, month, year, startDate, endDate, lineFilter = "week" } = req.query;
+
+//         const now = new Date();
+//         const currentMonth = month ? parseInt(month) - 1 : now.getMonth();
+//         const currentYear = year ? parseInt(year) : now.getFullYear();
+
+//         let matchConditions = { status: "Delivered" };
+//         let startOfWeek, endOfWeek;
+
+//         // Timezone adjustment helper
+//         const adjustForTimezone = (date) => {
+//             const offset = date.getTimezoneOffset();
+//             return new Date(date.getTime() - offset * 60 * 1000);
+//         };
+
+//         // Set match conditions based on filter
+//         if (filter === "daily") {
+//             matchConditions.createdAt = {
+//                 $gte: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0),
+//                 $lt: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59),
+//             };
+//         } else if (filter === "weekly") {
+//             startOfWeek = new Date(now);
+//             startOfWeek.setDate(now.getDate() - ((now.getDay() + 1) % 7)); // Previous Saturday
+//             startOfWeek.setHours(0, 0, 0, 0);
+//             endOfWeek = new Date(startOfWeek);
+//             endOfWeek.setDate(startOfWeek.getDate() + 6); // Following Friday
+//             endOfWeek.setHours(23, 59, 59, 999);
+//             matchConditions.createdAt = { $gte: adjustForTimezone(startOfWeek), $lte: adjustForTimezone(endOfWeek) };
+//             console.log("Weekly Match Condition:", { startOfWeek, endOfWeek });
+//         } else if (filter === "monthly") {
+//             matchConditions.createdAt = {
+//                 $gte: new Date(currentYear, currentMonth, 1),
+//                 $lte: new Date(currentYear, currentMonth + 1, 0, 23, 59, 59, 999),
+//             };
+//         } else if (filter === "yearly") {
+//             matchConditions.createdAt = {
+//                 $gte: new Date(currentYear, 0, 1),
+//                 $lte: new Date(currentYear, 11, 31, 23, 59, 59, 999),
+//             };
+//         } else if (filter === "custom" && startDate && endDate) {
+//             const start = new Date(startDate);
+//             const end = new Date(endDate);
+//             if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+//                 return res.status(400).json({ success: false, message: "Invalid date format" });
+//             }
+//             if (start > end) {
+//                 return res.status(400).json({ success: false, message: "Start date must be before end date" });
+//             }
+//             end.setHours(23, 59, 59, 999);
+//             matchConditions.createdAt = { $gte: start, $lte: end };
+//         } else {
+//             return res.status(400).json({ success: false, message: "Invalid or missing filter parameter" });
+//         }
+
+//         // Bar Chart Data
+//         let barLabels = [];
+//         let barSales = [];
+//         if (filter === "daily") {
+//             const dailyData = await Order.aggregate([
+//                 { $match: matchConditions },
+//                 { $group: { _id: { $hour: "$createdAt" }, totalSales: { $sum: "$totalAmount" } } },
+//                 { $sort: { _id: 1 } },
+//             ]);
+//             console.log("Daily Bar Data:", dailyData);
+//             barLabels = dailyData.map(item => `Hour ${item._id}`) || [];
+//             barSales = dailyData.map(item => item.totalSales || 0);
+//         } else if (filter === "weekly") {
+//             const weeklyData = await Order.aggregate([
+//                 { $match: matchConditions },
+//                 { $group: { _id: { $dayOfWeek: "$createdAt" }, totalSales: { $sum: "$totalAmount" } } },
+//                 { $sort: { _id: 1 } },
+//             ]);
+//             console.log("Weekly Bar Data:", weeklyData);
+
+//             const days = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
+//             barLabels = days;
+//             barSales = Array(7).fill(0);
+
+//             weeklyData.forEach(item => {
+//                 const mongoDay = item._id; // 1 (Sun) to 7 (Sat)
+//                 const chartDayIndex = mongoDay === 7 ? 0 : mongoDay - 1; // Map Sat (7) to 0, Sun (1) to 0, etc.
+//                 barSales[chartDayIndex] = item.totalSales || 0;
+//             });
+//         } else if (filter === "monthly") {
+//             const monthlyData = await Order.aggregate([
+//                 { $match: matchConditions },
+//                 { $group: { _id: { $dayOfMonth: "$createdAt" }, totalSales: { $sum: "$totalAmount" } } },
+//                 { $sort: { _id: 1 } },
+//             ]);
+//             console.log("Monthly Bar Data:", monthlyData);
+//             barLabels = monthlyData.map(item => `Day ${item._id}`) || [];
+//             barSales = monthlyData.map(item => item.totalSales || 0);
+//         } else if (filter === "custom" && startDate && endDate) {
+//             const daysDiff = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)) + 1;
+//             if (daysDiff === 1) {
+//                 const customData = await Order.aggregate([
+//                     { $match: matchConditions },
+//                     { $group: { _id: { $hour: "$createdAt" }, totalSales: { $sum: "$totalAmount" } } },
+//                     { $sort: { _id: 1 } },
+//                 ]);
+//                 console.log("Custom Single-Day Bar Data:", customData);
+//                 barLabels = customData.map(item => `Hour ${item._id}`) || [];
+//                 barSales = customData.map(item => item.totalSales || 0);
+//             } else {
+//                 const customData = await Order.aggregate([
+//                     { $match: matchConditions },
+//                     { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, totalSales: { $sum: "$totalAmount" } } },
+//                     { $sort: { _id: 1 } },
+//                 ]);
+//                 console.log("Custom Multi-Day Bar Data:", customData);
+//                 barLabels = customData.map(item => item._id) || [];
+//                 barSales = customData.map(item => item.totalSales || 0);
+//             }
+//         } else if (filter === "yearly") {
+//             const yearlyData = await Order.aggregate([
+//                 { $match: matchConditions },
+//                 { $group: { _id: { $month: "$createdAt" }, totalSales: { $sum: "$totalAmount" } } },
+//                 { $sort: { _id: 1 } },
+//             ]);
+//             console.log("Yearly Bar Data:", yearlyData);
+//             const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+//             barLabels = monthNames;
+//             barSales = monthNames.map((_, i) => yearlyData.find(d => d._id === i + 1)?.totalSales || 0);
+//         }
+
+//         // Pie Chart Data
+//         const paymentData = await Order.aggregate([
+//             { $match: matchConditions },
+//             { $group: { _id: "$paymentMethod", totalSales: { $sum: "$totalAmount" } } },
+//         ]);
+//         console.log("Pie Data:", paymentData);
+//         const pieLabels = paymentData.map(item => item._id || "Unknown") || [];
+//         const pieSales = paymentData.map(item => item.totalSales || 0) || [];
+
+//         // Line Chart Data
+//         let lineLabels = [];
+//         let lineSales = [];
+//         let currentWeekSales = [];
+//         let previousWeekSales = [];
+
+//         if (filter === "yearly") {
+//             const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+//             lineLabels = monthNames;
+//             const yearlyLineData = await Order.aggregate([
+//                 { $match: matchConditions },
+//                 { $group: { _id: { $month: "$createdAt" }, totalSales: { $sum: "$totalAmount" } } },
+//                 { $sort: { _id: 1 } },
+//             ]);
+//             console.log("Yearly Line Data:", yearlyLineData);
+//             lineSales = monthNames.map((_, i) => yearlyLineData.find(d => d._id === i + 1)?.totalSales || 0);
+//         } else if (filter === "monthly") {
+//             const startOfMonth = new Date(currentYear, currentMonth, 1);
+//             const endOfMonth = new Date(currentYear, currentMonth + 1, 0);
+//             endOfMonth.setHours(23, 59, 59, 999);
+
+//             if (lineFilter === "day") {
+//                 const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+//                 lineLabels = Array.from({ length: daysInMonth }, (_, i) => `Day ${i + 1}`);
+//                 const dailyData = await Order.aggregate([
+//                     { $match: matchConditions },
+//                     { $group: { _id: { $dayOfMonth: "$createdAt" }, totalSales: { $sum: "$totalAmount" } } },
+//                     { $sort: { _id: 1 } },
+//                 ]);
+//                 console.log("Monthly Daily Line Data:", dailyData);
+//                 lineSales = lineLabels.map((_, i) => dailyData.find(d => d._id === i + 1)?.totalSales || 0);
+//             } else {
+//                 // Week-based (Saturday to Friday)
+//                 const weeksInMonth = [];
+//                 let currentWeekStart = new Date(startOfMonth);
+//                 currentWeekStart.setDate(startOfMonth.getDate() - ((currentWeekStart.getDay() + 1) % 7)); // First Saturday before or on startOfMonth
+//                 currentWeekStart.setHours(0, 0, 0, 0);
+
+//                 while (currentWeekStart <= endOfMonth) {
+//                     const weekEnd = new Date(currentWeekStart);
+//                     weekEnd.setDate(currentWeekStart.getDate() + 6); // Friday
+//                     weekEnd.setHours(23, 59, 59, 999);
+
+//                     const adjustedStart = currentWeekStart < startOfMonth ? startOfMonth : currentWeekStart;
+//                     const adjustedEnd = weekEnd > endOfMonth ? endOfMonth : weekEnd;
+
+//                     weeksInMonth.push({ start: new Date(adjustedStart), end: new Date(adjustedEnd) });
+//                     currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+//                 }
+
+//                 lineLabels = weeksInMonth.map((week, i) => {
+//                     const startStr = week.start.toISOString().split("T")[0];
+//                     const endStr = week.end.toISOString().split("T")[0];
+//                     return `Week ${i + 1} (${startStr} to ${endStr})`;
+//                 });
+
+//                 const weeklyData = await Promise.all(
+//                     weeksInMonth.map(async (week) => {
+//                         const data = await Order.aggregate([
+//                             {
+//                                 $match: {
+//                                     status: "Delivered",
+//                                     createdAt: { $gte: adjustForTimezone(week.start), $lte: adjustForTimezone(week.end) }
+//                                 }
+//                             },
+//                             { $group: { _id: null, totalSales: { $sum: "$totalAmount" } } },
+//                         ]);
+//                         return data.length > 0 ? data[0].totalSales : 0;
+//                     })
+//                 );
+//                 console.log("Monthly Weekly Line Data:", weeklyData);
+//                 console.log("Monthly Weekly Labels:", lineLabels);
+//                 lineSales = weeklyData;
+//             }
+//         } else if (filter === "custom" && startDate && endDate) {
+//             const start = new Date(startDate);
+//             const end = new Date(endDate);
+//             const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+//             lineLabels = Array.from({ length: daysDiff }, (_, i) => {
+//                 const date = new Date(start);
+//                 date.setDate(start.getDate() + i);
+//                 return date.toISOString().split("T")[0];
+//             });
+//             const lineData = await Order.aggregate([
+//                 { $match: matchConditions },
+//                 { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, totalSales: { $sum: "$totalAmount" } } },
+//                 { $sort: { _id: 1 } },
+//             ]);
+//             console.log("Custom Line Data:", lineData);
+//             lineSales = lineLabels.map(label => lineData.find(d => d._id === label)?.totalSales || 0);
+//         } else if (filter === "weekly") {
+//             const days = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
+//             lineLabels = days;
+
+//             const currentWeekData = await Order.aggregate([
+//                 { $match: matchConditions },
+//                 { $group: { _id: { $dayOfWeek: "$createdAt" }, totalSales: { $sum: "$totalAmount" } } },
+//                 { $sort: { _id: 1 } },
+//             ]);
+//             console.log("Current Week Data:", currentWeekData);
+
+//             const startOfPreviousWeek = new Date(startOfWeek);
+//             startOfPreviousWeek.setDate(startOfWeek.getDate() - 7);
+//             const endOfPreviousWeek = new Date(endOfWeek);
+//             endOfPreviousWeek.setDate(endOfWeek.getDate() - 7);
+//             const previousWeekData = await Order.aggregate([
+//                 { $match: { status: "Delivered", createdAt: { $gte: adjustForTimezone(startOfPreviousWeek), $lte: adjustForTimezone(endOfPreviousWeek) } } },
+//                 { $group: { _id: { $dayOfWeek: "$createdAt" }, totalSales: { $sum: "$totalAmount" } } },
+//                 { $sort: { _id: 1 } },
+//             ]);
+//             console.log("Previous Week Data:", previousWeekData);
+
+//             currentWeekSales = Array(7).fill(0);
+//             previousWeekSales = Array(7).fill(0);
+
+//             currentWeekData.forEach(item => {
+//                 const mongoDay = item._id; // 1 (Sun) to 7 (Sat)
+//                 const chartDayIndex = mongoDay === 7 ? 0 : mongoDay - 1; // Map Sat (7) to 0, Sun (1) to 0, etc.
+//                 currentWeekSales[chartDayIndex] = item.totalSales || 0;
+//             });
+
+//             previousWeekData.forEach(item => {
+//                 const mongoDay = item._id; // 1 (Sun) to 7 (Sat)
+//                 const chartDayIndex = mongoDay === 7 ? 0 : mongoDay - 1; // Map Sat (7) to 0, Sun (1) to 0, etc.
+//                 previousWeekSales[chartDayIndex] = item.totalSales || 0;
+//             });
+
+//             console.log("Final Current Week Sales:", currentWeekSales);
+//             console.log("Final Previous Week Sales:", previousWeekSales);
+//         }
+
+//         // Response data
+//         const responseData = {
+//             barChart: { labels: barLabels, sales: barSales },
+//             pieChart: { labels: pieLabels, sales: pieSales },
+//             lineChart: {
+//                 labels: lineLabels,
+//                 sales: lineSales,
+//                 currentWeekSales: currentWeekSales,
+//                 previousWeekSales: previousWeekSales,
+//             },
+//         };
+
+//         console.log("Response Data:", responseData);
+//         res.json(responseData);
+//     } catch (error) {
+//         console.error("Error generating chart data:", error);
+//         return res.status(500).json({ success: false, message: error.message });
+//     }
+// };
+
+
 export const chart = async (req, res) => {
     try {
         const { filter, month, year, startDate, endDate, lineFilter = "week" } = req.query;
 
-        const now = new Date();
+        const now = new Date(); // Current date and time (e.g., March 09, 2025)
         const currentMonth = month ? parseInt(month) - 1 : now.getMonth();
         const currentYear = year ? parseInt(year) : now.getFullYear();
 
         let matchConditions = { status: "Delivered" };
         let startOfWeek, endOfWeek;
 
-        // Timezone adjustment helper
-        const adjustForTimezone = (date) => {
-            const offset = date.getTimezoneOffset();
-            return new Date(date.getTime() - offset * 60 * 1000);
-        };
+        console.log("Query Parameters:", req.query);
 
         // Set match conditions based on filter
         if (filter === "daily") {
             matchConditions.createdAt = {
                 $gte: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0),
-                $lt: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59),
+                $lte: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59),
             };
         } else if (filter === "weekly") {
             startOfWeek = new Date(now);
-            startOfWeek.setDate(now.getDate() - ((now.getDay() + 1) % 7)); // Previous Saturday
+            startOfWeek.setDate(now.getDate() - ((now.getDay() + 1) % 7)); // Start at Saturday
             startOfWeek.setHours(0, 0, 0, 0);
-            endOfWeek = new Date(startOfWeek);
-            endOfWeek.setDate(startOfWeek.getDate() + 6); // Following Friday
-            endOfWeek.setHours(23, 59, 59, 999);
-            matchConditions.createdAt = { $gte: adjustForTimezone(startOfWeek), $lte: adjustForTimezone(endOfWeek) };
-            console.log("Weekly Match Condition:", { startOfWeek, endOfWeek });
+            endOfWeek = new Date(now+1); // Include up to current time
+            matchConditions.createdAt = { $gte: startOfWeek, $lte: endOfWeek }; // Removed adjustForTimezone
         } else if (filter === "monthly") {
             matchConditions.createdAt = {
                 $gte: new Date(currentYear, currentMonth, 1),
@@ -1324,35 +1606,56 @@ export const chart = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid or missing filter parameter" });
         }
 
-        // Bar Chart Data
+        console.log("Match Conditions:", matchConditions);
+
+        // Declare all variables at the top
         let barLabels = [];
         let barSales = [];
-        if (filter === "daily") {
-            const dailyData = await Order.aggregate([
-                { $match: matchConditions },
-                { $group: { _id: { $hour: "$createdAt" }, totalSales: { $sum: "$totalAmount" } } },
-                { $sort: { _id: 1 } },
-            ]);
-            console.log("Daily Bar Data:", dailyData);
-            barLabels = dailyData.map(item => `Hour ${item._id}`) || [];
-            barSales = dailyData.map(item => item.totalSales || 0);
-        } else if (filter === "weekly") {
+        let pieLabels = [];
+        let pieSales = [];
+        let lineLabels = [];
+        let lineSales = [];
+        let currentWeekSales = [];
+        let previousWeekSales = [];
+
+        // Calculate total sales first to ensure consistency
+        const totalSalesData = await Order.aggregate([
+            { $match: matchConditions },
+            { $group: { _id: null, totalSales: { $sum: "$totalAmount" } } },
+        ]);
+        const expectedTotal = totalSalesData.length > 0 ? totalSalesData[0].totalSales : 0;
+        console.log("Expected Total Sales from Match Conditions:", expectedTotal);
+
+        // Log raw orders for debugging
+        const rawOrders = await Order.find(matchConditions).select("createdAt totalAmount paymentMethod");
+        console.log("Raw Orders:", rawOrders.map(order => ({
+            createdAt: order.createdAt,
+            totalAmount: order.totalAmount,
+            paymentMethod: order.paymentMethod,
+            dayOfWeek: order.createdAt.getDay() // JS: 0=Sun, 6=Sat
+        })));
+
+        // Bar Chart Data
+        if (filter === "weekly") {
             const weeklyData = await Order.aggregate([
                 { $match: matchConditions },
                 { $group: { _id: { $dayOfWeek: "$createdAt" }, totalSales: { $sum: "$totalAmount" } } },
-                { $sort: { _id: 1 } },
+                { $sort: { _id: 1 } }, // MongoDB: 1=Sun, 7=Sat
             ]);
             console.log("Weekly Bar Data:", weeklyData);
-
             const days = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
             barLabels = days;
             barSales = Array(7).fill(0);
-
             weeklyData.forEach(item => {
-                const mongoDay = item._id; // 1 (Sun) to 7 (Sat)
-                const chartDayIndex = mongoDay === 7 ? 0 : mongoDay - 1; // Map Sat (7) to 0, Sun (1) to 0, etc.
+                const mongoDay = item._id; // MongoDB: 1=Sun, 7=Sat
+                const chartDayIndex = mongoDay === 7 ? 0 : mongoDay ; // Map to Sat-Fri (0=Sat, 1=Sun)
                 barSales[chartDayIndex] = item.totalSales || 0;
             });
+            const barTotal = barSales.reduce((sum, val) => sum + val, 0);
+            console.log("Bar Chart Total:", barTotal);
+            if (barTotal !== expectedTotal) {
+                console.warn("Bar Chart Total does not match Expected Total:", { barTotal, expectedTotal });
+            }
         } else if (filter === "monthly") {
             const monthlyData = await Order.aggregate([
                 { $match: matchConditions },
@@ -1362,37 +1665,6 @@ export const chart = async (req, res) => {
             console.log("Monthly Bar Data:", monthlyData);
             barLabels = monthlyData.map(item => `Day ${item._id}`) || [];
             barSales = monthlyData.map(item => item.totalSales || 0);
-        } else if (filter === "custom" && startDate && endDate) {
-            const daysDiff = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)) + 1;
-            if (daysDiff === 1) {
-                const customData = await Order.aggregate([
-                    { $match: matchConditions },
-                    { $group: { _id: { $hour: "$createdAt" }, totalSales: { $sum: "$totalAmount" } } },
-                    { $sort: { _id: 1 } },
-                ]);
-                console.log("Custom Single-Day Bar Data:", customData);
-                barLabels = customData.map(item => `Hour ${item._id}`) || [];
-                barSales = customData.map(item => item.totalSales || 0);
-            } else {
-                const customData = await Order.aggregate([
-                    { $match: matchConditions },
-                    { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, totalSales: { $sum: "$totalAmount" } } },
-                    { $sort: { _id: 1 } },
-                ]);
-                console.log("Custom Multi-Day Bar Data:", customData);
-                barLabels = customData.map(item => item._id) || [];
-                barSales = customData.map(item => item.totalSales || 0);
-            }
-        } else if (filter === "yearly") {
-            const yearlyData = await Order.aggregate([
-                { $match: matchConditions },
-                { $group: { _id: { $month: "$createdAt" }, totalSales: { $sum: "$totalAmount" } } },
-                { $sort: { _id: 1 } },
-            ]);
-            console.log("Yearly Bar Data:", yearlyData);
-            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            barLabels = monthNames;
-            barSales = monthNames.map((_, i) => yearlyData.find(d => d._id === i + 1)?.totalSales || 0);
         }
 
         // Pie Chart Data
@@ -1401,50 +1673,72 @@ export const chart = async (req, res) => {
             { $group: { _id: "$paymentMethod", totalSales: { $sum: "$totalAmount" } } },
         ]);
         console.log("Pie Data:", paymentData);
-        const pieLabels = paymentData.map(item => item._id || "Unknown") || [];
-        const pieSales = paymentData.map(item => item.totalSales || 0) || [];
+        pieLabels = paymentData.map(item => item._id || "Unknown");
+        pieSales = paymentData.map(item => item.totalSales || 0);
+        const pieTotal = pieSales.reduce((sum, val) => sum + val, 0);
+        console.log("Pie Chart Total:", pieTotal);
+        if (pieTotal !== expectedTotal) {
+            console.warn("Pie Chart Total does not match Expected Total:", { pieTotal, expectedTotal });
+        }
 
         // Line Chart Data
-        let lineLabels = [];
-        let lineSales = [];
-        let currentWeekSales = [];
-        let previousWeekSales = [];
+        if (filter === "weekly") {
+            const days = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
+            lineLabels = days;
 
-        if (filter === "yearly") {
-            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            lineLabels = monthNames;
-            const yearlyLineData = await Order.aggregate([
+            const currentWeekData = await Order.aggregate([
                 { $match: matchConditions },
-                { $group: { _id: { $month: "$createdAt" }, totalSales: { $sum: "$totalAmount" } } },
+                { $group: { _id: { $dayOfWeek: "$createdAt" }, totalSales: { $sum: "$totalAmount" } } },
+                { $sort: { _id: 1 } }, // MongoDB: 1=Sun, 7=Sat
+            ]);
+            console.log("Current Week Data:", currentWeekData);
+
+            const startOfPreviousWeek = new Date(startOfWeek);
+            startOfPreviousWeek.setDate(startOfWeek.getDate() - 7);
+            const endOfPreviousWeek = new Date(startOfPreviousWeek);
+            endOfPreviousWeek.setDate(startOfPreviousWeek.getDate() + 6);
+            endOfPreviousWeek.setHours(23, 59, 59, 999);
+            const previousWeekData = await Order.aggregate([
+                { $match: { status: "Delivered", createdAt: { $gte: startOfPreviousWeek, $lte: endOfPreviousWeek } } },
+                { $group: { _id: { $dayOfWeek: "$createdAt" }, totalSales: { $sum: "$totalAmount" } } },
                 { $sort: { _id: 1 } },
             ]);
-            console.log("Yearly Line Data:", yearlyLineData);
-            lineSales = monthNames.map((_, i) => yearlyLineData.find(d => d._id === i + 1)?.totalSales || 0);
+            console.log("Previous Week Data:", previousWeekData);
+
+            currentWeekSales = Array(7).fill(0);
+            previousWeekSales = Array(7).fill(0);
+
+            currentWeekData.forEach(item => {
+                const mongoDay = item._id;
+                const chartDayIndex = mongoDay === 7 ? 0 : mongoDay  ; // Map to Sat-Fri
+                currentWeekSales[chartDayIndex] = item.totalSales || 0;
+            });
+
+            previousWeekData.forEach(item => {
+                const mongoDay = item._id;
+                const chartDayIndex = mongoDay === 7 ? 0 : mongoDay ;
+                previousWeekSales[chartDayIndex] = item.totalSales || 0;
+            });
+
+            const currentWeekTotal = currentWeekSales.reduce((sum, val) => sum + val, 0);
+            console.log("Current Week Total:", currentWeekTotal);
+            if (currentWeekTotal !== expectedTotal) {
+                console.warn("Current Week Total does not match Expected Total:", { currentWeekTotal, expectedTotal });
+            }
         } else if (filter === "monthly") {
             const startOfMonth = new Date(currentYear, currentMonth, 1);
             const endOfMonth = new Date(currentYear, currentMonth + 1, 0);
             endOfMonth.setHours(23, 59, 59, 999);
 
-            if (lineFilter === "day") {
-                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-                lineLabels = Array.from({ length: daysInMonth }, (_, i) => `Day ${i + 1}`);
-                const dailyData = await Order.aggregate([
-                    { $match: matchConditions },
-                    { $group: { _id: { $dayOfMonth: "$createdAt" }, totalSales: { $sum: "$totalAmount" } } },
-                    { $sort: { _id: 1 } },
-                ]);
-                console.log("Monthly Daily Line Data:", dailyData);
-                lineSales = lineLabels.map((_, i) => dailyData.find(d => d._id === i + 1)?.totalSales || 0);
-            } else {
-                // Week-based (Saturday to Friday)
+            if (lineFilter === "week") {
                 const weeksInMonth = [];
                 let currentWeekStart = new Date(startOfMonth);
-                currentWeekStart.setDate(startOfMonth.getDate() - ((currentWeekStart.getDay() + 1) % 7)); // First Saturday before or on startOfMonth
+                currentWeekStart.setDate(startOfMonth.getDate() - ((currentWeekStart.getDay() + 1) % 7));
                 currentWeekStart.setHours(0, 0, 0, 0);
 
                 while (currentWeekStart <= endOfMonth) {
                     const weekEnd = new Date(currentWeekStart);
-                    weekEnd.setDate(currentWeekStart.getDate() + 6); // Friday
+                    weekEnd.setDate(currentWeekStart.getDate() + 6);
                     weekEnd.setHours(23, 59, 59, 999);
 
                     const adjustedStart = currentWeekStart < startOfMonth ? startOfMonth : currentWeekStart;
@@ -1453,6 +1747,8 @@ export const chart = async (req, res) => {
                     weeksInMonth.push({ start: new Date(adjustedStart), end: new Date(adjustedEnd) });
                     currentWeekStart.setDate(currentWeekStart.getDate() + 7);
                 }
+
+                console.log("Weeks in Month:", weeksInMonth);
 
                 lineLabels = weeksInMonth.map((week, i) => {
                     const startStr = week.start.toISOString().split("T")[0];
@@ -1466,7 +1762,7 @@ export const chart = async (req, res) => {
                             {
                                 $match: {
                                     status: "Delivered",
-                                    createdAt: { $gte: adjustForTimezone(week.start), $lte: adjustForTimezone(week.end) }
+                                    createdAt: { $gte: week.start, $lte: week.end }
                                 }
                             },
                             { $group: { _id: null, totalSales: { $sum: "$totalAmount" } } },
@@ -1475,75 +1771,28 @@ export const chart = async (req, res) => {
                     })
                 );
                 console.log("Monthly Weekly Line Data:", weeklyData);
-                console.log("Monthly Weekly Labels:", lineLabels);
                 lineSales = weeklyData;
+            } else if (lineFilter === "day") {
+                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+                lineLabels = Array.from({ length: daysInMonth }, (_, i) => `Day ${i + 1}`);
+                const dailyData = await Order.aggregate([
+                    { $match: matchConditions },
+                    { $group: { _id: { $dayOfMonth: "$createdAt" }, totalSales: { $sum: "$totalAmount" } } },
+                    { $sort: { _id: 1 } },
+                ]);
+                console.log("Monthly Daily Line Data:", dailyData);
+                lineSales = lineLabels.map((_, i) => dailyData.find(d => d._id === i + 1)?.totalSales || 0);
             }
-        } else if (filter === "custom" && startDate && endDate) {
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-            const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
-            lineLabels = Array.from({ length: daysDiff }, (_, i) => {
-                const date = new Date(start);
-                date.setDate(start.getDate() + i);
-                return date.toISOString().split("T")[0];
-            });
-            const lineData = await Order.aggregate([
-                { $match: matchConditions },
-                { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, totalSales: { $sum: "$totalAmount" } } },
-                { $sort: { _id: 1 } },
-            ]);
-            console.log("Custom Line Data:", lineData);
-            lineSales = lineLabels.map(label => lineData.find(d => d._id === label)?.totalSales || 0);
-        } else if (filter === "weekly") {
-            const days = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
-            lineLabels = days;
-
-            const currentWeekData = await Order.aggregate([
-                { $match: matchConditions },
-                { $group: { _id: { $dayOfWeek: "$createdAt" }, totalSales: { $sum: "$totalAmount" } } },
-                { $sort: { _id: 1 } },
-            ]);
-            console.log("Current Week Data:", currentWeekData);
-
-            const startOfPreviousWeek = new Date(startOfWeek);
-            startOfPreviousWeek.setDate(startOfWeek.getDate() - 7);
-            const endOfPreviousWeek = new Date(endOfWeek);
-            endOfPreviousWeek.setDate(endOfWeek.getDate() - 7);
-            const previousWeekData = await Order.aggregate([
-                { $match: { status: "Delivered", createdAt: { $gte: adjustForTimezone(startOfPreviousWeek), $lte: adjustForTimezone(endOfPreviousWeek) } } },
-                { $group: { _id: { $dayOfWeek: "$createdAt" }, totalSales: { $sum: "$totalAmount" } } },
-                { $sort: { _id: 1 } },
-            ]);
-            console.log("Previous Week Data:", previousWeekData);
-
-            currentWeekSales = Array(7).fill(0);
-            previousWeekSales = Array(7).fill(0);
-
-            currentWeekData.forEach(item => {
-                const mongoDay = item._id; // 1 (Sun) to 7 (Sat)
-                const chartDayIndex = mongoDay === 7 ? 0 : mongoDay - 1; // Map Sat (7) to 0, Sun (1) to 0, etc.
-                currentWeekSales[chartDayIndex] = item.totalSales || 0;
-            });
-
-            previousWeekData.forEach(item => {
-                const mongoDay = item._id; // 1 (Sun) to 7 (Sat)
-                const chartDayIndex = mongoDay === 7 ? 0 : mongoDay - 1; // Map Sat (7) to 0, Sun (1) to 0, etc.
-                previousWeekSales[chartDayIndex] = item.totalSales || 0;
-            });
-
-            console.log("Final Current Week Sales:", currentWeekSales);
-            console.log("Final Previous Week Sales:", previousWeekSales);
         }
 
-        // Response data
         const responseData = {
             barChart: { labels: barLabels, sales: barSales },
             pieChart: { labels: pieLabels, sales: pieSales },
             lineChart: {
                 labels: lineLabels,
                 sales: lineSales,
-                currentWeekSales: currentWeekSales,
-                previousWeekSales: previousWeekSales,
+                currentWeekSales,
+                previousWeekSales,
             },
         };
 
@@ -1552,5 +1801,74 @@ export const chart = async (req, res) => {
     } catch (error) {
         console.error("Error generating chart data:", error);
         return res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+
+export const ledger = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+
+   
+        const totalOrders = await Order.countDocuments({});
+        const totalPages = Math.ceil(totalOrders / limit);
+
+        const orders = await Order.find({})
+            .populate('addressId')
+            .populate('appliedCoupon')
+            .skip((page - 1) * limit)
+            .limit(limit);
+
+        let totalIncome = 0;
+        let totalDiscount = 0;
+        let totalRefund = 0;
+
+        const ledgerData = orders.map(order => {
+            let totalAmount = parseFloat(order.totalAmount) || 0;
+            let refundedAmount = parseFloat(order.refundedAmount) || 0;
+            let couponDiscount = 0;
+
+            if (order.appliedCoupon && order.appliedCoupon.value) {
+                const discountValue = parseFloat(order.appliedCoupon.value) || 0;
+
+                if (order.appliedCoupon.discountType === 'percentage') {
+                    couponDiscount = (totalAmount * discountValue) / 100;
+                } else if (order.appliedCoupon.discountType === 'flat') {
+                    couponDiscount = discountValue;
+                }
+            }
+
+            totalIncome += totalAmount;
+            totalDiscount += couponDiscount;
+            totalRefund += refundedAmount;
+
+            return {
+                orderId: order._id,
+                customer: order.addressId?.fullName || 'N/A',
+                date: order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A',
+                paymentMethod: order.paymentMethod || 'N/A',
+                totalAmount: totalAmount.toFixed(2),
+                discount: couponDiscount.toFixed(2),
+                refund: refundedAmount.toFixed(2),
+                profit: (totalAmount - couponDiscount - refundedAmount).toFixed(2),
+            };
+        });
+
+        const totalProfit = (totalIncome - totalDiscount - totalRefund).toFixed(2);
+
+        res.render('admin/ledger', { 
+            ledgerData, 
+            page, 
+            totalPages, 
+            limit,
+            totalIncome: totalIncome.toFixed(2),
+            totalDiscount: totalDiscount.toFixed(2),
+            totalRefund: totalRefund.toFixed(2),
+            totalProfit
+        });
+    } catch (error) {
+        console.error("Error generating ledger:", error);
+        res.status(500).send("Failed to load ledger data");
     }
 };

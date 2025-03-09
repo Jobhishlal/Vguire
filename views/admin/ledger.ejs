@@ -1,0 +1,121 @@
+<style>
+    main {
+        margin-top: 50px;
+        padding-left: 250px;
+        background-color: #121212;
+        color: white;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        font-size: 16px;
+        text-align: center;
+        background-color: #1e1e1e;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    th {
+        background-color: #333;
+        color: white;
+        padding: 12px;
+    }
+
+    td {
+        padding: 12px;
+        border-bottom: 1px solid #444;
+    }
+
+    tr:nth-child(even) {
+        background-color: #252525;
+    }
+
+    tr:hover {
+        background-color: #333;
+    }
+
+    .credit {
+        color: green;
+        font-weight: bold;
+    }
+
+    .debit {
+        color: red;
+        font-weight: bold;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+
+    .pagination a {
+        color: white;
+        padding: 10px 16px;
+        text-decoration: none;
+        border: 1px solid #444;
+        margin: 0 4px;
+        border-radius: 5px;
+        transition: 0.3s;
+        background-color: #222;
+    }
+
+    .pagination a.active {
+        background-color: #4CAF50;
+        border-color: #4CAF50;
+    }
+
+    .pagination a:hover:not(.active) {
+        background-color: #ff4444;
+        border-color: #ff4444;
+    }
+</style>
+    
+    <%- include('../partials/admin/navbar.ejs') %>
+    
+    <main>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Payment Method</th>
+                    <th>Credit (Total Amount)</th>
+                    <th>Debit (Discount + Refund)</th>
+                    <th>Net Profit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% ledgerData.forEach(entry => { %>
+                    <tr>
+                        <td><%= entry.orderId %></td>
+                        <td><%= entry.customer %></td>
+                        <td><%= entry.date %></td>
+                        <td><%= entry.paymentMethod %></td>
+                        <td class="credit">₹<%= entry.totalAmount %></td>
+                        <td class="debit">₹<%= entry.discount %> + ₹<%= entry.refund %></td>
+                        <td class="<%= entry.profit >= 0 ? 'credit' : 'debit' %>">₹<%= entry.profit %></td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    
+        <!-- Summary Section -->
+        <div class="ledger-summary">
+            <h3>Total Ledger Summary</h3>
+            <p><strong>Total Income (Credit):</strong> ₹<%= totalIncome %></p>
+            <p><strong>Total Discounts + Refunds (Debit):</strong> ₹<%= (Number(totalDiscount) + Number(totalRefund)).toFixed(2) %></p>
+            <p><strong>Net Profit:</strong> <span class="<%= totalProfit >= 0 ? 'credit' : 'debit' %>">₹<%= totalProfit %></span></p>
+        </div>
+    
+        <div class="pagination">
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <a href="?page=<%= i %>&limit=<%= limit %>" class="<%= page === i ? 'active' : '' %>"><%= i %></a>
+            <% } %>
+        </div>
+    </main>
+    

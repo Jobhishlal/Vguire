@@ -67,6 +67,71 @@ export const singlecheckout = async (req, res) => {
     }
 };
 
+// export const buyNowCartView = async (req, res) => {
+//     try {
+//         const userId = req.user._id;
+//         const cart = await Cart.findOne({ userId }).populate("items.productId");
+
+//         if (!cart || cart.items.length === 0) {
+//             return res.redirect("/cart");
+//         }
+
+//         const addresses = await Address.find({ userId });
+//         const selectedAddressId = addresses.length > 0 ? addresses[0]._id.toString() : '';
+
+//         let totalAmount = cart.items.reduce((total, item) => {
+//             const product = item.productId;
+//             const price = (product.Offerprice && product.Offerprice > 0) ? product.Offerprice : product.price;
+//             return total + (price * item.quantity);
+//         }, 0);
+
+//         let discountAmount = 0;
+//         let appliedCoupon = null;
+
+//         if (req.session.appliedCoupon) {
+//             const coupon = await Coupon.findOne({ code: req.session.appliedCoupon });
+
+//             if (coupon) {
+//                 discountAmount = Math.min(coupon.discountAmount, totalAmount); 
+//                 appliedCoupon = coupon.code;
+//                 totalAmount -= discountAmount;
+//             }
+//         }
+
+//         const availableCoupons = await Coupon.find({
+//             usedByUsers: { $ne: userId },  
+//             expirationDate: { $gte: new Date() },  
+//             startDate: { $lte: new Date() },  
+//             usageLimit: { $gt: 0 }, 
+//             minOrderAmount: { $lte: totalAmount }  
+//         });
+        
+
+//         res.render("user/checkout", {
+//             items: cart.items.map(item => ({
+//                 size: item.size,
+//                 product: item.productId,
+//                 quantity: item.quantity,
+//                 price: (item.productId.Offerprice && item.productId.Offerprice > 0) ? item.productId.Offerprice : item.productId.price
+//             })),
+//             addresses,
+//             selectedAddressId,
+//             totalAmount,
+//             discountAmount,
+//             appliedCoupon,
+//             currentCheckoutUrl: "/user/checkout",
+//             checkoutType: "cart",
+//             flashMessage: req.session.flashMessage || null,
+//             availableCoupons
+//         });
+
+//         delete req.session.flashMessage;
+
+//     } catch (error) {
+//         console.error("Checkout Error:", error);
+//         res.status(500).send("Server Error");
+//     }
+// };
 export const buyNowCartView = async (req, res) => {
     try {
         const userId = req.user._id;
@@ -79,33 +144,53 @@ export const buyNowCartView = async (req, res) => {
         const addresses = await Address.find({ userId });
         const selectedAddressId = addresses.length > 0 ? addresses[0]._id.toString() : '';
 
+        // Ensure totalAmount is always a valid number
         let totalAmount = cart.items.reduce((total, item) => {
             const product = item.productId;
-            const price = (product.Offerprice && product.Offerprice > 0) ? product.Offerprice : product.price;
+
+            // Get the correct price, ensuring it's a valid number
+            let price = (product.Offerprice && product.Offerprice > 0) ? product.Offerprice : product.price;
+            if (!price || isNaN(price)) {
+                console.error(`Invalid price for product ${product._id}:`, price);
+                return total; // Skip invalid prices
+            }
+
+            // Ensure quantity is a valid number
+            if (!item.quantity || isNaN(item.quantity)) {
+                console.error(`Invalid quantity for product ${product._id}:`, item.quantity);
+                return total; // Skip invalid quantities
+            }
+
             return total + (price * item.quantity);
         }, 0);
+
+        // Ensure totalAmount is a valid number before proceeding
+        if (!totalAmount || isNaN(totalAmount)) {
+            console.error("Invalid totalAmount:", totalAmount);
+            totalAmount = 0; // Default to 0 if invalid
+        }
 
         let discountAmount = 0;
         let appliedCoupon = null;
 
-        if (req.session.appliedCoupon) {
+        if (req.session.appliedCoupon && typeof req.session.appliedCoupon === "string") {
             const coupon = await Coupon.findOne({ code: req.session.appliedCoupon });
 
             if (coupon) {
-                discountAmount = Math.min(coupon.discountAmount, totalAmount); 
+                discountAmount = Math.min(coupon.value, totalAmount); 
                 appliedCoupon = coupon.code;
                 totalAmount -= discountAmount;
             }
         }
 
+        // Ensure totalAmount is valid before querying
         const availableCoupons = await Coupon.find({
             usedByUsers: { $ne: userId },  
             expirationDate: { $gte: new Date() },  
             startDate: { $lte: new Date() },  
             usageLimit: { $gt: 0 }, 
-            minOrderAmount: { $lte: totalAmount }  
+            minOrderAmount: { $lte: totalAmount || 0 }  // Ensure totalAmount is always valid
         });
-        
 
         res.render("user/checkout", {
             items: cart.items.map(item => ({
@@ -172,6 +257,195 @@ export const cartproduct = async (req, res) => {
 
 
 
+// export const placeorder = async (req, res) => {
+//     try {
+//         console.log("Request Body:", req.body);
+
+//         let { addressId, items, paymentMethod = "COD" } = req.body;
+//         let checkoutType = req.body.checkoutType || "cart";
+
+//         const userId = req.user?._id;
+
+//         const cart = await Cart.findOne({ userId }).populate("items.productId");
+//         console.log("Cart Data:", cart);
+
+//         if (!mongoose.Types.ObjectId.isValid(addressId)) {
+//             return res.status(400).send("Invalid address selected. Please choose a valid address.");
+//         }
+
+//         if (!items || !Array.isArray(items) || items.length === 0) {
+//             return res.status(400).send("No items found in the order.");
+//         }
+
+//         console.log("Valid items received:", items);
+
+//         const productIds = items.map(item => item.productId);
+//         const products = await Product.find({ _id: { $in: productIds } });
+
+//         if (!products || products.length === 0) {
+//             return res.status(400).send("Invalid products in order.");
+//         }
+
+//         let outOfStockItems = [];
+//         let updatedItems = [];
+
+//         for (let item of items) {
+//             const product = products.find(p => p._id.toString() === item.productId);
+//             if (!product) {
+//                 console.error(`Product not found: ${item.productId}`);
+//                 continue;
+//             }
+
+//             const sizeKey = `size${item.size.trim().replace(/^size/i, "").toUpperCase()}`;
+//             console.log("Looking for size key:", sizeKey);
+
+//             const sizeStock = product[sizeKey] !== undefined ? product[sizeKey] : 0;
+//             console.log(`Available Stock for ${product.name} (${sizeKey}):`, sizeStock);
+
+//             if (sizeStock < parseInt(item.quantity)) {
+//                 outOfStockItems.push({
+//                     productName: product.name,
+//                     availableStock: sizeStock,
+//                     size: item.size
+//                 });
+//                 continue;
+//             }
+
+//             const updateFields = { totalStock: -parseInt(item.quantity) };
+
+//             if (sizeKey in product) {
+//                 updateFields[sizeKey] = -parseInt(item.quantity);
+//             }
+
+//             const updatedProduct = await Product.findByIdAndUpdate(
+//                 item.productId,
+//                 { $inc: updateFields },
+//                 { new: true }
+//             );
+
+//             console.log(`Updated stock for ${updatedProduct.name} - Size: ${item.size}`);
+
+//             updatedItems.push({
+//                 productId: product._id,
+//                 quantity: parseInt(item.quantity),
+//                 size: item.size,
+//                 price: parseInt(product.Offerprice || product.price),
+//                 totalprice: parseInt((product.Offerprice || product.price) * item.quantity)
+//             });
+//         }
+
+//         if (updatedItems.length === 0) {
+//             console.error("No valid items available for order. Order not placed.");
+//             return res.status(400).send("All items are out of stock. Please update your cart.");
+//         }
+
+//         let totalAmount = updatedItems.reduce((sum, item) => sum + item.totalprice, 0);
+
+       
+//         let discountAmount = 0;
+//         let appliedCoupon = null;
+//         let couponDetails = null; 
+        
+//         if (req.session.appliedCoupon) {
+//             const couponCode = typeof req.session.appliedCoupon === "object"
+//                 ? req.session.appliedCoupon.code
+//                 : req.session.appliedCoupon;
+        
+//             const coupon = await Coupon.findOne({ code: couponCode });
+        
+//             if (coupon) {
+//                 appliedCoupon = coupon._id; 
+        
+             
+//                 if (coupon.discountType === "percentage") {
+//                     discountAmount = Math.floor((coupon.value / 100) * totalAmount); 
+//                 } else {
+//                     discountAmount = coupon.value;
+//                 }
+        
+                
+//                 totalAmount = Math.max(0, totalAmount - discountAmount);
+        
+            
+//                 // await Coupon.updateOne({ _id: appliedCoupon }, { $inc: { usageLimit: -1 } });
+//                 await Coupon.updateOne(
+//                     { _id: appliedCoupon },
+//                     { $addToSet: { temporarilyUsedByUsers: userId } }
+//                 );
+        
+//                 delete req.session.appliedCoupon; 
+
+//                 couponDetails = {
+//                     code: coupon.code,
+//                     discountType: coupon.discountType,
+//                     value: coupon.value,
+//                     minOrderAmount: coupon.minOrderAmount
+//                 };
+//             }
+//         }
+
+
+//         if (paymentMethod === "COD" && totalAmount > 1000) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: "Cash on Delivery is not available for orders above ₹1000. Please choose another payment method."
+//             });
+//         }
+        
+
+//         console.log("Final Total Amount After Coupon:", totalAmount);
+
+//         const deliveryDate = new Date();
+//         deliveryDate.setDate(deliveryDate.getDate() + 5);
+
+//         const paymentStatus = paymentMethod === "COD" ? "Pending" : "Paid";
+
+//         const newOrder = new Order({
+//             userId,
+//             items: updatedItems,
+//             addressId,
+//             totalAmount,
+//             discountAmount, 
+//             appliedCoupon, 
+//             couponDetails,
+//             paymentMethod,
+//             deliveryDate,
+//             status: "Pending",
+//             paymentStatus,
+//             transactionId: `TXN-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+//             trackingNumber: `TRK-${Math.random().toString(36).substr(2, 10).toUpperCase()}`
+//         });
+        
+
+//         await newOrder.save();
+//         console.log("Order placed successfully:", newOrder);
+
+//         await Cart.deleteOne({ userId });
+//         console.log("Cart cleared successfully");
+//         if (appliedCoupon) {
+//             await Coupon.updateOne(
+//                 { _id: appliedCoupon },
+//                 { 
+//                     $addToSet: { usedByUsers: userId },
+//                     $pull: { temporarilyUsedByUsers: userId }
+//                 }
+//             );
+//         }
+
+//         return res.redirect("/user/order-success");
+
+//     } catch (error) {
+//         console.error("Order Placement Error:", error);
+//         if (req.session.appliedCoupon) {
+//             await Coupon.updateOne(
+//                 { code: req.session.appliedCoupon },
+//                 { $pull: { temporarilyUsedByUsers: req.user?._id } }
+//             );
+//         }
+//         return res.status(500).send("Server Error");
+//     }
+// };
+
 export const placeorder = async (req, res) => {
     try {
         console.log("Request Body:", req.body);
@@ -221,7 +495,7 @@ export const placeorder = async (req, res) => {
                 outOfStockItems.push({
                     productName: product.name,
                     availableStock: sizeStock,
-                    size: item.size
+                    size: item.size,
                 });
                 continue;
             }
@@ -245,7 +519,7 @@ export const placeorder = async (req, res) => {
                 quantity: parseInt(item.quantity),
                 size: item.size,
                 price: parseInt(product.Offerprice || product.price),
-                totalprice: parseInt((product.Offerprice || product.price) * item.quantity)
+                totalprice: parseInt((product.Offerprice || product.price) * item.quantity),
             });
         }
 
@@ -256,57 +530,50 @@ export const placeorder = async (req, res) => {
 
         let totalAmount = updatedItems.reduce((sum, item) => sum + item.totalprice, 0);
 
-       
         let discountAmount = 0;
         let appliedCoupon = null;
-        let couponDetails = null; 
-        
+        let couponDetails = null;
+
         if (req.session.appliedCoupon) {
             const couponCode = typeof req.session.appliedCoupon === "object"
                 ? req.session.appliedCoupon.code
                 : req.session.appliedCoupon;
-        
+
             const coupon = await Coupon.findOne({ code: couponCode });
-        
+
             if (coupon) {
-                appliedCoupon = coupon._id; 
-        
-             
+                appliedCoupon = coupon._id;
+
                 if (coupon.discountType === "percentage") {
-                    discountAmount = Math.floor((coupon.value / 100) * totalAmount); 
+                    discountAmount = Math.floor((coupon.value / 100) * totalAmount);
                 } else {
                     discountAmount = coupon.value;
                 }
-        
-                
+
                 totalAmount = Math.max(0, totalAmount - discountAmount);
-        
-            
-                // await Coupon.updateOne({ _id: appliedCoupon }, { $inc: { usageLimit: -1 } });
+
                 await Coupon.updateOne(
                     { _id: appliedCoupon },
                     { $addToSet: { temporarilyUsedByUsers: userId } }
                 );
-        
-                delete req.session.appliedCoupon; 
+
+                delete req.session.appliedCoupon;
 
                 couponDetails = {
                     code: coupon.code,
                     discountType: coupon.discountType,
                     value: coupon.value,
-                    minOrderAmount: coupon.minOrderAmount
+                    minOrderAmount: coupon.minOrderAmount,
                 };
             }
         }
 
-
         if (paymentMethod === "COD" && totalAmount > 1000) {
             return res.status(400).json({
                 success: false,
-                message: "Cash on Delivery is not available for orders above ₹1000. Please choose another payment method."
+                message: "Cash on Delivery is not available for orders above ₹1000. Please choose another payment method.",
             });
         }
-        
 
         console.log("Final Total Amount After Coupon:", totalAmount);
 
@@ -320,17 +587,16 @@ export const placeorder = async (req, res) => {
             items: updatedItems,
             addressId,
             totalAmount,
-            discountAmount, 
-            appliedCoupon, 
+            discountAmount,
+            appliedCoupon,
             couponDetails,
             paymentMethod,
             deliveryDate,
             status: "Pending",
             paymentStatus,
             transactionId: `TXN-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-            trackingNumber: `TRK-${Math.random().toString(36).substr(2, 10).toUpperCase()}`
+            trackingNumber: `TRK-${Math.random().toString(36).substr(2, 10).toUpperCase()}`,
         });
-        
 
         await newOrder.save();
         console.log("Order placed successfully:", newOrder);
@@ -340,15 +606,14 @@ export const placeorder = async (req, res) => {
         if (appliedCoupon) {
             await Coupon.updateOne(
                 { _id: appliedCoupon },
-                { 
+                {
                     $addToSet: { usedByUsers: userId },
-                    $pull: { temporarilyUsedByUsers: userId }
+                    $pull: { temporarilyUsedByUsers: userId },
                 }
             );
         }
 
-        return res.redirect("/user/order-success");
-
+        return res.json({ success: true, message: "Order placed successfully" });
     } catch (error) {
         console.error("Order Placement Error:", error);
         if (req.session.appliedCoupon) {
@@ -357,7 +622,7 @@ export const placeorder = async (req, res) => {
                 { $pull: { temporarilyUsedByUsers: req.user?._id } }
             );
         }
-        return res.status(500).send("Server Error");
+        return res.status(500).json({ success: false, message: "Server Error" });
     }
 };
 
@@ -949,6 +1214,176 @@ export const orderdetails = async (req, res) => {
 //     });
 // };
 
+// const generateInvoice = (res, order) => {
+//     const invoicesDir = path.join(__dirname, "../public/invoices");
+//     if (!fs.existsSync(invoicesDir)) {
+//         fs.mkdirSync(invoicesDir, { recursive: true });
+//     }
+
+//     const invoicePath = path.join(invoicesDir, `invoice-${order._id}.pdf`);
+//     const stream = fs.createWriteStream(invoicePath);
+//     const doc = new PDFDocument({ margin: 50 });
+
+//     doc.pipe(stream);
+
+//     // Header with Design
+//     doc.fillColor('#333333')
+//         .fontSize(24)
+//         .font('Helvetica-Bold')
+//         .text("VGUIRE", { align: "center" })
+//         .moveDown(0.5);
+
+//     doc.fillColor('#555555')
+//         .fontSize(18)
+//         .font('Helvetica-Bold')
+//         .text("Product Invoice", { align: "center" })
+//         .moveDown(2);
+
+//     // Customer Details
+//     doc.fillColor('#000000')
+//         .fontSize(12)
+       
+//         .text(`Email: ${order.userId?.email || 'N/A'}`)
+//         .text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`)
+//         .text(`Customer Name: ${order.addressId?.fullName || 'N/A'}`)
+//         .moveDown();
+
+//     // Address Details
+//     doc.text(`Address:${order.addressId?.fullName || 'N/A'}`)
+//         .text(`${order.addressId?.streetAddress || 'N/A'}`)
+//         .text(`${order.addressId?.city || 'N/A'}`)
+//         .text(`${order.addressId?.state || 'N/A'}`)
+//         .text(`${order.addressId?.pincode || 'N/A'}`)
+//         .text(`Phone: ${order.addressId?.phone || 'N/A'}`)
+//         .moveDown();
+
+//     // Delivery Date in Green Color
+//     doc.fillColor('#008000') // Green color for delivery date
+//         .text(`Delivery Date: ${new Date(order.deliveryDate).toLocaleDateString()}`)
+//         .fillColor('#000000') // Reset to black
+//         .moveDown();
+
+//     // Product Details Table
+//     doc.fontSize(14)
+//         .fillColor('#0000FF') // Blue color for headings
+//         .font('Helvetica-Bold')
+//         .text("Product Details", { underline: true })
+//         .moveDown();
+
+//     const tableTop = doc.y;
+//     const columnPositions = [50, 200, 300, 380, 460];
+//     const columnWidths = [150, 100, 80, 80, 80];
+
+//     // Draw table headers
+//     doc.fontSize(12)
+//         .fillColor('#0000FF') 
+//         .font('Helvetica-Bold')
+//         .text("Product", columnPositions[0], tableTop, { width: columnWidths[0], align: "left" })
+//         .text("Status", columnPositions[1], tableTop, { width: columnWidths[1], align: "left" })
+//         .text("Quantity", columnPositions[2], tableTop, { width: columnWidths[2], align: "right" })
+//         .text("Size", columnPositions[3], tableTop, { width: columnWidths[3], align: "right" })
+//         .text("Amount", columnPositions[4], tableTop, { width: columnWidths[4], align: "right" });
+
+//     // Draw horizontal line under headers
+//     doc.moveTo(50, tableTop + 20).lineTo(540, tableTop + 20).stroke();
+
+//     // Table Rows
+//     let subtotal = 0;
+//     order.items.forEach((item) => {
+//         let productPrice = Number(item.productId?.price) || 0;
+//         let offerPrice = Number(item.productId?.Offerprice) || productPrice;
+//         let totalPrice = item.quantity * offerPrice;
+
+//         if (typeof totalPrice === 'number') {
+//             subtotal += totalPrice;
+
+//             const yOffset = doc.y + 10;
+//             doc.fontSize(12)
+//                 .fillColor('#000000')
+//                 .font('Helvetica')
+//                 .text(`${item.productId?.name || 'N/A'}`, columnPositions[0], yOffset, { width: columnWidths[0], align: "left" })
+//                 .text(`${item.status || 'N/A'}`, columnPositions[1], yOffset, { width: columnWidths[1], align: "left" })
+//                 .text(`${item.quantity}`, columnPositions[2], yOffset, { width: columnWidths[2], align: "right" })
+//                 .text(`${item.size || 'N/A'}`, columnPositions[3], yOffset, { width: columnWidths[3], align: "right" })
+//                 .text(`${totalPrice.toFixed(2)}`, columnPositions[4], yOffset, { width: columnWidths[4], align: "right" });
+
+//             // Draw horizontal line after each row
+//             doc.moveTo(50, yOffset + 10).lineTo(540, yOffset + 10).stroke();
+//         } else {
+//             console.error(`Invalid totalPrice for item: ${item.productId?.name}`);
+//         }
+//     });
+
+//    // Totals
+// doc.moveDown();
+// if (typeof subtotal === 'number') {
+//     // Calculate coupon discount based on the coupon type
+//     let couponDiscount = 0;
+//     if (order.appliedCoupon && typeof order.appliedCoupon === 'object') {  
+//         if (order.appliedCoupon.discountType === 'percentage') {
+//             couponDiscount = (subtotal * order.appliedCoupon.value) / 100;
+//         } else if (order.appliedCoupon.discountType === 'flat') {
+//             couponDiscount = order.appliedCoupon.value;
+//         }
+//     }
+//     const currentY = doc.y;
+//     doc.fontSize(12)
+//         .fillColor('#000000')
+//         .font('Helvetica-Bold')
+//         .text(`Subtotal: ${subtotal.toFixed(2)}`, 50, currentY + 10, { align: "left" })
+//         .text(`Total Product Discount: ${(order.totalProductDiscount || 0).toFixed(2)}`, { align: "left" })
+//         .text(`Coupon Discount: ${couponDiscount.toFixed(2)}`, { align: "left" });
+
+   
+//         if (typeof order.refundedAmount === 'number' && !isNaN(order.refundedAmount)) {
+//             doc.fillColor('#008000')
+//                 .font('Helvetica-Bold')
+//                 .text(`Refund Amount: ${order.refundedAmount.toFixed(2)}`, { align: "left" });
+//         }
+        
+//     console.log("Refund Amount:", order.refundAmount);
+
+
+//     doc.fillColor('#FF0000') 
+//         .text(`Final Total Amount: ${(order.totalAmount).toFixed(2)}`, { align: "left", bold: true });
+// } else {
+//     console.error(`Invalid subtotal: ${subtotal}`);
+// }
+
+
+    
+//     doc.moveDown();
+//     doc.fontSize(12)
+//         .fillColor('#0000FF') 
+//         .font('Helvetica-Bold')
+//         .text(`Payment Status: ${order.paymentStatus || 'N/A'}`, { align: "left" });
+
+   
+//     doc.moveDown();
+//     doc.fontSize(10)
+//         .fillColor('#555555')
+//         .font('Helvetica')
+//         .text("Thanks for Shopping!", { align: "left" })
+//         .text("Vguire sports Store", { align: "left" })
+//         .text("1527 Fashion Ave", { align: "left" })
+//         .text("Los Angeles", { align: "left" })
+//         .text("CA 90015", { align: "left" })
+//         .text("USA", { align: "left" })
+//         .text("Vguire@gmail.com", { align: "left" })
+//         .text("+1 (213) 555-7890", { align: "left" });
+
+//     doc.end();
+
+//     stream.on("finish", () => {
+//         res.download(invoicePath);
+//     });
+
+//     stream.on("error", (err) => {
+//         console.error("Invoice generation error:", err);
+//         res.status(500).send("Failed to generate invoice");
+//     });
+// };
+
 const generateInvoice = (res, order) => {
     const invoicesDir = path.join(__dirname, "../public/invoices");
     if (!fs.existsSync(invoicesDir)) {
@@ -977,14 +1412,13 @@ const generateInvoice = (res, order) => {
     // Customer Details
     doc.fillColor('#000000')
         .fontSize(12)
-       
         .text(`Email: ${order.userId?.email || 'N/A'}`)
         .text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`)
         .text(`Customer Name: ${order.addressId?.fullName || 'N/A'}`)
         .moveDown();
 
     // Address Details
-    doc.text(`Address:${order.addressId?.fullName || 'N/A'}`)
+    doc.text(`Address: ${order.addressId?.fullName || 'N/A'}`)
         .text(`${order.addressId?.streetAddress || 'N/A'}`)
         .text(`${order.addressId?.city || 'N/A'}`)
         .text(`${order.addressId?.state || 'N/A'}`)
@@ -993,28 +1427,28 @@ const generateInvoice = (res, order) => {
         .moveDown();
 
     // Delivery Date in Green Color
-    doc.fillColor('#008000') // Green color for delivery date
+    doc.fillColor('#008000')
         .text(`Delivery Date: ${new Date(order.deliveryDate).toLocaleDateString()}`)
-        .fillColor('#000000') // Reset to black
+        .fillColor('#000000')
         .moveDown();
 
     // Product Details Table
     doc.fontSize(14)
-        .fillColor('#0000FF') // Blue color for headings
+        .fillColor('#0000FF')
         .font('Helvetica-Bold')
         .text("Product Details", { underline: true })
         .moveDown();
 
     const tableTop = doc.y;
-    const columnPositions = [50, 200, 300, 380, 460];
-    const columnWidths = [150, 100, 80, 80, 80];
+    const columnPositions = [50, 220, 310, 390, 480];
+    const columnWidths = [170, 90, 80, 80, 80];
 
     // Draw table headers
     doc.fontSize(12)
-        .fillColor('#0000FF') 
+        .fillColor('#0000FF')
         .font('Helvetica-Bold')
         .text("Product", columnPositions[0], tableTop, { width: columnWidths[0], align: "left" })
-        .text("Status", columnPositions[1], tableTop, { width: columnWidths[1], align: "left" })
+        .text("Payment", columnPositions[1], tableTop, { width: columnWidths[1], align: "left" })
         .text("Quantity", columnPositions[2], tableTop, { width: columnWidths[2], align: "right" })
         .text("Size", columnPositions[3], tableTop, { width: columnWidths[3], align: "right" })
         .text("Amount", columnPositions[4], tableTop, { width: columnWidths[4], align: "right" });
@@ -1037,7 +1471,7 @@ const generateInvoice = (res, order) => {
                 .fillColor('#000000')
                 .font('Helvetica')
                 .text(`${item.productId?.name || 'N/A'}`, columnPositions[0], yOffset, { width: columnWidths[0], align: "left" })
-                .text(`${item.status || 'N/A'}`, columnPositions[1], yOffset, { width: columnWidths[1], align: "left" })
+                .text(`${order.paymentMethod || 'N/A'}`, columnPositions[1], yOffset, { width: columnWidths[1], align: "left" })
                 .text(`${item.quantity}`, columnPositions[2], yOffset, { width: columnWidths[2], align: "right" })
                 .text(`${item.size || 'N/A'}`, columnPositions[3], yOffset, { width: columnWidths[3], align: "right" })
                 .text(`${totalPrice.toFixed(2)}`, columnPositions[4], yOffset, { width: columnWidths[4], align: "right" });
@@ -1049,57 +1483,52 @@ const generateInvoice = (res, order) => {
         }
     });
 
-   // Totals
-doc.moveDown();
-if (typeof subtotal === 'number') {
-    // Calculate coupon discount based on the coupon type
-    let couponDiscount = 0;
-    if (order.appliedCoupon && typeof order.appliedCoupon === 'object') {  
-        if (order.appliedCoupon.discountType === 'percentage') {
-            couponDiscount = (subtotal * order.appliedCoupon.value) / 100;
-        } else if (order.appliedCoupon.discountType === 'flat') {
-            couponDiscount = order.appliedCoupon.value;
+    // Totals
+    doc.moveDown();
+    if (typeof subtotal === 'number') {
+        // Calculate coupon discount
+        let couponDiscount = 0;
+        if (order.appliedCoupon && typeof order.appliedCoupon === 'object') {
+            if (order.appliedCoupon.discountType === 'percentage') {
+                couponDiscount = (subtotal * order.appliedCoupon.value) / 100;
+            } else if (order.appliedCoupon.discountType === 'flat') {
+                couponDiscount = order.appliedCoupon.value;
+            }
         }
-    }
-    const currentY = doc.y;
-    doc.fontSize(12)
-        .fillColor('#000000')
-        .font('Helvetica-Bold')
-        .text(`Subtotal: ${subtotal.toFixed(2)}`, 50, currentY + 10, { align: "left" })
-        .text(`Total Product Discount: ${(order.totalProductDiscount || 0).toFixed(2)}`, { align: "left" })
-        .text(`Coupon Discount: ${couponDiscount.toFixed(2)}`, { align: "left" });
+        
+        const currentY = doc.y;
+        doc.fontSize(12)
+            .fillColor('#000000')
+            .font('Helvetica-Bold')
+            .text(`Subtotal: ${subtotal.toFixed(2)}`, 50, currentY + 10, { align: "left" })
+            .text(`Total Product Discount: ${(order.totalProductDiscount || 0).toFixed(2)}`, { align: "left" })
+            .text(`Coupon Discount: ${couponDiscount.toFixed(2)}`, { align: "left" });
 
-   
-        if (typeof order.refundedAmount === 'number' && !isNaN(order.refundedAmount)) {
+        // Show refund amount only if a product was returned
+        if (order.refundedAmount && order.refundedAmount > 0) {
             doc.fillColor('#008000')
                 .font('Helvetica-Bold')
                 .text(`Refund Amount: ${order.refundedAmount.toFixed(2)}`, { align: "left" });
         }
-        
-    console.log("Refund Amount:", order.refundAmount);
 
+        doc.fillColor('#FF0000')
+            .text(`Final Total Amount: ${(order.totalAmount).toFixed(2)}`, { align: "left", bold: true });
+    } else {
+        console.error(`Invalid subtotal: ${subtotal}`);
+    }
 
-    doc.fillColor('#FF0000') 
-        .text(`Final Total Amount: ${(order.totalAmount).toFixed(2)}`, { align: "left", bold: true });
-} else {
-    console.error(`Invalid subtotal: ${subtotal}`);
-}
-
-
-    
     doc.moveDown();
     doc.fontSize(12)
-        .fillColor('#0000FF') 
+        .fillColor('#0000FF')
         .font('Helvetica-Bold')
         .text(`Payment Status: ${order.paymentStatus || 'N/A'}`, { align: "left" });
 
-   
     doc.moveDown();
     doc.fontSize(10)
         .fillColor('#555555')
         .font('Helvetica')
         .text("Thanks for Shopping!", { align: "left" })
-        .text("Vguire sports Store", { align: "left" })
+        .text("Vguire Sports Store", { align: "left" })
         .text("1527 Fashion Ave", { align: "left" })
         .text("Los Angeles", { align: "left" })
         .text("CA 90015", { align: "left" })

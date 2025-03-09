@@ -105,6 +105,7 @@ router.get("/chart-data",isAuthenticatedAdmin,dashboardController.chart)
 
 
 router.get("/returnRequests", isAuthenticatedAdmin, adminorderController.getReturnRequests);
-router.post("/return-controller",isAuthenticatedAdmin,adminorderController.returnrequest)
+router.post("/return-controller",isAuthenticatedAdmin,adminorderController.returnrequest);
+router.get("/ledger",isAuthenticatedAdmin,dashboardController.ledger)
 
 export default router;

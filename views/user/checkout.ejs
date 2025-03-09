@@ -380,7 +380,7 @@
                     <a class="nav-link" href="#">Contact</a>
                 </li>
                 <li class="nav-item">   
-                    <a class="nav-link" href="#">Profile</a>
+                    <a class="nav-link" href="/user/profile">Profile</a>
                 </li>
             </ul>
             <div class="d-flex align-items-center">
@@ -558,7 +558,6 @@
         
             <!-- Hidden Input for Total Amount -->
             <input type="hidden" name="totalAmount" id="totalAmount" value="<%= totalAmount %>" data-original-amount="<%= totalAmount %>">
-
         
             <!-- Payment Method Selection -->
             <div class="mb-4">
@@ -570,7 +569,6 @@
                 </select>
             </div>
         
-            <!-- Submit Button -->
             <% if (typeof selectedAddressId !== 'undefined' && selectedAddressId) { %>
                 <button type="submit" class="btn btn-custom-secondary w-100">
                     <i class="fas fa-shopping-bag me-2"></i> Place Order
@@ -581,7 +579,6 @@
                 </button>
             <% } %>
         </form>
-        
         
         
         </div>
@@ -861,7 +858,7 @@
 //     }
 //     }
 // });
-document.getElementById("checkoutForm").addEventListener("submit", async function(event) {
+document.getElementById("checkoutForm").addEventListener("submit", async function (event) {
     event.preventDefault();
 
     const totalAmount = parseFloat(document.getElementById("totalAmount").value);
@@ -885,18 +882,26 @@ document.getElementById("checkoutForm").addEventListener("submit", async functio
     }
 
     if (paymentMethod === "COD" && totalAmount > 1000) {
-        Swal.fire("Error", "Cash on Delivery is not available for orders above ₹1000. Please choose another payment method.", "error");
+        Swal.fire("Warning", "Cash on Delivery is not available for orders above ₹1000. Please choose another payment method.", "error");
         return;
     }
 
-    if (paymentMethod === "UPI") {
-        try {
-            const response = await fetch("/user/checkout/razorpay-order", {
+    // Prepare data for all payment methods
+    const orderData = {
+        addressId,
+        items,
+        paymentMethod,
+        totalAmount,
+    };
+
+    try {
+        let response;
+        if (paymentMethod === "UPI") {
+            response = await fetch("/user/checkout/razorpay-order", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount: totalAmount, addressId, items })
+                body: JSON.stringify({ amount: totalAmount, addressId, items }),
             });
-
             const order = await response.json();
 
             if (!order || !order.id) {
@@ -927,8 +932,8 @@ document.getElementById("checkoutForm").addEventListener("submit", async functio
                             addressId,
                             items,
                             totalAmount,
-                            userId
-                        })
+                            userId,
+                        }),
                     });
 
                     const verificationResult = await verifyResponse.json();
@@ -938,7 +943,7 @@ document.getElementById("checkoutForm").addEventListener("submit", async functio
                             text: "Congratulations! Your order is confirmed.",
                             icon: "success",
                             confirmButtonText: "OK",
-                            allowOutsideClick: false
+                            allowOutsideClick: false,
                         }).then(() => {
                             window.location.href = "/user/order-success";
                         });
@@ -949,13 +954,11 @@ document.getElementById("checkoutForm").addEventListener("submit", async functio
                             text: "Transaction could not be verified. Do you want to retry the payment?",
                             showCancelButton: true,
                             confirmButtonText: "Retry",
-                            cancelButtonText: "Cancel"
+                            cancelButtonText: "Cancel",
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                // Retry payment logic
                                 razorpay.open();
                             } else if (result.dismiss === Swal.DismissReason.cancel) {
-                                // Store order with payment status as pending
                                 storeOrderAsPending(order.id, addressId, items, totalAmount, userId);
                             }
                         });
@@ -972,39 +975,31 @@ document.getElementById("checkoutForm").addEventListener("submit", async functio
                             confirmButtonText: "Retry",
                             cancelButtonText: "Place Order",
                             showDenyButton: true,
-                            denyButtonText: "Cancel Order"
+                            denyButtonText: "Cancel Order",
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                // Retry payment logic
                                 razorpay.open();
                             } else if (result.dismiss === Swal.DismissReason.cancel) {
-                                // Place order with payment status as pending
                                 storeOrderAsPending(order.id, addressId, items, totalAmount, userId);
                             } else if (result.isDenied) {
                                 Swal.fire("Order Cancelled", "Your order has been cancelled.", "info");
                             }
                         });
-                    }
+                    },
                 },
-                theme: { color: "#3399cc" }
+                theme: { color: "#3399cc" },
             };
 
             const razorpay = new window.Razorpay(options);
             razorpay.open();
-        } catch (error) {
-            console.error("Payment Error:", error);
-            Swal.fire("Error", "Something went wrong. Please try again.", "error");
-        }
-    } else if (paymentMethod === "Wallet") {
-        try {
-            const response = await fetch("/user/checkout/placeorderwallet", {
+        } else if (paymentMethod === "Wallet") {
+            response = await fetch("/user/checkout/placeorderwallet", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ totalAmount, addressId, items })
+                body: JSON.stringify(orderData),
             });
 
             const textResponse = await response.text();
-
             try {
                 const walletOrderResult = JSON.parse(textResponse);
                 if (walletOrderResult.success) {
@@ -1013,7 +1008,7 @@ document.getElementById("checkoutForm").addEventListener("submit", async functio
                         text: "Your order has been placed using wallet balance.",
                         icon: "success",
                         confirmButtonText: "OK",
-                        allowOutsideClick: false
+                        allowOutsideClick: false,
                     }).then(() => {
                         window.location.href = "/user/order-success";
                     });
@@ -1024,10 +1019,31 @@ document.getElementById("checkoutForm").addEventListener("submit", async functio
                 console.error("JSON Parsing Error:", jsonError, textResponse);
                 Swal.fire("Error", "Unexpected response from server.", "error");
             }
-        } catch (error) {
-            console.error("Wallet Payment Fetch Error:", error);
-            Swal.fire("Error", "Something went wrong. Please try again.", "error");
+        } else if (paymentMethod === "COD") {
+            response = await fetch("/user/checkout/placeorder", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(orderData),
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                Swal.fire({
+                    title: "Order Placed!",
+                    text: "Your order has been successfully placed with Cash on Delivery.",
+                    icon: "success",
+                    confirmButtonText: "OK",
+                    allowOutsideClick: false,
+                }).then(() => {
+                    window.location.href = "/user/order-success";
+                });
+            } else {
+                Swal.fire("Error", result.message || "Failed to place order.", "error");
+            }
         }
+    } catch (error) {
+        console.error("Checkout Error:", error);
+        Swal.fire("Error", "Something went wrong. Please try again.", "error");
     }
 });
 async function storeOrderAsPending(orderId, addressId, items, totalAmount, userId, couponCode = 0, discountAmount = 0, appliedCoupon = null, couponDetails = null) {
