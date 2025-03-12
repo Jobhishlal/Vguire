@@ -325,21 +325,21 @@ export const loginUser = async (req, res) => {
     try {
         const user = await User.findOne({ email });
         if (!user) {
-            return res.render('user/login', { error: 'Invalid email or password' ,csrfToken: req.csrfToken() });
+            return res.render('user/login', { error: 'Invalid email or password'  });
             
         }
 
         if (!user.verified) {
-            return res.render('user/login', { error: 'Please verify your account first.' ,csrfToken: req.csrfToken() });
+            return res.render('user/login', { error: 'Please verify your account first.'  });
         }
         if (user.blocked) {
-            return res.render('user/login',{error:'User  blocked',csrfToken: req.csrfToken() })
+            return res.render('user/login',{error:'User  blocked'})
           }
         
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch ) {
-            return res.render('user/login', { error: 'Invalid email or password',csrfToken: req.csrfToken()  });
+            return res.render('user/login', { error: 'Invalid email or password' });
         }
         
         req.session.isLogged=true
@@ -841,7 +841,7 @@ export const shoppage = async (req, res) => {
 
         console.log("Received request with params:", req.query);
 
-        // Apply filters based on query parameters
+     
         if (query) {
             filter.name = { $regex: `^${query}`, $options: "i" };
         }

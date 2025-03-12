@@ -97,7 +97,6 @@ router.get("/coupons/edit/:id",isAuthenticatedAdmin, couponcontroller.editCoupon
 router.put("/coupons/edit/:id",isAuthenticatedAdmin,couponcontroller.editCoupon);
 
 
-
 router.get("/sales-report",isAuthenticatedAdmin,dashboardController.salesreportget)
 router.get("/chart-data",isAuthenticatedAdmin,dashboardController.chart)
 

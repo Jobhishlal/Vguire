@@ -7,30 +7,45 @@ import sharp from 'sharp';
 import { error } from 'console';
 import flash from 'express-flash';
 
-
 export const showProducts = async (req, res) => {
     try {
-        const products = await Product.find().populate('category');
-
-        
-        const productsWithCroppedImages = products.map(product => ({
-            ...product._doc,
-            croppedImages: product.images.map(image => {
-                const filename = path.basename(image); 
-                return `/uploads/products/cropped-${filename}`;
-            })
-        }));
-
-        res.render('admin/product', { products: productsWithCroppedImages ,messages:{
-            success:req.flash("success"),
-            error:req.flash("error")
-        }});
+      const page = parseInt(req.query.page) || 1; // Current page number
+      const limit = parseInt(req.query.limit) || 10; // Number of products per page
+      const skip = (page - 1) * limit; // Calculate how many products to skip
+  
+      const totalProducts = await Product.countDocuments(); // Total number of products
+      const totalPages = Math.ceil(totalProducts / limit); // Total number of pages
+  
+      const products = await Product.find()
+        .populate("category")
+        .skip(skip)
+        .limit(limit); // Apply pagination
+  
+      // Map products to include cropped images
+      const productsWithCroppedImages = products.map((product) => ({
+        ...product._doc,
+        croppedImages: product.images.map((image) => {
+          const filename = path.basename(image);
+          return `/uploads/products/cropped-${filename}`;
+        }),
+      }));
+  
+  
+      res.render("admin/product", {
+        products: productsWithCroppedImages,
+        currentPage: page,
+        totalPages,
+        totalProducts,
+        messages: {
+          success: req.flash("success"),
+          error: req.flash("error"),
+        },
+      });
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Error retrieving products');
+      console.error(error);
+      res.status(500).send("Error retrieving products");
     }
-};
-
+  };
 
 export const getproduct = async (req, res) => {
     try {

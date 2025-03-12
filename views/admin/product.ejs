@@ -583,6 +583,51 @@
                 height: 32px;
             }
         }
+        .pagination {
+    display: inline-flex;
+    list-style: none;
+    padding: 0;
+    margin: 20px auto;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .pagination a,
+  .pagination span {
+    display: block;
+    padding: 10px 16px;
+    margin: 0;
+    text-decoration: none;
+    color: #007bff;
+    background: #fff;
+    border-right: 1px solid #ddd;
+    font-weight: 500;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  .pagination a:last-child,
+  .pagination span:last-child {
+    border-right: none;
+  }
+
+  .pagination a:hover {
+    background: #007bff;
+    color: white;
+  }
+
+  .pagination .active {
+    background: #007bff;
+    color: white;
+    font-weight: bold;
+    pointer-events: none;
+  }
+
+  .pagination span.disabled {
+    color: #ccc;
+    background: #f9f9f9;
+    pointer-events: none;
+  }
 
     </style>
 </head>
@@ -828,6 +873,29 @@
             </div>
             
         </div>
+        <ul class="pagination">
+            <% if (currentPage > 1) { %>
+              <li><a href="?page=<%= currentPage - 1 %>&limit=10">&laquo; Previous</a></li>
+            <% } else { %>
+              <li><span class="disabled">&laquo; Previous</span></li>
+            <% } %>
+          
+            <% for (let i = 1; i <= totalPages; i++) { %>
+              <% if (i === currentPage) { %>
+                <li><span class="active"><%= i %></span></li>
+              <% } else { %>
+                <li><a href="?page=<%= i %>&limit=10"><%= i %></a></li>
+              <% } %>
+            <% } %>
+          
+            <% if (currentPage < totalPages) { %>
+              <li><a href="?page=<%= currentPage + 1 %>&limit=10">Next &raquo;</a></li>
+            <% } else { %>
+              <li><span class="disabled">Next &raquo;</span></li>
+            <% } %>
+          </ul>
+          
+          
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>

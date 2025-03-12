@@ -724,7 +724,7 @@
                             x: {
                                 title: { 
                                     display: true, 
-                                    text: filter === "weekly" ? "Day of Week" : "Period", 
+                                    text: filter === "weekly" ? "Day of Week" : filter === "yearly" ? "Month" : "Period", 
                                     color: "#e4e4e4", 
                                     font: { size: 14 } 
                                 },
@@ -735,7 +735,7 @@
                         plugins: {
                             title: { 
                                 display: true, 
-                                text: filter === "weekly" ? "Weekly Sales Trend" : "Sales Trend", 
+                                text: filter === "weekly" ? "Weekly Sales Trend" : filter === "yearly" ? "Yearly Sales by Month" : "Sales Trend", 
                                 color: "#224abe", 
                                 font: { size: 16, weight: "bold" } 
                             },
@@ -853,16 +853,6 @@
                             },
                         },
                     };
-        
-                    if (validCurrentWeekSales.every(val => val === 0) && validPreviousWeekSales.every(val => val === 0)) {
-                        console.warn("No sales data for weekly comparison.");
-                        Swal.fire({
-                            icon: 'info',
-                            title: 'No Data',
-                            text: 'No sales data available for the weekly comparison.',
-                            confirmButtonColor: '#3085d6',
-                        });
-                    }
                 } else {
                     const validLineSales = lineSales.map(val => val || 0);
         
@@ -910,7 +900,7 @@
                             plugins: {
                                 title: {
                                     display: true,
-                                    text: filter === "yearly" ? "Yearly Monthly Sales" : 
+                                    text: filter === "yearly" ? "Yearly Monthly Sales Trend" : 
                                           (filter === "monthly" ? (lineFilter === "day" ? "Monthly Daily Sales" : "Monthly Weekly Sales") : 
                                           "Sales Over Custom Range"),
                                     color: "#224abe",
@@ -921,26 +911,17 @@
                             },
                         },
                     };
-        
-                    if (filter !== "weekly" && validLineSales.every(val => val === 0)) {
-                        console.warn("No sales data for the selected period.");
-                        Swal.fire({
-                            icon: 'info',
-                            title: 'No Data',
-                            text: 'No sales data available for the selected period.',
-                            confirmButtonColor: '#3085d6',
-                        });
-                    }
                 }
         
                 console.log("Line Chart Datasets:", lineConfig.data.datasets);
                 lineChartInstance = new Chart(lineCtx, lineConfig);
         
-                if (barSales.every(val => val === 0) && 
-                    pieSales.every(val => val === 0) && 
-                    (filter === "weekly" ? 
-                        (validCurrentWeekSales.every(val => val === 0) && validPreviousWeekSales.every(val => val === 0)) : 
-                        validLineSales.every(val => val === 0))) {
+                // Improved "No Data" check
+                const hasData = barSales.some(val => val > 0) || 
+                                pieSales.some(val => val > 0) || 
+                                lineSales.some(val => val > 0) || 
+                                (filter === "weekly" && (currentWeekSales.some(val => val > 0) || previousWeekSales.some(val => val > 0)));
+                if (!hasData) {
                     console.warn("No sales data available for the selected period");
                     Swal.fire({
                         icon: 'info',

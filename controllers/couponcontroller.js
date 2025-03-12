@@ -2,14 +2,35 @@ import Coupon from "../models/couponSchema.js";
 
 
 export const getcoupon = async (req, res) => {
-     try {
-      const coupons = await Coupon.find();
-    res.render("admin/coupons", { coupons });
-     } catch  {
-      res.status(500).json({ message: "Error fetching coupons" });
-      
-     }
+  try {
+    // Get page and limit from query params, with default values
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10; // Default limit is 10 per page
+
+    const skip = (page - 1) * limit;
+
+    // Fetch total number of coupons for pagination calculation
+    const totalCoupons = await Coupon.countDocuments();
+
+  
+    const coupons = await Coupon.find()
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 }); 
+
+    const totalPages = Math.ceil(totalCoupons / limit);
+
+    res.render("admin/coupons", { 
+      coupons,
+      currentPage: page,
+      totalPages,
+      totalCoupons
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching coupons", error: err.message });
+  }
 };
+
 
 export const addcoupon = async (req, res) => {
   try {
