@@ -192,6 +192,63 @@ body {
     width: 100px;
 }
 
+/* Mobile Devices */
+@media (max-width: 768px) {
+    .login-form-container {
+        flex-direction: column; /* Stack form and image vertically */
+        align-items: center;
+        max-width: 100%; /* Full width */
+    }
+
+    .login-form, .logo {
+        width: 100%; /* Take full width */
+        padding: 20px; /* Reduce padding */
+        border-right: none; /* Remove right border in form */
+    }
+
+    .login-form h2 {
+        font-size: 24px;
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        width: 100%; /* Full width for input fields */
+    }
+
+    .btn {
+        width: 100%; /* Full width button */
+    }
+
+    .logo img {
+        width: 200px; /* Adjust logo size */
+        height: auto;
+        border-radius: 100px;
+        top: 0;
+        left: 0;
+        margin-top: 10px;
+    }
+}
+
+/* Very Small Devices */
+@media (max-width: 480px) {
+    .login-form, .logo {
+        padding: 15px;
+    }
+
+    .form-control {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .btn {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .logo img {
+        width: 150px; /* Smaller logo */
+    }
+}
 
 
 

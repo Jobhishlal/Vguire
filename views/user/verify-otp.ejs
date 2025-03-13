@@ -1,11 +1,9 @@
-
-
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>OTP Verification</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/style.css">
 </head>
@@ -13,26 +11,27 @@
     <div class="container login-container" id="login">
         <div class="login-form-container">
             <div class="login-form">
-                <h2>OTP</h2>
+                <h2>OTP Verification</h2>
 
-    <% if (msg) { %>
-        <p style="color: red;"><%= msg %></p>
-    <% } %>
-    <!-- otp.ejs -->
-    <form action="/user/forgotverify-otp"method="POST">
-        <div class="form-group">
-            <label for="otp">Enter the OTP:</label>
-            <input type="text" name="otp" class="form-control" placeholder="OTP"  />
-           
-        </div>
-        <button type="submit" class="btn btn-primary">Verify OTP</button>
-    </form>
-    
-    
+                <% if (msg) { %>
+                    <p style="color: red;"><%= msg %></p>
+                <% } %>
 
-    
+                <!-- OTP Verification Form -->
+                <form action="/user/forgotverify-otp" method="POST">
+                    <div class="form-group">
+                        <label for="otp">Enter the OTP:</label>
+                        <input type="text" name="otp" class="form-control" placeholder="OTP" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Verify OTP</button>
+                </form>
+
+                <!-- Resend OTP with Countdown -->
+                <button id="resendOtpBtn" class="btn btn-link mt-3">Resend OTP</button>
+                <p id="resendMsg" style="color: green; margin-top: 10px;"></p>
                 
             </div>
+
             <div class="logo">
                 <img src="/image/Screenshot%202025-01-02%20185508.png" alt="Logo">
                 <p></p>
@@ -41,9 +40,56 @@
             </div>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+   
+    <script>
+        $(document).ready(function() {
+            let countdown;
+            let timeRemaining = <%= typeof timeRemaining !== 'undefined' ? timeRemaining : 60 %>; // Default to 60 if undefined
+    
+            function startTimer(duration) {
+                let timer = duration;
+                $('#resendOtpBtn').prop('disabled', true); 
+    
+                countdown = setInterval(function() {
+                    let seconds = timer;
+                    $('#resendOtpBtn').html('Resend OTP <span style="color: red;">(' + seconds + 's)</span>');
+    
+                    timer--;
+    
+                    if (timer < 0) {
+                        clearInterval(countdown); 
+                        $('#resendOtpBtn').prop('disabled', false).html('Resend OTP');
+                    }
+                }, 1000);
+            }
+    
+            startTimer(timeRemaining); // ✅ Start with remaining time if user enters wrong OTP
+    
+            $('#resendOtpBtn').click(function() {
+                $.ajax({
+                    url: '/user/resend-otp',
+                    method: 'POST',
+                    success: function(response) {
+                        if (response.success) {
+                            $('#resendMsg').text(response.msg).css('color', 'green');
+                            startTimer(60); // Restart for 60 seconds on successful resend
+                        } else {
+                            $('#resendMsg').text(response.msg).css('color', 'red');
+                        }
+                    },
+                    error: function() {
+                        $('#resendMsg').text('Server error. Please try again later.').css('color', 'red');
+                    }
+                });
+            });
+        });
+    </script>
+    
 </body>
 </html>
-

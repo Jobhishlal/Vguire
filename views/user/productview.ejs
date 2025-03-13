@@ -6,11 +6,10 @@
     <title>Product View Page</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- <link rel="stylesheet" href="/style.css"> -->
     
     <style>
         :root {
-            --primary-color:black;
+            --primary-color: black;
             --secondary-color: #2ecc71;
             --accent-color: #e74c3c;
         }
@@ -38,7 +37,6 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        /* Additional styling for carousel images */
         .carousel-item img {
             object-fit: cover;
             width: 100%;
@@ -72,7 +70,7 @@
             color: white;
             border-color: var(--primary-color);
         }
-        
+
         .quantity-input {
             width: 100px;
             border-radius: 25px;
@@ -192,306 +190,239 @@
             margin-bottom: 20px;
         }
 
-        .product-image {
-            border-radius: 15px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .product-image:hover {
-            transform: scale(1.05);
-            transition: transform 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .size-btn {
-            width: 45px;
-            height: 45px;
-            margin: 5px;
-            border: 2px solid #eee;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            color: #666;
-        }
-        
-        .size-btn:hover {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-            transform: translateY(-2px);
-        }
-
-        .size-btn.active {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-        
-        .quantity-input {
-            width: 100px;
-            border-radius: 25px;
-            text-align: center;
-            border: 2px solid #eee;
-            padding: 8px;
-        }
-        
         .related-product {
             border-radius: 15px;
             overflow: hidden;
             border: none;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        
+
         .related-product:hover {
             transform: translateY(-5px);
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
-        
-        .action-buttons {
-            display: flex;
-            gap: 15px;
+
+        .carousel-inner {
+            position: relative;
+            width: 500px;
+            overflow: hidden;
         }
 
-        .btn-custom {
-            padding: 12px 30px;
-            border-radius: 25px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 14px;
-            transition: all 0.3s ease;
+        .zoom-image {
+            width: 100%;
+            transition: transform 0.1s ease-in-out;
         }
-        
-        .btn-buy-now {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border: none;
+
+        .carousel-item {
+            height: 500px;
+        }
+
+        .carousel-caption {
+            padding: 1.5rem;
+            border-radius: 10px;
+            animation: fadeInUp 1s ease;
+        }
+
+        .buy-now-form {
+            text-align: center;
+            margin-top: 15px;
+            position: absolute;
+            top: 665px;
+            left: 1000px;
+        }
+
+        .buy-now-btn {
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
             color: white;
-            width: auto;
-        }
-        
-        .btn-buy-now:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
-        }
-
-        .btn-add-cart {
-            background: white;
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        .btn-add-cart:hover {
-            background: var(--primary-color);
-            color: white;
-            transform: translateY(-2px);
-        }
-        
-        .product-price {
-            font-size: 2rem;
-            color: var(--primary-color);
+            font-size: 18px;
             font-weight: bold;
-        }
-        
-        .original-price {
-            text-decoration: line-through;
-            color: #6c757d;
-            font-size: 1.2rem;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(255, 75, 43, 0.4);
+            transition: all 0.3s ease-in-out;
         }
 
-        .discount-badge {
-            background: var(--accent-color);
+        .buy-now-btn:hover {
+            background: linear-gradient(45deg, #ff4b2b, #ff416c);
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 75, 43, 0.6);
+        }
+
+        .buy-now-btn i {
+            margin-right: 8px;
+        }
+
+        .selected-size {
+            background-color: #ff5733;
             color: white;
-            padding: 5px 15px;
-            border-radius: 25px;
-            font-size: 0.9rem;
-            margin-left: 10px;
+            border: 2px solid #ff5733;
         }
 
-        .feature-badge {
-            background: #f8f9fa;
-            border-radius: 20px;
-            padding: 10px 20px;
-            margin: 5px;
-            display: inline-flex;
-            align-items: center;
+        .breadcrumb {
+            list-style: none;
+            display: flex;
             gap: 8px;
-            font-size: 0.9rem;
+            font-size: 14px;
+            padding: 10px 0;
+        }
+
+        .breadcrumb li {
+            display: flex;
+            align-items: center;
+        }
+
+        .breadcrumb li a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: 500;
+            transition: color 0.3s ease-in-out;
+        }
+
+        .breadcrumb li a:hover {
+            color: #0056b3;
+        }
+
+        .breadcrumb li::after {
+            content: "›";
+            margin: 0 8px;
             color: #666;
         }
 
-        .feature-badge i {
-            color: var(--primary-color);
+        .breadcrumb li:last-child::after {
+            content: "";
         }
 
-        .thumbnail-container {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
+        /* Responsive Adjustments */
+        @media (max-width: 1200px) {
+            .carousel-inner {
+                width: 100%;
+            }
+
+            .buy-now-form {
+                left: auto;
+                right: 20px;
+            }
         }
 
-        .thumbnail {
-            width: 80px;
-            height: 80px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        @media (max-width: 991px) {
+            .product-container {
+                padding: 20px;
+            }
+
+            .product-title {
+                font-size: 2rem;
+            }
+
+            .carousel-item {
+                height: 400px;
+            }
+
+            .product-price {
+                font-size: 1.8rem;
+            }
+
+            .size-btn {
+                width: 40px;
+                height: 40px;
+            }
+
+            .thumbnail {
+                width: 70px;
+                height: 70px;
+            }
+
+            .buy-now-form {
+                position: static;
+                margin-top: 20px;
+            }
         }
 
-        .thumbnail:hover {
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        @media (max-width: 767px) {
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .btn-custom {
+                width: 100%;
+                padding: 10px 20px;
+            }
+
+            .carousel-item {
+                height: 300px;
+            }
+
+            .product-title {
+                font-size: 1.5rem;
+            }
+
+            .product-price {
+                font-size: 1.5rem;
+            }
+
+            .original-price {
+                font-size: 1rem;
+            }
+
+            .feature-badge {
+                padding: 8px 15px;
+                font-size: 0.8rem;
+            }
+
+            .thumbnail-container {
+                justify-content: center;
+            }
+
+            .related-product {
+                margin-bottom: 15px;
+            }
         }
 
-        .product-title {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #2c3e50;
+        @media (max-width: 575px) {
+            .product-container {
+                padding: 15px;
+            }
+
+            .carousel-item {
+                height: 200px;
+            }
+
+            .product-title {
+                font-size: 1.2rem;
+            }
+
+            .product-price {
+                font-size: 1.3rem;
+            }
+
+            .size-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 12px;
+            }
+
+            .thumbnail {
+                width: 50px;
+                height: 50px;
+            }
+
+            .feature-badge {
+                display: block;
+                margin: 5px 0;
+                text-align: center;
+            }
+
+            .breadcrumb {
+                font-size: 12px;
+                flex-wrap: wrap;
+            }
+
+            .buy-now-btn {
+                font-size: 16px;
+                padding: 10px 15px;
+            }
         }
-
-        .stock-status {
-            color: var(--secondary-color);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-bottom: 20px;
-        }
-        .carousel-inner {
-    position: relative;
-    width: 500px;
-    overflow: hidden;
-    }
-
-   .zoom-image {
-    width: 100%;
-    transition: transform 0.1s ease-in-out;
-    }
-  
-
-/* Banner Slider */
-.carousel-item {
-    height: 500px;
-}
-
-@media (max-width: 768px) {
-    .carousel-item {
-        height: 300px;
-    }
-}
-
-.carousel-item img {
-    object-fit: cover;
-    height: 100%;
-    width: 100%;
-}
-
-.carousel-caption {
-   
-    padding: 1.5rem;
-    border-radius: 10px;
-    animation: fadeInUp 1s ease;
-}
-
-@media (max-width: 576px) {
-    .carousel-caption {
-        padding: 1rem;
-    }
-    .carousel-caption h2 {
-        font-size: 1.5rem;
-    }
-    .carousel-caption p {
-        font-size: 0.9rem;
-    }
-}
-
-
-.buy-now-form {
-    text-align: center;
-    margin-top: 15px;
-    position: absolute;
-    top: 665px;
-    left: 1000px;
-}
-
-.buy-now-btn {
-    background: linear-gradient(45deg, #ff416c, #ff4b2b);  
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(255, 75, 43, 0.4);
-    transition: all 0.3s ease-in-out;
-}
-
-.buy-now-btn:hover {
-    background: linear-gradient(45deg, #ff4b2b, #ff416c);
-    transform: scale(1.05);
-    box-shadow: 0 8px 20px rgba(255, 75, 43, 0.6);
-}
-
-.buy-now-btn i {
-    margin-right: 8px;
-}
-
-.size-btn {
-        padding: 10px 20px;
-        border: 2px solid #ccc;
-        background-color: white;
-        color: black;
-        cursor: pointer;
-        border-radius: 5px;
-        transition: 0.3s;
-    }
-
-    .selected-size {
-    background-color: #ff5733;
-    color: white;
-    border: 2px solid #ff5733;
-}
-.breadcrumb {
-    list-style: none;
-    display: flex;
-    gap: 8px;
-    font-size: 14px;
-    padding: 10px 0;
-}
-
-.breadcrumb li {
-    display: flex;
-    align-items: center;
-}
-
-.breadcrumb li a {
-    text-decoration: none;
-    color: #007bff; /* Blue color */
-    font-weight: 500;
-    transition: color 0.3s ease-in-out;
-}
-
-.breadcrumb li a:hover {
-    color: #0056b3; /* Darker blue on hover */
-}
-
-.breadcrumb li::after {
-    content: "›"; /* Breadcrumb separator */
-    margin: 0 8px;
-    color: #666;
-}
-
-.breadcrumb li:last-child::after {
-    content: ""; /* Remove separator from last item */
-}
-
-
-
     </style>
 </head>
 <body>
@@ -504,14 +435,9 @@
         </ul>
     </div>
     
-    <!-- Product View Section -->
     <div class="container py-5" style="margin-top: -30px;">
         <div class="product-container">
-           
-    
-            <!-- Main Product Section -->
             <div class="row mb-5">
-                <!-- Product Images -->
                 <div class="col-md-6">
                     <% if (product.images.length > 0) { %>
                         <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -535,8 +461,7 @@
                         <p>No images available</p>
                     <% } %>
                 </div>
-    
-                <!-- Product Details -->
+
                 <div class="col-md-6">
                     <h2 class="product-title"><%= product.name %></h2>
                     <div class="stock-status">
@@ -547,57 +472,41 @@
                         <span class="product-price">
                             <% if (product.isOfferActive) { %>
                                 <% if (product.offerType === "product") { %>
-                                    ₹<%= product.Offerprice %> <!-- Product offer price -->
+                                    ₹<%= product.Offerprice %>
                                 <% } else if (product.offerType === "category") { %>
-                                    ₹<%= product.price - (product.price * product.discountPercentage / 100) %> <!-- Category offer price -->
+                                    ₹<%= product.price - (product.price * product.discountPercentage / 100) %>
                                 <% } %>
                             <% } else { %>
-                                ₹<%= product.price %> <!-- Regular price if no offer -->
+                                ₹<%= product.price %>
                             <% } %>
                         </span>
-                        
-                        <span class="original-price ms-2">
-                            ₹<%= product.price %> <!-- Original price -->
-                        </span>
-                        
+                        <span class="original-price ms-2">₹<%= product.price %></span>
                         <% if (product.isOfferActive) { %>
-                            <span class="discount-badge">
-                                <%= product.discountPercentage %> % offer <!-- Display discount percentage -->
-                            </span>
+                            <span class="discount-badge"><%= product.discountPercentage %> % offer</span>
                         <% } %>
                     </div>
-                    
 
                     <% if (avgRating && avgRating !== "No ratings yet") { %>
                         <div class="product-rating d-flex align-items-center">
                             <% let rating = Math.round(avgRating); %>
                             <% for (let i = 1; i <= 5; i++) { %>
                                 <% if (i <= rating) { %>
-                                    <i class="fas fa-star text-warning"></i> 
+                                    <i class="fas fa-star text-warning"></i>
                                 <% } else { %>
-                                    <i class="far fa-star text-warning"></i> 
+                                    <i class="far fa-star text-warning"></i>
                                 <% } %>
                             <% } %>
-                        
                         </div>
                     <% } %>
-                    
-                      
-    
+
                     <div class="features mb-4">
                         <div class="feature-badge"><i class="fas fa-tshirt"></i> Premium Quality</div>
                         <div class="feature-badge"><i class="fas fa-shipping-fast"></i> Fast Delivery</div>
                         <div class="feature-badge"><i class="fas fa-sync"></i> Easy Returns</div>
                     </div>
-                    
-    
-                    
 
                     <form id="add-to-cart-form" action="/user/add-to-cart" method="POST">
-
                         <input type="hidden" name="productId" value="<%= product._id %>">
-                        
-                        
                         <div class="mb-4">
                             <h5 class="fw-bold">Select Size</h5>
                             <div class="size-buttons d-flex gap-2">
@@ -622,39 +531,30 @@
                                     <label for="sizeXXL" class="size-btn">XXL</label>
                                 <% } %>
                             </div>
-                            
                         </div>
-                    
-                        
+
                         <div class="mb-3" style="display: none;">
                             <label for="quantity" class="fw-bold">Quantity</label>
                             <input type="number" name="quantity" id="quantity" class="form-control" value="1" min="1">
                         </div>
-                        
-                    
-                      
+
                         <button type="submit" class="btn btn-custom btn-add-cart">
                             <i class="fas fa-plus me-2"></i> Add to Cart
                         </button>
                     </form>
-                    
-                    
 
                     <form onsubmit="a(event)">
                         <input type="hidden" name="productId" value="<%= product._id %>">
                         <input type="hidden" name="quantity" value="1">
                         <input type="hidden" name="size" id="hh">
                         <input type="hidden" name="price" value="<%= product.price %>">
-                        
-                        <button type="submit" class="btn buy-now-btn" style="position: relative;     left: 240px;  top: -52px; display: none;">
+                        <button type="submit" class="btn buy-now-btn" style="position: relative; left: 240px; top: -52px; display: none;">
                             <i class="fas fa-shopping-cart"></i> Buy Now
                         </button>
                     </form>
-                    
                 </div>
             </div>
-    
-            <!-- Related Products -->
+
             <div class="row mt-5">
                 <h3 class="mb-4 fw-bold">Others Also Bought</h3>
                 <% for (let i = 0; i < simProducts.length; i++) { %>
@@ -674,213 +574,125 @@
         </div>
     </div>
     
-    <!-- Footer -->
     <%- include('../partials/user/footer.ejs') %>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-   
-
     <script>
-     
-
-
-
-
-
 document.addEventListener("DOMContentLoaded", function() {
-    
-   
     const sizeLabels = document.querySelectorAll(".size-btn");
-    const addToCartForm = document.getElementById("addToCartForm");
+    const addToCartForm = document.getElementById("add-to-cart-form");
     const buyNowForm = document.querySelector('form[onsubmit="a(event)"]');
     const zoomImages = document.querySelectorAll(".zoom-image");
 
-   
     initializeSizeSelection();
-    
-
     initializeAddToCart();
     initializeBuyNow();
-    
-
     initializeImageZoom();
-
 
     function initializeSizeSelection() {
         sizeLabels.forEach(label => {
             label.addEventListener("click", function() {
-             
                 sizeLabels.forEach(l => l.classList.remove("selected-size"));
-            
                 this.classList.add("selected-size");
-                
-             
                 const radioId = this.getAttribute("for");
                 document.getElementById(radioId).checked = true;
             });
         });
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-    initializeAddToCart();
-});
+    function initializeAddToCart() {
+        if (!addToCartForm) return;
 
+        addToCartForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            if (!validateSizeSelection()) return;
 
+            const formData = new FormData(this);
+            const jsonData = Object.fromEntries(formData.entries());
 
-function initializeAddToCart() {
-    const addToCartForm = document.getElementById("add-to-cart-form");
-
-    if (!addToCartForm) {
-        console.error(" Error: #addToCartForm not found in the DOM.");
-        return;
-    }
-
-    addToCartForm.addEventListener("submit", async function (event) {
-        event.preventDefault();
-
-        if (!validateSizeSelection()) return;
-
-        const formData = new FormData(this);
-        const jsonData = Object.fromEntries(formData.entries());
-
-        try {
-            const response = await fetch("/user/add-to-cart", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(jsonData),
-            });
-
-            const result = await response.json();
-            console.log(" Server Response:", result); 
-
-            if (response.ok && result.success) {
-                console.log("Product added to cart successfully! Redirecting...");
-            
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Added to Cart!',
-                    text: 'Product successfully added to your cart.',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    window.location.href = result.redirectUrl; 
+            try {
+                const response = await fetch("/user/add-to-cart", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(jsonData),
                 });
 
-            } else {
-                showErrorAlert("Failed to Add", result.message || "Failed to add product to cart.");
-            }
+                const result = await response.json();
 
-        } catch (error) {
-            console.error(" Error:", error);
-            showErrorAlert("Error", "An unexpected error occurred. Please try again.");
-        }
-    });
-}
-
-
-
-
-
-function validateSizeSelection() {
-    const size = document.querySelector('input[name="size"]:checked');
-    if (!size) {
-        showErrorAlert('Size Required', 'Please select a size before adding to cart.');
-        return false;
-    }
-    return true;
-}
-
-function showSuccessAlert(title, message) {
-    return Swal.fire({
-        icon: 'success',
-        title: title,
-        text: message,
-        confirmButtonText: 'OK'
-    });
-}
-
-function showErrorAlert(title, message) {
-    return Swal.fire({
-        icon: 'error',
-        title: title,
-        text: message,
-        confirmButtonText: 'OK'
-    });
-}
-
-
- 
-    function initializeBuyNow() {
-    if (!buyNowForm) {
-        console.error("Error: buyNowForm not found!");
-        return;
-    }
-
-    buyNowForm.addEventListener("submit", async function (event) {
-        event.preventDefault();
-
-        if (!validateSizeSelection()) return;
-
-        const selectedSize = document.querySelector('input[name="size"]:checked');
-        if (!selectedSize) {
-            showErrorAlert('Size Required!', 'Please select a size before proceeding.');
-            return;
-        }
-
-        document.getElementById("hh").value = selectedSize.value;
-
-        const formData = {
-            productId: this.querySelector('input[name="productId"]')?.value || null,
-            quantity: 1,
-            size: selectedSize.value,
-            price: this.querySelector('input[name="price"]')?.value || null
-        };
-
-        console.log("Form Data Sent:", formData);
-
-        if (!formData.productId || !formData.price) {
-            console.error("Error: Missing productId or price in form.");
-            showErrorAlert('Error', 'Invalid product details. Please try again.');
-            return;
-        }
-
-        try {
-            const response = await fetch("/user/checkout/buy-now", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(formData)
-            });
-
-            const text = await response.text();
-            console.log("Raw Response:", text);
-
-            let result;
-            try {
-                result = JSON.parse(text);
+                if (response.ok && result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Added to Cart!',
+                        text: 'Product successfully added to your cart.',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = result.redirectUrl;
+                    });
+                } else {
+                    showErrorAlert("Failed to Add", result.message || "Failed to add product to cart.");
+                }
             } catch (error) {
-                console.error("Response is not valid JSON:", error);
-                showErrorAlert('Error', 'Invalid server response. Please try again.');
-                return;
+                console.error("Error:", error);
+                showErrorAlert("Error", "An unexpected error occurred. Please try again.");
             }
+        });
+    }
 
-            console.log("Parsed JSON Response:", result);
-
-            if (response.ok && result.success) {
-                window.location.href = `/user/checkout/single?productId=${formData.productId}&quantity=${formData.quantity}&size=${formData.size}`;
-            } else {
-                showErrorAlert('Checkout Failed', result.message || "Failed to proceed to checkout.");
-            }
-        } catch (error) {
-            console.error("Error:", error);
-            showErrorAlert('Error', 'An unexpected error occurred. Please try again.');
+    function validateSizeSelection() {
+        const size = document.querySelector('input[name="size"]:checked');
+        if (!size) {
+            showErrorAlert('Size Required', 'Please select a size before adding to cart.');
+            return false;
         }
-    });
-}
+        return true;
+    }
 
+    function showErrorAlert(title, message) {
+        return Swal.fire({
+            icon: 'error',
+            title: title,
+            text: message,
+            confirmButtonText: 'OK'
+        });
+    }
 
+    function initializeBuyNow() {
+        if (!buyNowForm) return;
 
+        buyNowForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            if (!validateSizeSelection()) return;
 
-    // Image Zoom System
+            const selectedSize = document.querySelector('input[name="size"]:checked');
+            document.getElementById("hh").value = selectedSize.value;
+
+            const formData = {
+                productId: this.querySelector('input[name="productId"]').value,
+                quantity: 1,
+                size: selectedSize.value,
+                price: this.querySelector('input[name="price"]').value
+            };
+
+            try {
+                const response = await fetch("/user/checkout/buy-now", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    window.location.href = `/user/checkout/single?productId=${formData.productId}&quantity=${formData.quantity}&size=${formData.size}`;
+                } else {
+                    showErrorAlert('Checkout Failed', result.message || "Failed to proceed to checkout.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                showErrorAlert('Error', 'An unexpected error occurred. Please try again.');
+            }
+        });
+    }
+
     function initializeImageZoom() {
         zoomImages.forEach(image => {
             let isZoomed = false;
@@ -888,11 +700,9 @@ function showErrorAlert(title, message) {
 
             image.addEventListener("mousemove", function(e) {
                 if (!isZoomed) return;
-                
                 const rect = this.getBoundingClientRect();
                 const x = ((e.clientX - rect.left) / rect.width) * 100;
                 const y = ((e.clientY - rect.top) / rect.height) * 100;
-                
                 this.style.transformOrigin = `${x}% ${y}%`;
                 this.style.transform = `scale(${zoomLevel})`;
             });
@@ -907,102 +717,18 @@ function showErrorAlert(title, message) {
                 this.style.transform = "scale(1)";
             });
 
-            // Optional: Add zoom level control with mouse wheel
             image.addEventListener("wheel", function(e) {
                 e.preventDefault();
                 if (isZoomed) {
-                    if (e.deltaY < 0 && zoomLevel < 4) {
-                        zoomLevel += 0.5;
-                    } else if (e.deltaY > 0 && zoomLevel > 1.5) {
-                        zoomLevel -= 0.5;
-                    }
+                    if (e.deltaY < 0 && zoomLevel < 4) zoomLevel += 0.5;
+                    else if (e.deltaY > 0 && zoomLevel > 1.5) zoomLevel -= 0.5;
                     this.style.transform = `scale(${zoomLevel})`;
                 }
             });
         });
     }
-
-    // Alert Helpers
-    function showSuccessAlert(title, text) {
-        return Swal.fire({
-            icon: "success",
-            title: title,
-            text: text,
-            timer: 2000,
-            timerProgressBar: true,
-            showConfirmButton: false,
-            position: 'top-end',
-            toast: true,
-            showClass: {
-                popup: 'animate__animated animate__fadeInRight'
-            },
-            hideClass: {
-                popup: 'animate__animated animate__fadeOutRight'
-            }
-        });
-    }
-
-    function showErrorAlert(title, text) {
-        return Swal.fire({
-            icon: "error",
-            title: title,
-            text: text,
-            confirmButtonColor: "#ff5733",
-            showClass: {
-                popup: 'animate__animated animate__fadeInDown'
-            },
-            hideClass: {
-                popup: 'animate__animated animate__fadeOutUp'
-            }
-        });
-    }
-
-    // Optional: Add quantity control system
-    function initializeQuantityControl() {
-        const quantityInput = document.querySelector('input[name="quantity"]');
-        if (quantityInput) {
-            const minusBtn = document.createElement('button');
-            const plusBtn = document.createElement('button');
-            
-            minusBtn.type = 'button';
-            plusBtn.type = 'button';
-            minusBtn.className = 'btn btn-outline-secondary';
-            plusBtn.className = 'btn btn-outline-secondary';
-            minusBtn.textContent = '-';
-            plusBtn.textContent = '+';
-
-            minusBtn.onclick = () => {
-                const currentValue = parseInt(quantityInput.value);
-                if (currentValue > 1) {
-                    quantityInput.value = currentValue - 1;
-                }
-            };
-
-            plusBtn.onclick = () => {
-                const currentValue = parseInt(quantityInput.value);
-                const maxStock = parseInt(quantityInput.dataset.maxStock || '99');
-                if (currentValue < maxStock) {
-                    quantityInput.value = currentValue + 1;
-                }
-            };
-
-            const container = document.createElement('div');
-            container.className = 'input-group';
-            container.appendChild(minusBtn);
-            container.appendChild(quantityInput);
-            container.appendChild(plusBtn);
-
-            quantityInput.parentNode.replaceChild(container, quantityInput);
-        }
-    }
-
-    
 });
-   
-       </script>
-       
-       <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-
-
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 </body>
-</html> 
+</html>

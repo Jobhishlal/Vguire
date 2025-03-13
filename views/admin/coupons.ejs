@@ -7,131 +7,34 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <style>
-        /* Keep existing navbar styles */
+        /* Assuming CSS variables are defined elsewhere, fallback values added */
         :root {
-            --sidebar-width: 250px;
-            --sidebar-collapsed-width: 70px;
-            --header-height: 60px;
-            --primary-color: #cbcfda;
-            --secondary-color: #858796;
             --dark-bg: #1a1a1a;
-            --card-bg: #242424;
-            --text-color: #e4e4e4;
-        }
-        
-        /* Existing navbar styles here... */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: var(--sidebar-width);
-            background: linear-gradient(180deg, #010612 0%, #224abe 100%);
-            transition: all 0.3s ease;
-            z-index: 1000;
-            padding-top: var(--header-height);
+            --text-color: #ffffff;
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 80px;
+            --header-height: 60px;
+            --card-bg: #2c2c2c;
         }
 
-        .sidebar.collapsed {
-            width: var(--sidebar-collapsed-width);
-        }
-
-        .sidebar-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: var(--sidebar-width);
-            height: var(--header-height);
-            background: rgba(1, 6, 18, 0.9);
-            display: flex;
-            align-items: center;
-            padding: 0 1rem;
-            transition: all 0.3s ease;
-            z-index: 1001;
-        }
-
-        .sidebar.collapsed .sidebar-header {
-            width: var(--sidebar-collapsed-width);
-        }
-
-        .logo-full {
-            display: flex;
-            align-items: center;
-            color: white;
-            text-decoration: none;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .logo-mini {
-            display: none;
-            color: white;
-            text-decoration: none;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .sidebar.collapsed .logo-full {
-            display: none;
-        }
-
-        .sidebar.collapsed .logo-mini {
-            display: block;
-        }
-
-        .nav-item {
-            position: relative;
-            margin: 0.25rem 1rem;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .nav-link:hover {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .nav-link i {
-            width: 20px;
-            text-align: center;
-            margin-right: 1rem;
-        }
-
-        .sidebar.collapsed .nav-link span {
-            display: none;
-        }
-
-        .sidebar.collapsed .nav-item {
-            margin: 0.25rem 0.5rem;
-        }
-
-        .sidebar.collapsed .nav-link i {
-            margin-right: 0;
-        }
-        
-        /* New styles for content area */
         body {
             background-color: var(--dark-bg);
             color: var(--text-color);
-            margin-left: var(--sidebar-width);
-            transition: margin-left 0.3s ease;
-        }
-
-        .sidebar.collapsed + body {
-            margin-left: var(--sidebar-collapsed-width);
+            margin: 0;
+            padding: 0;
         }
 
         .content-wrapper {
             padding: 2rem;
             margin-top: var(--header-height);
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.3s ease;
+            z-index: 2; /* Ensure main content is above the navbar */
+            position: relative;
+        }
+
+        .sidebar.collapsed + .content-wrapper {
+            margin-left: var(--sidebar-collapsed-width);
         }
 
         .page-header {
@@ -151,6 +54,8 @@
 
         .table {
             color: var(--text-color);
+            width: 100%;
+            min-width: 600px; /* Ensures table doesn't collapse too much */
         }
 
         .table-dark {
@@ -186,122 +91,143 @@
 
         .table-responsive {
             border-radius: 1rem;
-            overflow: hidden;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
         }
+
         .pagination {
-  display: inline-block;
-  margin-top: 20px;
-  text-align: center;
-  width: 100%;
-}
+            display: inline-block;
+            margin-top: 20px;
+            text-align: center;
+            width: 100%;
+        }
 
-.pagination a, .pagination span {
-  color: #333;
-  float: none;
-  padding: 8px 16px;
-  text-decoration: none;
-  transition: background-color 0.3s;
-  margin: 0 4px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
+        .pagination a, .pagination span {
+            color: #333;
+            float: none;
+            padding: 8px 16px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            margin: 0 4px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
 
-.pagination a:hover {
-  background-color: #f0f0f0;
-}
+        .pagination a:hover {
+            background-color: #f0f0f0;
+        }
 
-.pagination a.active {
-  background-color: #007bff;
-  color: white;
-  border: 1px solid #007bff;
-}
+        .pagination a.active {
+            background-color: #007bff;
+            color: white;
+            border: 1px solid #007bff;
+        }
 
-.pagination span {
-  padding: 8px 16px;
-  color: grey;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  margin: 0 4px;
-}
+        .pagination span {
+            padding: 8px 16px;
+            color: grey;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 0 4px;
+        }
 
+        /* Media Queries for Responsiveness */
+        @media (max-width: 992px) {
+            .content-wrapper {
+                margin-left: 0; /* Remove sidebar margin on smaller screens if sidebar collapses */
+                padding: 1.5rem;
+            }
+
+            .page-header {
+                padding: 1.5rem;
+            }
+
+            .btn-add-coupon {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content-wrapper {
+                padding: 1rem;
+            }
+
+            .page-header {
+                padding: 1rem;
+            }
+
+            .table th, .table td {
+                padding: 0.75rem; /* Reduce padding */
+                font-size: 0.9rem; /* Adjust font size */
+            }
+
+            .btn-add-coupon {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+            }
+
+            .btn-edit, .btn-remove {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+
+            .badge {
+                font-size: 0.75rem;
+            }
+
+            .pagination a, .pagination span {
+                padding: 6px 12px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .content-wrapper {
+                padding: 0.75rem;
+            }
+
+            .page-header {
+                padding: 0.75rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .page-header p {
+                font-size: 0.9rem;
+            }
+
+            .table th, .table td {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            .btn-add-coupon {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.75rem;
+            }
+
+            .btn-edit, .btn-remove {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.7rem;
+            }
+
+            .badge {
+                font-size: 0.65rem;
+                padding: 0.4em 0.6em;
+            }
+
+            .pagination a, .pagination span {
+                padding: 5px 10px;
+                font-size: 0.8rem;
+            }
+        }
     </style>
 </head>
 <body>
-  
-      <nav class="sidebar">
-        <div class="sidebar-header">
-            <a href="#" class="logo-full">
-                <i class="fas fa-shopping-bag me-2"></i>
-                VGURIE
-            </a>
-            <a href="#" class="logo-mini">
-                <i class="fas fa-shopping-bag"></i>
-            </a>
-        </div>
-        <div class="nav flex-column">
-            <div class="nav-item">
-                <a href="/admin/dashboard" class="nav-link">
-                    <i class="fas fa-th-large"></i>
-                    <span>Dashboard</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/admin/product" class="nav-link">
-                    <i class="fas fa-box"></i>
-                    <span>Products</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/admin/ordermanagement" class="nav-link">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Orders</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/admin/usersmanagement" class="nav-link">
-                    <i class="fas fa-users"></i>
-                    <span>Users</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/admin/categories" class="nav-link">
-                    <i class="fas fa-tags"></i>
-                    <span>Categories</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/admin/returnRequests" class="nav-link">
-                    <i class="fas fa-undo-alt"></i> 
-                    <span>Returns & Refunds</span>  
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-ticket-alt"></i>
-                    <span>Coupons</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-image"></i>
-                    <span>Banners</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </a>
-            </div>
-            <div class="nav-item mt-auto">
-                <a href="#" class="nav-link text-danger">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
-            </div>
-        </div>
-  
-    </nav>
+    <%- include('../partials/admin/navbar.ejs') %>
 
     <div class="content-wrapper">
         <div class="page-header">
@@ -327,7 +253,6 @@
                                 <th>Value</th>
                                 <th>Start Date</th>
                                 <th>Expiration</th>
-                                
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -349,13 +274,11 @@
                                         <%= new Date(coupon.startDate).toLocaleDateString() %>
                                     </span>
                                 </td>
-                                
                                 <td>
                                     <span class="<%= new Date(coupon.expirationDate) < new Date() ? 'text-danger' : 'text-success' %>">
                                         <%= new Date(coupon.expirationDate).toLocaleDateString() %>
                                     </span>
                                 </td>
-                               
                                 <td>
                                     <% 
                                         const currentDate = new Date();
@@ -378,7 +301,6 @@
                                         } 
                                     %>
                                 </td>
-                                
                                 <td>
                                     <div class="btn-group">
                                         <a href="/admin/coupons/edit/<%= coupon._id %>" 
@@ -399,6 +321,7 @@
             </div>
         </div>
     </div>
+
     <div class="pagination">
         <% if (currentPage > 1) { %>
           <a href="?page=<%= currentPage - 1 %>&limit=10">Previous</a>
@@ -412,7 +335,6 @@
           <a href="?page=<%= currentPage + 1 %>&limit=10">Next</a>
         <% } %>
       </div>
-      
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.all.min.js"></script>
     <script>

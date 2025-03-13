@@ -1,123 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Responsive Sidebar with Toggle</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --sidebar-width: 250px;
+      --sidebar-collapsed-width: 70px;
+      --header-height: 60px;
+      --primary-color: #cbcfda;
+      --secondary-color: #858796;
+      --dark-bg: #1a1a1a;
+      --card-bg: #242424;
+      --text-color: #e4e4e4;
+      --fluorescent-green: #2b08ee;
+      --gradient-green: linear-gradient(135deg, #b0aec8, rgb(120, 100, 100));
+    }
 
-<style>
-      :root {
-            --sidebar-width: 250px;
-            --sidebar-collapsed-width: 70px;
-            --header-height: 60px;
-            --primary-color: #cbcfda;
-            --secondary-color: #858796;
-            --dark-bg: #1a1a1a;
-            --card-bg: #242424;
-            --text-color: #e4e4e4;
-            --fluorescent-green: #2b08ee;
-            --gradient-green: linear-gradient(135deg, #b0aec8, rgb(120, 100, 100));
+    body {
+      background-color: var(--dark-bg);
+      color: var(--text-color);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
 
-        }
-        body {
-            background-color: var(--dark-bg);
-            color: var(--text-color);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: var(--sidebar-width);
-            background: linear-gradient(180deg, #010612 0%, #224abe 100%);
-            transition: all 0.3s ease;
-            z-index: 1000;
-            padding-top: var(--header-height);
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
-        }
-        .sidebar.collapsed {
-            width: var(--sidebar-collapsed-width);
-        }
-        .sidebar-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: var(--sidebar-width);
-            height: var(--header-height);
-            background: rgba(1, 6, 18, 0.9);
-            display: flex;
-            align-items: center;
-            padding: 0 1rem;
-            transition: all 0.3s ease;
-            z-index: 1001;
-        }
-        .sidebar.collapsed .sidebar-header {
-            width: var(--sidebar-collapsed-width);
-        }
-        .logo-full {
-            display: flex;
-            align-items: center;
-            color: white;
-            text-decoration: none;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        .logo-mini {
-            display: none;
-            color: white;
-            text-decoration: none;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        .sidebar.collapsed .logo-full {
-            display: none;
-        }
-        .sidebar.collapsed .logo-mini {
-            display: block;
-        }
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-        }
-        .nav-link:hover {
-            color: white;
-            background: var(--gradient-green);
-        }
-        .nav-link i {
-            width: 20px;
-            text-align: center;
-            margin-right: 1rem;
-        }
-        .sidebar.collapsed .nav-link span {
-            display: none;
-        }
-        .sidebar.collapsed .nav-link i {
-            margin-right: 0;
-        }
-</style>
-<
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: var(--sidebar-width);
+      background: linear-gradient(180deg, #010612 0%, #224abe 100%);
+      transition: all 0.3s ease;
+      z-index: 1; /* Behind the main content */
+      padding-top: var(--header-height);
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+      overflow-y: auto;
+    }
 
-<nav class="sidebar">
-    <div class="sidebar-header">
-        <a href="#" class="logo-full">
-            <i class="fas fa-shopping-bag me-2"></i>
-            VGURIE
-        </a>
-        <a href="#" class="logo-mini">
-            <i class="fas fa-shopping-bag"></i>
-        </a>
-    </div>
-    <div class="nav flex-column p-3">
-        <a href="/admin/dashboard" class="nav-link mb-2"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
-        <a href="/admin/product" class="nav-link mb-2"><i class="fas fa-box"></i><span>Products</span></a>
-        <a href="/admin/ordermanagement" class="nav-link mb-2"><i class="fas fa-shopping-cart"></i><span>Orders</span></a>
-        <a href="/admin/usersmanagement" class="nav-link mb-2"><i class="fas fa-users"></i><span>Users</span></a>
-        <a href="/admin/categories" class="nav-link mb-2"><i class="fas fa-tags"></i><span>Categories</span></a>
-        <a href="/admin/returnRequests" class="nav-link mb-2"><i class="fas fa-undo-alt"></i><span>Returns & Refunds</span></a>
-        <a href="/admin/coupons" class="nav-link mb-2"><i class="fas fa-ticket-alt"></i><span>Coupons</span></a>
-        <a href="/admin/ledger" class="nav-link mb-2"><i class="fas fa-image"></i><span>Account</span></a>
-        <a href="#" class="nav-link mb-2"><i class="fas fa-cog"></i><span>Settings</span></a>
-        <a href="/admin/logout" class="nav-link text-danger mt-auto"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
-    </div>
+    .sidebar.hidden {
+      left: -250px;
+    }
+
+    /* Header */
+    .sidebar-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: var(--sidebar-width);
+      height: var(--header-height);
+      background: rgba(1, 6, 18, 0.9);
+      display: flex;
+      align-items: center;
+      padding: 0 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .logo-full {
+      color: white;
+      text-decoration: none;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .logo-mini {
+      display: none;
+    }
+
+    /* Nav links */
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+      margin-bottom: 0.5rem;
+    }
+
+    .nav-link:hover {
+      color: white;
+      background: var(--gradient-green);
+    }
+
+    .nav-link i {
+      width: 24px;
+      text-align: center;
+      margin-right: 1rem;
+    }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 1000;
+      font-size: 2rem;
+      color: white;
+      cursor: pointer;
+    }
+
+    /* Main content */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      padding: 20px;
+      transition: margin-left 0.3s ease;
+      z-index: 2; /* Always on top of sidebar */
+      position: relative;
+      background-color: var(--dark-bg); /* Ensure background color matches */
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 720px) {
+      .sidebar {
+        left: -250px;
+      }
+
+      .sidebar.show {
+        left: 0;
+      }
+
+      .hamburger {
+        display: block;
+      }
+
+      .main-content {
+        margin-left: 0; /* No margin when sidebar is hidden */
+      }
+      
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- Hamburger icon -->
+<div class="hamburger" onclick="toggleSidebar()">
+  <i class="fas fa-bars"></i>
+</div>
+
+<!-- Sidebar -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="#" class="logo-full">
+      <i class="fas fa-shopping-bag me-2"></i>
+      VGURIE
+    </a>
+  </div>
+  <div class="nav flex-column p-3">
+    <a href="/admin/dashboard" class="nav-link"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
+    <a href="/admin/product" class="nav-link"><i class="fas fa-box"></i><span>Products</span></a>
+    <a href="/admin/ordermanagement" class="nav-link"><i class="fas fa-shopping-cart"></i><span>Orders</span></a>
+    <a href="/admin/usersmanagement" class="nav-link"><i class="fas fa-users"></i><span>Users</span></a>
+    <a href="/admin/categories" class="nav-link"><i class="fas fa-tags"></i><span>Categories</span></a>
+    <a href="/admin/returnRequests" class="nav-link"><i class="fas fa-undo-alt"></i><span>Returns & Refunds</span></a>
+    <a href="/admin/coupons" class="nav-link"><i class="fas fa-ticket-alt"></i><span>Coupons</span></a>
+    <a href="/admin/ledger" class="nav-link"><i class="fas fa-image"></i><span>Account</span></a>
+    <a href="#" class="nav-link"><i class="fas fa-cog"></i><span>Settings</span></a>
+    <a href="/admin/logout" class="nav-link text-danger"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+  </div>
 </nav>
+
+
+
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('show');
+  }
+</script>
+
+</body>
+</html>

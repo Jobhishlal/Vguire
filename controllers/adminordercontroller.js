@@ -290,27 +290,52 @@ export const updateOrderStatus = async (req, res) => {
 
 export const getReturnRequests = async (req, res) => {
     try {
+        const page = parseInt(req.query.page) || 1; 
+        const limit = parseInt(req.query.limit) || 1; 
+        const skip = (page - 1) * limit; 
+
+        const totalOrders = await Order.countDocuments({
+            "items": {
+                $elemMatch: {
+                    returnRequested: true,
+                    returnApproved: { $ne: true }
+                }
+            }
+        });
+
+        
         const returnOrders = await Order.find({
             "items": {
                 $elemMatch: {
                     returnRequested: true,
-                    returnApproved: { $ne: true }  // Ensures unapproved returns are shown
+                    returnApproved: { $ne: true }
                 }
             }
-        }).populate("userId", "name email");
+        })
+        .populate("userId", "name email")
+        .skip(skip)
+        .limit(limit);
 
-    
         const filteredOrders = returnOrders.map(order => ({
             ...order.toObject(),
             items: order.items.filter(item => item.returnRequested && !item.returnApproved)
         }));
 
-        res.render("admin/returnRequests", { returnOrders: filteredOrders });
+        const totalPages = Math.ceil(totalOrders / limit);
+
+        res.render("admin/returnRequests", { 
+            returnOrders: filteredOrders,
+            currentPage: page,
+            totalPages,
+            totalOrders
+        });
+
     } catch (error) {
         console.error("Error fetching return requests:", error);
         res.status(500).send("Server Error");
     }
 };
+
 
 
 

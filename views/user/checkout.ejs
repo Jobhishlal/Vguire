@@ -886,6 +886,11 @@ document.getElementById("checkoutForm").addEventListener("submit", async functio
         return;
     }
 
+    if(paymentMethod==="COD" && totalAmount<=0){
+        Swal.fire("Warning","totalAmount 0 is not possible to pay","error")
+        return
+    }
+
     // Prepare data for all payment methods
     const orderData = {
         addressId,
@@ -1000,6 +1005,10 @@ document.getElementById("checkoutForm").addEventListener("submit", async functio
             });
 
             const textResponse = await response.text();
+            if(paymentMethod==="Wallet" && totalAmount<=0){
+                Swal.fire("Warning","totalAmount 0 is not possible to pay","error")
+                return
+            }
             try {
                 const walletOrderResult = JSON.parse(textResponse);
                 if (walletOrderResult.success) {
@@ -1025,6 +1034,11 @@ document.getElementById("checkoutForm").addEventListener("submit", async functio
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(orderData),
             });
+
+            if(paymentMethod==="COD" && totalAmount<=0){
+                Swal.fire("Warning","totalAmount 0 is not possible to pay","error")
+                return
+            }
 
             const result = await response.json();
             if (result.success) {

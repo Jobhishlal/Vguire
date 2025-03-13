@@ -31,7 +31,8 @@ import {
     ,posteditaddress,
     deleteaddress,
     searchproduct,
-   referralCodeget
+   referralCodeget,
+   resendSignupOtp
 
     
 } from '../controllers/userController.js';
@@ -63,6 +64,8 @@ router.post('/signup', signup);
 router.get('/otp', otprecieve);
 router.post('/verify-otp', verifyOtp);
 
+router.post("/resend-signup-otp",resendSignupOtp)
+
 // Login routes
 router.get('/login',isCheckAuth, getLoginPage);
 router.post('/login',loginUser);
@@ -86,7 +89,7 @@ router.post('/resend-otp',resendOtp)
 
 router.get('/home',checkBlockedUser,isAuth,homepage)
 router.get('/shop' ,isAuth,checkBlockedUser,shoppage)
-router.get('/productview/:id',checkBlockedUser,productview)
+router.get('/productview/:id',isAuth,checkBlockedUser,productview)
 
 //google
 router.get('/auth/google', print, passport.authenticate('google', { scope: ['profile', 'email'] }));

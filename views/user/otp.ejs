@@ -59,56 +59,57 @@
         </div>
     </div>
 
-    <!-- JavaScript for Timer -->
     <script>
-        let resendCooldown = 60; // Cooldown in seconds
+        let resendCooldown = <%= otpRemainingTime %>; // Get from backend dynamically
         const resendBtn = document.getElementById('resendOtpBtn');
         const timer = document.getElementById('timer');
     
         const startTimer = () => {
-            console.log('check 1');
-            
+            console.log('Timer started from', resendCooldown, 'seconds');
+    
             const interval = setInterval(() => {
                 if (resendCooldown > 0) {
                     timer.textContent = `Resend OTP available in ${resendCooldown--} seconds`;
                 } else {
                     clearInterval(interval);
                     timer.textContent = '';
-                    resendBtn.disabled = false; // Enable the button after 60 seconds
+                    resendBtn.disabled = false; // Enable button after cooldown
                 }
             }, 1000);
         };
     
-        document.addEventListener('DOMContentLoaded', startTimer); // Start the timer when the page loads
+        document.addEventListener('DOMContentLoaded', startTimer); // Start on page load
     
         resendBtn.addEventListener('click', async () => {
-            // Disable the button and reset the timer
             resendBtn.disabled = true;
-            resendCooldown = 60;  // Reset cooldown
-            startTimer();         // Restart the timer
+            resendCooldown = 60; // Reset cooldown for next resend
+            startTimer(); // Restart timer
     
             try {
-                console.log('ok here');
-                
-                const response = await fetch('/user/resend-otp', {
-                    method: 'POST', // Use POST to match your controller
+                console.log('Resend OTP clicked');
+    
+                const response = await fetch('/user/resend-signup-otp', {
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email: '{{email}}' }) // Send email (if required, else use session)
+                    }
                 });
     
                 const data = await response.json();
                 if (data.success) {
-                    console.log('OTP has been resent successfully');
+                    console.log('OTP resent successfully');
                 } else {
-                    console.log('Error sending OTP');
+                    console.log('Error:', data.msg);
+                    alert(data.msg);
                 }
             } catch (error) {
                 console.error('Error in resending OTP:', error);
+                alert('Server error. Please try again later.');
             }
         });
     </script>
+    
+    
     
 
     <!-- External Scripts -->

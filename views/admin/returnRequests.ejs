@@ -163,83 +163,43 @@
         .approve-btn:hover {
             background-color: #218838;
         }
+        .pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.pagination-btn {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.pagination-btn:hover {
+    background-color: #0056b3;
+}
+
+.pagination-btn.disabled {
+    background-color: #cccccc;
+    pointer-events: none;
+    cursor: default;
+}
+
+.pagination-info {
+    font-size: 16px;
+    color: #333;
+}
+
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <nav class="sidebar">
-        <div class="sidebar-header">
-            <a href="#" class="logo-full">
-                <i class="fas fa-shopping-bag me-2"></i>
-                VGURIE
-            </a>
-            <a href="#" class="logo-mini">
-                <i class="fas fa-shopping-bag"></i>
-            </a>
-        </div>
-        <div class="nav flex-column">
-            <div class="nav-item">
-                <a href="/admin/dashboard" class="nav-link">
-                    <i class="fas fa-th-large"></i>
-                    <span>Dashboard</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/admin/product" class="nav-link">
-                    <i class="fas fa-box"></i>
-                    <span>Products</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/admin/ordermanagement" class="nav-link">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Orders</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/admin/usersmanagement" class="nav-link">
-                    <i class="fas fa-users"></i>
-                    <span>Users</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/admin/categories" class="nav-link">
-                    <i class="fas fa-tags"></i>
-                    <span>Categories</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/admin/returnRequests" class="nav-link">
-                    <i class="fas fa-undo-alt"></i> 
-                    <span>Returns & Refunds</span>  
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-ticket-alt"></i>
-                    <span>Coupons</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-image"></i>
-                    <span>Banners</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </a>
-            </div>
-            <div class="nav-item mt-auto">
-                <a href="#" class="nav-link text-danger">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
-            </div>
-        </div>
-    </nav>
+    <%- include('../partials/admin/navbar.ejs') %>
 
     <!-- Main Content -->
     <div class="main-content">
@@ -288,7 +248,17 @@
                 </tbody>
             </table>
         </div>
+        <% if (currentPage > 1) { %>
+            <a href="?page=<%= currentPage - 1 %>&limit=10">Previous</a>
+          <% } %>
+        
+          Page <%= currentPage %> of <%= totalPages %>
+        
+          <% if (currentPage < totalPages) { %>
+            <a href="?page=<%= currentPage + 1 %>&limit=10">Next</a>
+          <% } %>
     </div>
+   
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>

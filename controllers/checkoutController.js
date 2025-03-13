@@ -2290,6 +2290,11 @@ export const verifyPayment = async (req, res) => {
         .json({ success: false, message: "All items are out of stock" });
     }
 
+    if(updatedItems.totalAmount<=0){
+      return res.status(400)
+      .json({success:false,message:"total Amount 0 is not possible to share"})
+    }
+
     const estimatedDeliveryDate = new Date();
     estimatedDeliveryDate.setDate(estimatedDeliveryDate.getDate() + 5);
 

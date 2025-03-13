@@ -13,7 +13,8 @@ import cookieParser from "cookie-parser";
 import methodOverride from "method-override";
 import { fileURLToPath } from "url";
 import { homepage } from "./controllers/homeController.js";
-import morgan from "morgan";
+import compression from "compression";
+// import morgan from "morgan";
 import fs from "fs";
 import helmet from "helmet";
 
@@ -40,20 +41,20 @@ app.use(
   })
 );
 
-const userLogStream = fs.createWriteStream(
-  path.join(process.cwd(), "user-access.log"),
-  { flags: "a" }
-);
-const adminLogStream = fs.createWriteStream(
-  path.join(process.cwd(), "admin-access.log"),
-  { flags: "a" }
-);
+// const userLogStream = fs.createWriteStream(
+//   path.join(process.cwd(), "user-access.log"),
+//   { flags: "a" }
+// );
+// const adminLogStream = fs.createWriteStream(
+//   path.join(process.cwd(), "admin-access.log"),
+//   { flags: "a" }
+// );
 
-app.use("/user", morgan("combined", { stream: userLogStream }));
+// app.use("/user", morgan("combined", { stream: userLogStream }));
 
-app.use("/admin", morgan("combined", { stream: adminLogStream }));
+// app.use("/admin", morgan("combined", { stream: adminLogStream }));
 
-app.use(morgan("dev"));
+// app.use(morgan("dev"));
 
 app.use(
   session({
@@ -89,6 +90,7 @@ app.use((req, res, next) => {
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(authRoutes);
+app.use(compression());
 
 // Google OAuth routes
 // app.get('/auth/google',

@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,170 +9,219 @@
     <link href="styles.css" rel="stylesheet">
     <link rel="stylesheet" href="/style.css">
     <style>
+        /* Existing Pagination Styles */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
 
-        
+        .custom-pagination {
+            --bs-pagination-bg: var(--bg-darker);
+            --bs-pagination-color: var(--text-primary);
+            --bs-pagination-hover-bg: var(--accent-color);
+            --bs-pagination-hover-color: white;
+            --bs-pagination-active-bg: var(--accent-color);
+            --bs-pagination-active-border-color: var(--accent-color);
+        }
 
+        .custom-pagination .page-link {
+            background-color: var(--bg-darker);
+            color: var(--text-primary);
+            border-color: var(--highlight-color);
+            margin: 0 5px;
+            transition: all 0.3s ease;
+        }
 
+        .custom-pagination .page-link:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
 
-          .pagination-container {
-        display: flex;
-        justify-content: center;
-        margin-top: 20px;
-    }
+        .custom-pagination .page-item.active .page-link {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
 
-    .custom-pagination {
-        --bs-pagination-bg: var(--bg-darker);
-        --bs-pagination-color: var(--text-primary);
-        --bs-pagination-hover-bg: var(--accent-color);
-        --bs-pagination-hover-color: white;
-        --bs-pagination-active-bg: var(--accent-color);
-        --bs-pagination-active-border-color: var(--accent-color);
-    }
+        /* Table Container for Responsiveness */
+        .table-responsive-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+            margin-top: 20px;
+        }
 
-    .custom-pagination .page-link {
-        background-color: var(--bg-darker);
-        color: var(--text-primary);
-        border-color: var(--highlight-color);
-        margin: 0 5px;
-        transition: all 0.3s ease;
-    }
+        /* Table Styling */
+        .order-table {
+            width: 100%;
+            min-width: 600px; /* Ensures table doesn't collapse too much */
+            border-collapse: collapse;
+            background: #08012e00;
+            color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+        }
 
-    .custom-pagination .page-link:hover {
-        background-color: var(--accent-color);
-        color: white;
-    }
+        .order-table thead {
+            background: #1abc9c;
+            color: white;
+            text-align: left;
+        }
 
-    .custom-pagination .page-item.active .page-link {
-        background-color: var(--accent-color);
-        border-color: var(--accent-color);
-    }
+        .order-table th, .order-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
 
+        .order-table tbody tr:nth-child(even) {
+            background: #34495e;
+        }
 
-    .order-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background: #08012e00;
-    color: white;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
-}
+        .order-table tbody tr:hover {
+            background: #000c0a;
+            cursor: pointer;
+        }
 
-.order-table thead {
-    background: #1abc9c;
-    color: white;
-    text-align: left;
-}
+        /* Dropdown Styling */
+        .order-table select {
+            padding: 5px;
+            border-radius: 5px;
+            border: none;
+            background: #f39c12;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
 
-.order-table th, .order-table td {
-    padding: 12px 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
+        .order-table select:focus {
+            outline: none;
+            background: #e67e22;
+        }
 
-.order-table tbody tr:nth-child(even) {
-    background: #34495e;
-}
+        /* Button Styling */
+        .order-table .btn {
+            padding: 6px 12px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
 
-.order-table tbody tr:hover {
-    background: #000c0a;
-    cursor: pointer;
-}
+        .order-table .btn-primary {
+            background: #010612;
+            border: none;
+            color: white;
+        }
 
-/* Dropdown Styling */
-.order-table select {
-    padding: 5px;
-    border-radius: 5px;
-    border: none;
-    background: #f39c12;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-}
+        .order-table .btn-primary:hover {
+            background: #2933b9;
+        }
 
-.order-table select:focus {
-    outline: none;
-    background: #e67e22;
-}
+        .order-table .btn-danger {
+            background: #e74c3c;
+            border: none;
+            color: white;
+        }
 
-/* Button Styling */
-.order-table .btn {
-    padding: 6px 12px;
-    border-radius: 5px;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 14px;
-    font-weight: bold;
-    transition: 0.3s;
-}
+        .order-table .btn-danger:hover {
+            background: #c0392b;
+        }
 
-.order-table .btn-primary {
-    background: #010612;
-    border: none;
-    color: white;
-}
+        /* Pagination Buttons */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            font-size: 16px;
+            font-weight: bold;
+        }
 
-.order-table .btn-primary:hover {
-    background: #2933b9;
-}
+        .pagination-btn {
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            transition: all 0.3s ease-in-out;
+            font-weight: 600;
+        }
 
-.order-table .btn-danger {
-    background: #e74c3c;
-    border: none;
-    color: white;
-}
+        .prev {
+            background-color: #ff4757;
+            color: white;
+        }
 
-.order-table .btn-danger:hover {
-    background: #c0392b;
-}
+        .next {
+            background-color: #1e90ff;
+            color: white;
+        }
 
-.pagination-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-top: 20px;
-    font-size: 16px;
-    font-weight: bold;
-}
+        .pagination-btn:hover {
+            opacity: 0.8;
+        }
 
-.pagination-btn {
-    text-decoration: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-    transition: all 0.3s ease-in-out;
-    font-weight: 600;
-}
+        .pagination-text {
+            background: #222;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
 
-.prev {
-    background-color: #ff4757;
-    color: white;
-}
+        /* Media Queries for Responsiveness */
+        @media (max-width: 768px) {
+            .order-table th, .order-table td {
+                padding: 10px; /* Slightly reduce padding */
+                font-size: 14px; /* Adjust font size */
+            }
 
-.next {
-    background-color: #1e90ff;
-    color: white;
-}
+            .order-table .btn {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
 
-.pagination-btn:hover {
-    opacity: 0.8;
-}
+            .pagination-btn {
+                padding: 8px 14px;
+                font-size: 14px;
+            }
 
-.pagination-text {
-    background: #222;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-}
+            .pagination-text {
+                font-size: 14px;
+                padding: 6px 10px;
+            }
+        }
 
+        @media (max-width: 576px) {
+            .order-table th, .order-table td {
+                padding: 8px; /* Further reduce padding */
+                font-size: 12px; /* Smaller font size */
+            }
 
+            .order-table .btn {
+                padding: 4px 8px;
+                font-size: 10px;
+            }
+
+            .order-table select {
+                padding: 4px;
+                font-size: 12px;
+            }
+
+            .pagination-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .pagination-text {
+                font-size: 12px;
+                padding: 5px 8px;
+            }
+        }
     </style>
 </head>
 <body>
-
-
     <div class="dashboard-container">
-        
         <%- include('../partials/admin/navbar.ejs') %>
         <!-- Main Content -->
         <% if (messages.error) { %>
@@ -184,16 +231,13 @@
         <% if (messages.success) { %>
             <p style="color: green;"><%= messages.success %></p>
         <% } %>
-  <main class="main-content" style="background-color: black;">
+        <main class="main-content" style="background-color: black;">
             <div class="header">
-               
                 <div class="user-profile">
                     <img src="/image/Screenshot 2025-01-02 185508.png" alt="Profile" class="profile-img">
                 </div>
             </div>
 
-    
-                
             <div class="container">
                 <h2 class="page-title" style="color: white;">Manage Orders</h2>
             
@@ -208,53 +252,53 @@
                 <% if (!orders || orders.length === 0) { %>
                     <p>No orders found.</p>
                 <% } else { %>
-                    <table class="order-table">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>User</th>
-                                <th>Payment Method</th> <!-- Fixed typo: "Peyment" to "Payment" -->
-                                <th>Payment Status</th> <!-- Added for better visibility -->
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% orders.forEach(order => { %>
+                    <div class="table-responsive-wrapper">
+                        <table class="order-table">
+                            <thead>
                                 <tr>
-                                    <td>#<%= order._id %></td>
-                                    <td style="color: aliceblue;"><%= order.userId ? order.userId.email : "Unknown User" %></td>
-                                    <td style="color: aliceblue;"><%= order.paymentMethod %></td>
-                                    <td style="color: aliceblue;"><%= order.paymentStatus %></td>
-            
-                                    <% let totalPrice = order.items.reduce((sum, item) => sum + (item.totalprice || 0), 0); %>
-            
-                                    <td>
-                                        <form id="status-form-<%= order._id %>" action="/admin/ordermanagement/<%= order._id %>/update-status" method="POST">
-                                            <div onclick="checkStatusChange('<%= order._id %>', '<%= order.status %>')">
-                                                <select name="status" 
-                                                        onchange="confirmStatusChange('<%= order._id %>', this, '<%= order.paymentMethod %>', '<%= order.paymentStatus %>', '<%= order.status %>')"
-                                                        <%= (order.status === "Delivered" || order.status === "Cancelled") ? "disabled" : "" %>
-                                                        data-prev-status="<%= order.status %>">
-                                                    <option value="Pending" <%= order.status === "Pending" ? "selected" : "" %>>Pending</option>
-                                                    <option value="Processing" <%= order.status === "Processing" ? "selected" : "" %>>Processing</option>
-                                                    <option value="Shipped" <%= order.status === "Shipped" ? "selected" : "" %>>Shipped</option>
-                                                    <option value="Delivered" <%= order.status === "Delivered" ? "selected" : "" %>>Delivered</option>
-                                                    <option value="Cancelled" <%= order.status === "Cancelled" ? "selected" : "" %>>Cancelled</option>
-                                                </select>
-                                            </div>
-                                        </form>                                       
-                                    </td>
-                                    <td>
-                                        <a href="/admin/ordermanagement/<%= order._id %>" class="btn btn-primary">View</a>
-                                        <form action="/admin/ordermanagement/<%= order._id %>/delete" method="POST" onsubmit="return confirm('Are you sure?');">
-                                            <button type="submit" class="btn btn-danger">Delete</button>
-                                        </form>
-                                    </td>
+                                    <th>Order ID</th>
+                                    <th>User</th>
+                                    <th>Payment Method</th>
+                                    <th>Payment Status</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
                                 </tr>
-                            <% }); %>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <% orders.forEach(order => { %>
+                                    <tr>
+                                        <td>#<%= order._id %></td>
+                                        <td style="color: aliceblue;"><%= order.userId ? order.userId.email : "Unknown User" %></td>
+                                        <td style="color: aliceblue;"><%= order.paymentMethod %></td>
+                                        <td style="color: aliceblue;"><%= order.paymentStatus %></td>
+                                        <% let totalPrice = order.items.reduce((sum, item) => sum + (item.totalprice || 0), 0); %>
+                                        <td>
+                                            <form id="status-form-<%= order._id %>" action="/admin/ordermanagement/<%= order._id %>/update-status" method="POST">
+                                                <div onclick="checkStatusChange('<%= order._id %>', '<%= order.status %>')">
+                                                    <select name="status" 
+                                                            onchange="confirmStatusChange('<%= order._id %>', this, '<%= order.paymentMethod %>', '<%= order.paymentStatus %>', '<%= order.status %>')"
+                                                            <%= (order.status === "Delivered" || order.status === "Cancelled") ? "disabled" : "" %>
+                                                            data-prev-status="<%= order.status %>">
+                                                        <option value="Pending" <%= order.status === "Pending" ? "selected" : "" %>>Pending</option>
+                                                        <option value="Processing" <%= order.status === "Processing" ? "selected" : "" %>>Processing</option>
+                                                        <option value="Shipped" <%= order.status === "Shipped" ? "selected" : "" %>>Shipped</option>
+                                                        <option value="Delivered" <%= order.status === "Delivered" ? "selected" : "" %>>Delivered</option>
+                                                        <option value="Cancelled" <%= order.status === "Cancelled" ? "selected" : "" %>>Cancelled</option>
+                                                    </select>
+                                                </div>
+                                            </form>                                       
+                                        </td>
+                                        <td>
+                                            <a href="/admin/ordermanagement/<%= order._id %>" class="btn btn-primary">View</a>
+                                            <form action="/admin/ordermanagement/<%= order._id %>/delete" method="POST" onsubmit="return confirm('Are you sure?');">
+                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
             
                     <!-- Pagination -->
                     <div class="pagination-container">
@@ -274,7 +318,6 @@
                 function confirmStatusChange(orderId, selectElement, paymentMethod, paymentStatus, currentStatus) {
                     const selectedStatus = selectElement.value;
             
-                    // Client-side check for UPI + Pending
                     if (paymentMethod === 'UPI' && paymentStatus === 'Pending' && selectedStatus === 'Delivered') {
                         Swal.fire({
                             title: "Action Not Allowed",
@@ -300,7 +343,7 @@
                         if (result.isConfirmed) {
                             document.getElementById(`status-form-${orderId}`).submit();
                         } else {
-                            selectElement.value = currentStatus; // Reset to original status
+                            selectElement.value = currentStatus;
                         }
                     });
                 }
@@ -317,10 +360,7 @@
                     }
                 }
             </script>
-
-    
-
-    
+        </main>
+    </div>
 </body>
-</html> 
-
+</html>
