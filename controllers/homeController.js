@@ -2,6 +2,7 @@ import Product from "../models/products.js";
 import Cart from "../models/cart.js";
 import Category from "../models/category.js";
 import Order from "../models/order.js";
+import Wishlist from "../models/wishlist.js"
 
 
 export const homepage = async (req, res) => {

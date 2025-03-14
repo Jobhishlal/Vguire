@@ -4,8 +4,6 @@ import Category from '../models/category.js';
 import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
-import { error } from 'console';
-import flash from 'express-flash';
 
 export const showProducts = async (req, res) => {
     try {
