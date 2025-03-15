@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+
 import User from "../models/userSchema.js";
 import Product from "../models/products.js";
 
@@ -64,14 +64,11 @@ export const referorder = async (req, res) => {
   try {
     const adminReferralCode = req.session.admin.referralCode;
 
-    // Fetch referred users and their details (same as your current code)
     const referredUsers = await User.find({ referredBy: adminReferralCode });
     let message = "No referred users found yet.";
     if (referredUsers && referredUsers.length > 0) {
       message = ""; 
     }
-
-    // Get referred user details
     const referredUserDetails = await Promise.all(
       referredUsers.map(async (user) => {
         if (!user || !user.referralCode) {

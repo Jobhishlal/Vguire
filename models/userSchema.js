@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { nanoid } from 'nanoid';
-import { type } from 'os';
+
 
 const userSchema = new mongoose.Schema({
   fname: {

@@ -48,50 +48,7 @@ export const authenticateAdmin = async (req, res) => {
   }
 };
 
-// export const renderDashboard = async (req, res) => {
-//     try {
-//         if (!req.session.admin) {
-//             return res.redirect('/admin/login');
-//         }
 
-//         const admin = await Admin.findById(req.session.admin.id);
-//         if (!admin) {
-//             return res.status(404).send('Admin not found');
-//         }
-//         const pendingOrdersCount = await Order.countDocuments({ status: "Pending" });
-//         const totalUsersCount = await User.countDocuments();
-//         const salesData = await Order.aggregate([
-//                     { $match: { status: "Delivered" } },
-//                        { $group: { _id: null, totalSales: { $sum: "$totalAmount" } } }
-//            ]);
-//                const totalSales = salesData.length > 0 ? salesData[0].totalSales : 0;
-
-//                const discountData = await Order.aggregate([
-//                 { $match: { status: "Delivered" } },
-//                 { $group: { _id: null, totalCouponDiscount: { $sum: "$couponDiscount" || 0 } } }
-//             ]);
-//             const totalCouponDiscount = discountData.length > 0 ? discountData[0].totalCouponDiscount : 0;
-
-//             const totalOrders = await Order.countDocuments();
-
-//             const productsSoldData = await Order.aggregate([
-//                 { $match: { status: "Delivered" } },
-//                 { $unwind: "$items" },
-//                 { $group: { _id: null, totalProductsSold: { $sum: "$items.quantity" } } }
-//             ]);
-//             const totalProductsSold = productsSoldData.length > 0 ? productsSoldData[0].totalProductsSold : 0;
-
-//         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-//         res.setHeader('Pragma', 'no-cache');
-//         res.setHeader('Expires', '0');
-
-//         res.render('admin/dashboard', { admin,pendingOrdersCount,totalUsersCount,totalSales,totalCouponDiscount ,totalOrders,totalProductsSold});
-
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).send('Server Error');
-//     }
-// };
 
 export const renderDashboard = async (req, res) => {
   try {
