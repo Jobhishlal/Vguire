@@ -49,7 +49,6 @@ export const authenticateAdmin = async (req, res) => {
 };
 
 
-
 export const renderDashboard = async (req, res) => {
   try {
     if (!req.session.admin) {

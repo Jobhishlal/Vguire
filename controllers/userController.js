@@ -123,18 +123,23 @@ async function sendVerificationEmail(email, otp) {
 
 
 export const loadSignup = (req, res) => {
-    res.render('user/signup', {  message: req.flash('err') });
+    const data = req.session.details || {}; 
+    res.render('user/signup', { 
+        message: req.flash('err'),
+        data 
+    });
 };
 
 const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/;
 const validatepassword = (password) => {
     return passwordRegex.test(password);
 };
+
 export const signup = async (req, res) => {
     const { fname, lname, email, password, cpassword, referralCode } = req.body;
 
-    const data = { fname, lname, email, password, cpassword, referralCode };
-    req.session.details = data; // Store user input in session for later use
+    // Store all user inputs including password in session
+    req.session.details = { fname, lname, email, password, referralCode };
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
@@ -164,7 +169,7 @@ export const signup = async (req, res) => {
             if (referredUser) {
                 offerApplied = true;
                 req.flash('success', `Offer applied successfully! Referred by: ${referredUser.fname}`);
-                data.referredBy = referredUser.referralCode;
+                req.session.details.referredBy = referredUser.referralCode;
             } else {
                 req.flash('err', 'Invalid referral code.');
                 return res.redirect('/user/signup');
@@ -181,11 +186,12 @@ export const signup = async (req, res) => {
             return res.redirect('/user/signup');
         }
 
-        req.session.signupOtp = otp; // Store OTP
-        req.session.signupOtpSentAt = Date.now(); // Store OTP timestamp
-        req.session.email = email; // Store email for OTP verification
+        req.session.signupOtp = otp; 
+        req.session.signupOtpSentAt = Date.now(); 
+        req.session.email = email; 
 
         console.log("Generated OTP:", otp);
+
 
         req.flash('err', 'OTP sent to your email. Please verify.');
         return res.redirect('/user/otp');
@@ -195,6 +201,7 @@ export const signup = async (req, res) => {
         return res.redirect('/user/signup');
     }
 };
+
 
 export const otprecieve = (req, res) => {
     const email = req.session.email;
@@ -257,7 +264,12 @@ export const verifyOtp = async (req, res) => {
     const storedOtp = req.session.signupOtp;
     const otpSentAt = req.session.signupOtpSentAt;
 
-    if (!email || !otp || !storedOtp) {
+    if (!data || !data.password) {
+        req.flash('err', 'Session expired. Please start signup again.');
+        return res.redirect('/user/signup');
+    }
+
+    if (!email || !otp || !storedOtp || !otpSentAt) {
         req.flash('err', 'OTP session expired or invalid request. Please try again.');
         return res.redirect('/user/signup');
     }
@@ -265,20 +277,21 @@ export const verifyOtp = async (req, res) => {
     try {
         const otpExpiryTime = 1 * 60 * 1000; // 1 minute
 
-        // Check expiry
+        // 🚨 Check OTP Expiry
         if (Date.now() - otpSentAt > otpExpiryTime) {
             req.flash('err', 'OTP has expired. Please request a new OTP.');
-            req.session.signupOtp = null; // Clear OTP
+            req.session.signupOtp = null;
+            req.session.signupOtpSentAt = null; // Ensure expiry timestamp is also cleared
             return res.redirect('/user/otp');
         }
 
-        // Verify OTP
-        if (parseInt(otp) !== parseInt(storedOtp)) {
+        // 🚨 Verify OTP (Convert both to numbers for strict comparison)
+        if (Number(otp) !== Number(storedOtp)) {
             req.flash('err', 'Invalid OTP. Please try again.');
             return res.redirect('/user/otp');
         }
 
-        // Continue with registration
+        // 🚨 Hash Password Properly
         const hashedPassword = await bcrypt.hash(data.password, 10);
         const referralCode = generateReferralCode();
 
@@ -294,7 +307,7 @@ export const verifyOtp = async (req, res) => {
 
         await newUser.save();
 
-        // Referral logic
+        // 🚀 Handle Referral Logic
         if (data.referredBy) {
             const referral = await User.findOne({ referralCode: data.referredBy });
             if (referral) {
@@ -320,12 +333,12 @@ export const verifyOtp = async (req, res) => {
             }
         }
 
-        // Clear session data
+        // 🚀 Clear Session Data After Successful Signup
         req.session.signupOtp = null;
         req.session.signupOtpSentAt = null;
         req.session.details = null;
 
-        req.flash('err', 'User verified and registered successfully.');
+        req.flash('success', 'User verified and registered successfully.');
         return res.redirect('/user/home');
     } catch (error) {
         console.error('Error verifying OTP:', error);
@@ -333,8 +346,6 @@ export const verifyOtp = async (req, res) => {
         return res.redirect('/user/signup');
     }
 };
-
-
 
 
 export const getLoginPage = (req, res) => {
@@ -347,47 +358,39 @@ export const getLoginPage = (req, res) => {
 
     res.render("user/login", { 
         error, 
-       
+        email: "" 
     });
 };
 
 
 
 export const loginUser = async (req, res) => {
-    
     const { email, password } = req.body;
 
     try {
         const user = await User.findOne({ email });
+
         if (!user) {
-            return res.render('user/login', { error: 'Invalid email or password'  });
-            
+            return res.render('user/login', { error: 'Invalid email or password', email });
         }
 
         if (!user.verified) {
-            return res.render('user/login', { error: 'Please verify your account first.'  });
+            return res.render('user/login', { error: 'Please verify your account first.', email });
         }
+
         if (user.blocked) {
-            return res.render('user/login',{error:'User  blocked'})
-          }
-        
+            return res.render('user/login', { error: 'User blocked', email });
+        }
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch ) {
-            return res.render('user/login', { error: 'Invalid email or password' });
+        if (!isMatch) {
+            return res.render('user/login', { error: 'Invalid email or password', email });
         }
-        
-        req.session.isLogged=true
-        console.log('done');
-        console.log( req.session.isLogged);
-        
-        
-        req.session.user = user._id; 
-        console.log(user._id);
-        console.log(req.session.user);
-        
-        
-        res.redirect('/user/home')
+
+        req.session.isLogged = true;
+        req.session.user = user._id;
+
+        res.redirect('/user/home');
     } catch (err) {
         console.error(err);
         res.status(500).send('Server error');
