@@ -37,7 +37,7 @@ export const getcart = async (req, res) => {
 
         let totalPrice = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
-        console.log("Cart Data:", cart);
+    
         res.render("user/cart", { 
             cart, 
             user: req.user, 
@@ -70,7 +70,7 @@ export const addToCart = async (req, res) => {
         }
 
         const userId = req.user._id;
-        const MAX_QUANTITY_PER_ITEM = 5;  // You can adjust the max quantity per item as needed
+      
 
         const parsedQuantity = parseInt(quantity, 10);
         if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
@@ -161,7 +161,7 @@ export const updateCartQuantity = async (req, res) => {
     try {
         const { itemId, quantity } = req.body;
         const userId = req.user._id;
-        console.log(itemId,quantity);
+    
         
 
         let cart = await Cart.findOne({ userId });

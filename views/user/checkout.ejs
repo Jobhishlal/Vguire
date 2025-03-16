@@ -1447,8 +1447,58 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
+// document.getElementById("addAddressForm").addEventListener("submit", async function (e) {
+//     e.preventDefault();
+
+//     const formData = new FormData(this);
+//     const addressData = Object.fromEntries(formData.entries());
+
+//     try {
+//         const response = await fetch("/user/address/add", {
+//             method: "POST",
+//             headers: { "Content-Type": "application/json" },
+//             body: JSON.stringify(addressData),
+//         });
+
+//         const data = await response.json();
+
+//         if (!data.success) {
+//             Swal.fire({
+//                 icon: "error",
+//                 title: "Validation Errors",
+//                 html: `<ul style="text-align: left;">${data.errors.map(error => `<li>${error}</li>`).join('')}</ul>`,
+//                 confirmButtonText: "OK"
+//             });
+//             return;
+//         }
+
+        
+//         Swal.fire({
+//             icon: "success",
+//             title: "Address Added",
+//             text: "Your address has been saved successfully.",
+            
+//             showConfirmButton: false
+//         }).then(() => {
+//           console.log(data.redirectUrl);
+          
+//             window.location.href = data.redirectUrl;
+//             console.log(window.location.href);
+            
+//         });
+
+//     } catch (error) {
+//         Swal.fire({
+//             icon: "error",
+//             title: "Server Error",
+//             text: "Something went wrong. Please try again later.",
+//             confirmButtonText: "OK"
+//         });
+//     }
+// });
+
 document.getElementById("addAddressForm").addEventListener("submit", async function (e) {
-    e.preventDefault();
+    e.preventDefault(); // Prevent default form submission
 
     const formData = new FormData(this);
     const addressData = Object.fromEntries(formData.entries());
@@ -1463,6 +1513,7 @@ document.getElementById("addAddressForm").addEventListener("submit", async funct
         const data = await response.json();
 
         if (!data.success) {
+            // Show validation errors
             Swal.fire({
                 icon: "error",
                 title: "Validation Errors",
@@ -1472,22 +1523,29 @@ document.getElementById("addAddressForm").addEventListener("submit", async funct
             return;
         }
 
-        
+        // ✅ Show success alert and close modal
         Swal.fire({
             icon: "success",
             title: "Address Added",
             text: "Your address has been saved successfully.",
-            
+            timer: 1500,
             showConfirmButton: false
         }).then(() => {
-          console.log(data.redirectUrl);
-          
+            // ✅ Properly close the Bootstrap modal
+            const modalEl = document.getElementById('addAddressModal');
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            modalInstance.hide(); // Close the modal safely
+
+            // ✅ Focus back on "Add New Address" button or any other logical element outside the modal
+            const addNewAddressBtn = document.getElementById('addNewAddressBtn');
+            if (addNewAddressBtn) addNewAddressBtn.focus();
+
+            // ✅ Redirect to the provided URL after closing modal and shifting focus
             window.location.href = data.redirectUrl;
-            console.log(window.location.href);
-            
         });
 
     } catch (error) {
+        // Handle server or fetch errors
         Swal.fire({
             icon: "error",
             title: "Server Error",
@@ -1496,7 +1554,6 @@ document.getElementById("addAddressForm").addEventListener("submit", async funct
         });
     }
 });
-
 
   </script>
 

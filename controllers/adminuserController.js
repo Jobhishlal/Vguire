@@ -137,7 +137,6 @@ export const referraldiscount = async (req, res) => {
     const discountAmount = (product.Offerprice * product.discountPercentage) / 100;
     const finalPrice = (product.Offerprice - discountAmount).toFixed(2);
 
-    console.log(finalPrice);
     
 
    
@@ -159,29 +158,28 @@ export const applyoffer = async (req, res) => {
   try {
     const { offerPercentage, userId } = req.body;
 
-    // Validate the offer percentage
+ 
     if (!offerPercentage || offerPercentage < 1 || offerPercentage > 100) {
       return res.status(400).send("Invalid offer percentage. Please enter a value between 1 and 100.");
     }
 
-    // Find the referred user by their ID
+   
     const referredUser = await User.findById(userId);
     if (!referredUser) {
       return res.status(404).send("Referred user not found.");
     }
 
-    // Find the products associated with the referred user
-    const userProducts = await Product.find({ userId: referredUser._id }); // Assuming `userId` is stored in the product model
+   
+    const userProducts = await Product.find({ userId: referredUser._id }); 
 
     if (userProducts.length === 0) {
       return res.status(404).send("No products found for the referred user.");
     }
 
-    // Calculate the discount and apply it only to the referred user's products
-    const discountAmount = (offerPercentage / 100) * referredUser.price; // Example, applying discount to user's price
+    
+    const discountAmount = (offerPercentage / 100) * referredUser.price;
     const finalPrice = (referredUser.price - discountAmount).toFixed(2);
 
-    // Update the products with the new offer price
     await Product.updateMany(
       { _id: { $in: userProducts.map(product => product._id) } },
       { 

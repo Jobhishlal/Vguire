@@ -6,7 +6,7 @@ import Product from '../models/products.js';
 export const showCategories = async (req, res) => {
     try {
         const categories = await Category.find().lean();
-        console.log(categories);
+       
         
         for (let category of categories) {
           const productWithOffer = await Product.findOne({ 
@@ -74,7 +74,7 @@ export const addCategory = async (req, res) => {
 
 export const getEditCategory = async (req, res) => {
     try {
-        console.log("Category ID:", req.params.id); 
+        
         
         const category = await Category.findById(req.params.id);
         
@@ -140,15 +140,14 @@ export const list = async (req, res) => {
         const id = req.params.id;
 
         const category = await Category.findOne({ _id: id });
-        console.log("Before toggle:", category.isListed); 
+       
         if(!category){
             req.flash("error","category not found");
             return res.redirect("/admin/categories")
         }
         
         category.isListed = !category.isListed;
-
-        console.log("After toggle:", category.isListed); 
+ 
 
         await category.save();
         if(category.isListed){
@@ -158,7 +157,7 @@ export const list = async (req, res) => {
         }
 
         res.redirect("/admin/categories");
-    } catch (error) {
+    } catch  {
         req.flash("error", " Something went wrong!");
         return res.redirect("/admin/categories");
     }
@@ -228,8 +227,7 @@ export const applyCategoryOfferPost = async (req, res) => {
             product.offerType = "category";
             await product.save();
         }
-       console.log(products.Offerprice);
-       console.log("offer",products);
+       
        
        
 
@@ -272,8 +270,7 @@ export const removeCategoryOffer = async (req, res) => {
         }
         
        
-        console.log("flash success:", req.flash("success"));
-        console.log("flash error:", req.flash("error"));
+     
         
         res.redirect("/admin/categories");
         

@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import User from '../models/userSchema.js'; 
-import { error} from 'console';
+
 
 import Category from '../models/category.js';
 import Product from '../models/products.js'; 

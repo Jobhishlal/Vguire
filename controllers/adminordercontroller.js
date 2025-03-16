@@ -238,16 +238,13 @@ export const returnrequest = async (req, res) => {
             return res.status(404).json({ message: "Order not found" });
         }
 
-        // Debugging log: Check order data
-        console.log("Order Found:", order._id);
-        console.log("Order Items:", order.items.map(item => item.productId.toString()));
+       
 
         // Find product in the order
         const productIndex = order.items.findIndex(item =>
             item.productId && item.productId.toString() === productId.toString()
         );
 
-        console.log("Product Index Found:", productIndex); // Debugging log
 
         if (productIndex === -1) {
             return res.status(404).json({ message: "Product not found in order" });
@@ -255,8 +252,7 @@ export const returnrequest = async (req, res) => {
 
         const productItem = order.items[productIndex];
 
-        // Debugging logs
-        console.log("Product Data Before Check:", productItem);
+     
 
         if (!productItem.returnStatus || (productItem.returnStatus !== "Requested" && productItem.returnStatus !== "Rejected")) {
             return res.status(400).json({ message: "Return not requested or already processed." });
@@ -338,11 +334,7 @@ export const returnrequest = async (req, res) => {
 
             await order.save();
 
-            // Debugging logs
-            console.log("Product Return Status:", productItem.returnStatus);
-            console.log("Product ID:", productId);
-            console.log("Order ID:", orderId);
-            console.log("Refund Amount:", refundAmount);
+           
 
             res.json({
                 message: "Return approved, stock updated, and refund credited to wallet.",

@@ -21,7 +21,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export const singlecheckout = async (req, res) => {
-  console.log("poodo");
+
 
   try {
     const { productId, quantity, size } = req.body;
@@ -164,7 +164,7 @@ export const buyNowCartView = async (req, res) => {
 };
 
 export const cartproduct = async (req, res) => {
-  console.log("i am cart product");
+  
 
   try {
     const userId = req.user._id;
@@ -202,7 +202,7 @@ export const cartproduct = async (req, res) => {
 
 export const placeorder = async (req, res) => {
   try {
-    console.log("Request Body:", req.body);
+    
 
     let { addressId, items, paymentMethod = "COD" } = req.body;
     let checkoutType = req.body.checkoutType || "cart";
@@ -210,7 +210,7 @@ export const placeorder = async (req, res) => {
     const userId = req.user?._id;
 
     const cart = await Cart.findOne({ userId }).populate("items.productId");
-    console.log("Cart Data:", cart);
+    
 
     if (!mongoose.Types.ObjectId.isValid(addressId)) {
       return res
@@ -222,7 +222,7 @@ export const placeorder = async (req, res) => {
       return res.status(400).send("No items found in the order.");
     }
 
-    console.log("Valid items received:", items);
+  
 
     const productIds = items.map((item) => item.productId);
     const products = await Product.find({ _id: { $in: productIds } });
@@ -242,13 +242,10 @@ export const placeorder = async (req, res) => {
       }
 
       const sizeKey = `size${item.size.trim().replace(/^size/i, "").toUpperCase()}`;
-      console.log("Looking for size key:", sizeKey);
+     
 
       const sizeStock = product[sizeKey] !== undefined ? product[sizeKey] : 0;
-      console.log(
-        `Available Stock for ${product.name} (${sizeKey}):`,
-        sizeStock
-      );
+      
 
       if (sizeStock < parseInt(item.quantity)) {
         outOfStockItems.push({
@@ -271,9 +268,7 @@ export const placeorder = async (req, res) => {
         { new: true }
       );
 
-      console.log(
-        `Updated stock for ${updatedProduct.name} - Size: ${item.size}`
-      );
+    
 
       updatedItems.push({
         productId: product._id,
@@ -345,7 +340,7 @@ export const placeorder = async (req, res) => {
       });
     }
 
-    console.log("Final Total Amount After Coupon:", totalAmount);
+    
 
     const deliveryDate = new Date();
     deliveryDate.setDate(deliveryDate.getDate() + 5);
@@ -369,10 +364,10 @@ export const placeorder = async (req, res) => {
     });
 
     await newOrder.save();
-    console.log("Order placed successfully:", newOrder);
+   
 
     await Cart.deleteOne({ userId });
-    console.log("Cart cleared successfully");
+    
     if (appliedCoupon) {
       await Coupon.updateOne(
         { _id: appliedCoupon },
@@ -526,7 +521,7 @@ export const editaddress = async (req, res) => {
 };
 
 export const singleCheckoutView = async (req, res) => {
-  console.log("hello");
+
 
   try {
     const { productId, size } = req.query;
@@ -544,8 +539,7 @@ export const singleCheckoutView = async (req, res) => {
       addresses.length > 0 ? addresses[0]._id.toString() : "";
 
     const quantity = req.session.checkoutQuantity || 1;
-    console.log("quantity check", quantity);
-    console.log("user choose address id", selectedAddressId);
+    
 
     const totalAmount = product.Offerprice * quantity;
     const coupons = await Coupon.find({
@@ -553,7 +547,7 @@ export const singleCheckoutView = async (req, res) => {
       usageLimit: { $gt: 0 },
       minOrderAmount: { $lte: totalAmount },
     });
-    console.log("coupon details", coupons);
+    
 
     res.render("user/checkout", {
       items: [{ product, quantity, Offerprice: product.Offerprice, size }],
@@ -606,11 +600,7 @@ export const getcheckout = async (req, res) => {
 
         // Calculate total amount
         totalAmount += price * item.quantity;
-        console.log("cart total", totalAmount);
-
-        console.log(
-          `Product: ${product.name}, Price Used: ${price}, Quantity: ${item.quantity}, Running Total: ${totalAmount}`
-        );
+        
 
         return {
           product,
@@ -641,7 +631,7 @@ export const getcheckout = async (req, res) => {
       usedByUsers: { $ne: userId },
     });
 
-    console.log("Final Checkout Total:", totalAmount);
+   
 
     res.render("user/checkout", {
       items: updatedItems,
@@ -664,7 +654,7 @@ export const getcheckout = async (req, res) => {
 
 export const updateCheckoutQuantity = async (req, res) => {
   try {
-    console.log("Request Body:", req.body);
+   
 
     const { productId, size, quantity, redirectUrl } = req.body;
     const userId = req.user._id;
@@ -681,7 +671,7 @@ export const updateCheckoutQuantity = async (req, res) => {
     }
 
     req.session.checkoutQuantity = updatedQuantity;
-    console.log("Quantity updated. Redirecting to:", redirectUrl);
+   
 
     return res.redirect(redirectUrl || "/user/checkout");
   } catch (error) {
@@ -744,7 +734,7 @@ export const orderdetails = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
-    console.log("Fetched Orders with Items:", orders);
+    
 
     res.render("user/order-details", {
       orders,
@@ -1019,7 +1009,7 @@ export const createRAZO = async (req, res) => {
       razorpayKey: process.env.RAZORPAY_KEY_ID,
     });
 
-    console.log(" Razorpay order created & stored in DB:", razorpayOrder.id);
+    
   } catch (error) {
     console.error("Error creating Razorpay order:", error);
     res.status(500).json({ success: false, message: "Server error" });
@@ -1028,10 +1018,7 @@ export const createRAZO = async (req, res) => {
 
 export const verifyRazorpayPaymentorderview = async (req, res) => {
   try {
-    console.log("🔹 Debugging process.env:");
-    console.log("RAZORPAY_KEY_ID:", process.env.RAZORPAY_KEY_ID);
-    console.log("RAZORPAY_KEY_SECRET:", process.env.RAZORPAY_KEY_SECRET); // Should not be undefined
-
+   
     if (!process.env.RAZORPAY_KEY_SECRET) {
       throw new Error("RAZORPAY_KEY_SECRET is missing! Check your .env file.");
     }
@@ -1071,10 +1058,10 @@ export const verifyRazorpayPaymentorderview = async (req, res) => {
 };
 
 export const orderview = async (req, res) => {
-  console.log("hello i am");
+  
 
   try {
-    console.log("Received params:", req.params);
+    
 
     const userId = req.user._id;
     const { orderId } = req.params;
@@ -1091,7 +1078,7 @@ export const orderview = async (req, res) => {
       .populate("appliedCoupon")
       .populate("userId");
 
-    console.log("applied coupon", order.appliedCoupon);
+
 
     if (!order) {
       req.flash("error", "Order not found");
@@ -1125,14 +1112,12 @@ export const orderview = async (req, res) => {
       }
     }
 
-    console.log("Subtotal (Excluding Returns):", subtotal);
-    console.log("Total Product Discount:", totalProductDiscount);
-    console.log("Coupon Discount:", couponDiscount);
+   
 
     order.discountAmount = couponDiscount;
     order.totalAmount = subtotal - couponDiscount;
 
-    console.log("Final Total Amount:", order.totalAmount);
+ 
     if (invoice === "true") {
       return generateInvoice(res, order);
     }
@@ -1289,7 +1274,7 @@ export const ordercancel = async (req, res) => {
 
 export const ratingadd = async (req, res) => {
   try {
-    console.log(" Received request body:", req.body);
+    
 
     const { orderId, productId, rating } = req.body;
     const userId = req.user ? req.user._id : null;
@@ -1306,9 +1291,7 @@ export const ratingadd = async (req, res) => {
         .json({ success: false, message: "Invalid rating value!" });
     }
 
-    console.log(
-      `Checking order: ${orderId}, user: ${userId}, product: ${productId}`
-    );
+   
 
     const order = await Order.findOne({
       _id: orderId,
@@ -1317,7 +1300,7 @@ export const ratingadd = async (req, res) => {
     });
 
     if (!order) {
-      console.log("Order not found or not delivered.");
+    
       return res
         .status(404)
         .json({ success: false, message: "Order not found or not delivered!" });
@@ -1357,15 +1340,12 @@ export const ratingadd = async (req, res) => {
 };
 
 export const createRazorpayOrder = async (req, res) => {
-  console.log("i am razo");
+  
 
   try {
     const { amount, addressId, items, couponDiscount = 0 } = req.body;
     const userId = req.user?._id;
-    console.log(req.body);
-    console.log("userId getil kitty", userId);
-
-    console.log("itemsget", items);
+    
 
     if (!amount || !addressId || !items || items.length === 0) {
       return res
@@ -1403,8 +1383,7 @@ export const createRazorpayOrder = async (req, res) => {
 
 export const verifyPayment = async (req, res) => {
   try {
-    console.log("Received Payment Verification Request:", req.body);
-
+   
     const {
       razorpay_order_id,
       razorpay_payment_id,
@@ -1470,8 +1449,7 @@ export const verifyPayment = async (req, res) => {
       }
     }
 
-    console.log("Total Amount after applying coupon:", totalAmount);
-    console.log("Discount Amount:", discountAmount);
+   
 
     const productIds = items.map((item) => item.productId);
     const products = await Product.find({ _id: { $in: productIds } });
@@ -1535,12 +1513,7 @@ export const verifyPayment = async (req, res) => {
     const estimatedDeliveryDate = new Date();
     estimatedDeliveryDate.setDate(estimatedDeliveryDate.getDate() + 5);
 
-    // Ensure correct total amount storage
-    console.log(
-      "Final Stored Total Amount (Before Saving):",
-      typeof totalAmount,
-      totalAmount
-    );
+   
 
     const newOrder = new Order({
       userId: extractedUserId,
@@ -1561,9 +1534,9 @@ export const verifyPayment = async (req, res) => {
 
     await newOrder.save();
 
-    console.log("Order placed successfully:", newOrder);
+ 
     await Cart.deleteOne({ userId });
-    console.log("Cart cleared successfully");
+  
 
     return res.status(200).json({
       success: true,
@@ -1952,7 +1925,7 @@ export const placeorderwallet = async (req, res) => {
 
       if (coupon) {
         appliedCoupon = coupon._id;
-        console.log("Applied Coupon ID:", appliedCoupon);
+       
 
         if (coupon.discountType === "percentage") {
           discountAmount = Math.floor((coupon.value / 100) * totalAmount);
@@ -2016,10 +1989,10 @@ export const placeorderwallet = async (req, res) => {
     });
 
     await newOrder.save();
-    console.log("Wallet Order Placed Successfully:", newOrder);
+   
 
     await Cart.deleteOne({ userId });
-    console.log("Cart cleared successfully");
+    
 
     return res.status(200).json({
       success: true,

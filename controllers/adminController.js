@@ -12,7 +12,7 @@ export const authenticateAdmin = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    console.log(`Failed Login: ${email || "Unknown"}`);
+    
     return res.render("admin/adminlogin", {
       errorMessage: "Email and password are required",
     });
@@ -22,7 +22,7 @@ export const authenticateAdmin = async (req, res) => {
     const admin = await Admin.findOne({ email });
 
     if (!admin) {
-      console.log(`Failed Login: ${email}`);
+      
       return res.render("admin/adminlogin", {
         errorMessage: "Invalid email or password",
       });
@@ -30,7 +30,7 @@ export const authenticateAdmin = async (req, res) => {
 
     const isMatch = await admin.comparePassword(password);
     if (!isMatch) {
-      console.log(`Failed Login: ${email}`);
+      
       return res.render("admin/adminlogin", {
         errorMessage: "Invalid email or password",
       });
@@ -39,7 +39,7 @@ export const authenticateAdmin = async (req, res) => {
     req.session.admin = { id: admin._id, email: admin.email };
     req.session.cookie.maxAge = 60 * 60 * 1000;
 
-    console.log(`Successful Login: ${email}`);
+  
 
     res.redirect("/admin/dashboard");
   } catch (err) {
