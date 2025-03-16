@@ -663,7 +663,7 @@
                         <% } %>
                     </div>
 
-                    <% if (item.status !== "Shipped" && item.status !== "Delivered" && item.status !== "Cancelled" && order.status !== "Delivered") { %>
+                    <% if (item.status !== "Shipped" && item.status !== "Delivered" && item.status !== "Cancelled" && order.status !== "Delivered" && order.status !=="Returned") { %>
                         <td>
                             <button class="btn btn-danger cancel-btn" 
                                     data-order-id="<%= order._id %>" 
