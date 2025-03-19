@@ -654,7 +654,7 @@ export const changePassword = async (req, res) => {
         req.session.userEmail = null;
         req.session.otpSentAt = null;
 
-        return res.render("user/login", { msg: "Password changed successfully. Please login.", error: null });
+        return res.render("user/login", { msg: "Password changed successfully. Please login.", error: null , email: ""});
 
     } catch (err) {
         console.error("Error while changing password:", err);
